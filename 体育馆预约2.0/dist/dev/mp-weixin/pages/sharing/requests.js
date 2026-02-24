@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const stores_sharing = require("../../stores/sharing.js");
 const stores_user = require("../../stores/user.js");
+const api_sharing = require("../../api/sharing.js");
 const utils_helpers = require("../../utils/helpers.js");
 if (!Array) {
   const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
@@ -35,16 +36,17 @@ const _sfc_main = {
       if (currentFilter.value === "all") {
         return requests.value;
       }
-      const statusMap = {
-        "pending": "PENDING",
-        "approved_pending_payment": "APPROVED_PENDING_PAYMENT",
-        "approved": "APPROVED",
-        "rejected": "REJECTED",
-        "timeout_cancelled": "TIMEOUT_CANCELLED"
+      const statusSets = {
+        pending: /* @__PURE__ */ new Set(["PENDING"]),
+        approved_pending_payment: /* @__PURE__ */ new Set(["APPROVED_PENDING_PAYMENT"]),
+        approved: /* @__PURE__ */ new Set(["PAID", "APPROVED"]),
+        rejected: /* @__PURE__ */ new Set(["REJECTED"]),
+        timeout_cancelled: /* @__PURE__ */ new Set(["TIMEOUT_CANCELLED"])
       };
-      return requests.value.filter(
-        (request) => request.status === statusMap[currentFilter.value]
-      );
+      const set = statusSets[currentFilter.value];
+      if (!set)
+        return requests.value;
+      return requests.value.filter((request) => set.has((request.status || "").toString().toUpperCase()));
     });
     common_vendor.onLoad(() => {
       loadRequests();
@@ -98,7 +100,7 @@ const _sfc_main = {
           throw new Error("取消申请失败，请稍后再试");
         }
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/sharing/requests.vue:265", "An error occurred during cancellation:", err);
+        common_vendor.index.__f__("error", "at pages/sharing/requests.vue:291", "An error occurred during cancellation:", err);
         const errorMessage = err.message || "取消操作失败，请检查网络或联系客服";
         common_vendor.index.showToast({
           title: errorMessage,
@@ -110,18 +112,21 @@ const _sfc_main = {
         closeCancelModal();
       }
     };
-    const goToSharingDetail = (sharingId) => {
-      if (!sharingId) {
-        common_vendor.index.__f__("error", "at pages/sharing/requests.vue:281", "sharingId为空，无法跳转");
-        common_vendor.index.showToast({
-          title: "订单ID不存在",
-          icon: "error"
-        });
+    const goToSharingDetail = async (sharingIdOrOrderId) => {
+      if (!sharingIdOrOrderId) {
+        common_vendor.index.showToast({ title: "订单ID不存在", icon: "none" });
         return;
       }
-      common_vendor.index.navigateTo({
-        url: `/pages/sharing/detail?id=${sharingId}`
-      });
+      let targetSharingId = sharingIdOrOrderId;
+      try {
+        const resp = await api_sharing.getSharingOrderByMainOrderId(sharingIdOrOrderId);
+        const data = (resp == null ? void 0 : resp.data) || resp;
+        if (data == null ? void 0 : data.id) {
+          targetSharingId = data.id;
+        }
+      } catch (_e) {
+      }
+      common_vendor.index.navigateTo({ url: `/pages/sharing/detail?id=${targetSharingId}` });
     };
     const goToSharingList = () => {
       common_vendor.index.navigateTo({
@@ -159,7 +164,7 @@ const _sfc_main = {
             }
             formattedActivityTime = `${dateStr} ${timeSlot}`;
           } catch (error2) {
-            common_vendor.index.__f__("error", "at pages/sharing/requests.vue:335", "时间格式化错误:", error2, "for request:", req);
+            common_vendor.index.__f__("error", "at pages/sharing/requests.vue:363", "时间格式化错误:", error2, "for request:", req);
             formattedActivityTime = "时间格式错误";
           }
         } else {
@@ -245,13 +250,13 @@ const _sfc_main = {
       isRefreshing.value = true;
       error.value = "";
       try {
-        const response = await sharingStore.getSentRequestsList({ forceRefresh });
+        const response = await sharingStore.getSentRequestsList({ forceRefresh, pageSize: 100 });
         const data = response.data;
         requests.value = formatRequestsForDisplay(data || []);
         updateFilterCounts();
         lastRefreshTime.value = Date.now();
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/sharing/requests.vue:437", "拼场申请页面：加载申请列表失败:", err);
+        common_vendor.index.__f__("error", "at pages/sharing/requests.vue:466", "拼场申请页面：加载申请列表失败:", err);
         error.value = err.message || "加载失败，请稍后重试";
       } finally {
         isRefreshing.value = false;
@@ -277,6 +282,7 @@ const _sfc_main = {
       const statusMap = {
         "PENDING": "pending",
         "APPROVED_PENDING_PAYMENT": "approved_pending_payment",
+        "PAID": "approved",
         "APPROVED": "approved",
         "REJECTED": "rejected",
         "TIMEOUT_CANCELLED": "timeout_cancelled"
@@ -334,17 +340,24 @@ const _sfc_main = {
             n: request.status === "PENDING"
           }, request.status === "PENDING" ? {
             o: common_vendor.o(($event) => showCancelConfirm(request), request.id)
+          } : request.status === "APPROVED_PENDING_PAYMENT" ? {
+            q: common_vendor.o(($event) => goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId), request.id)
+          } : request.status === "PAID" ? {
+            s: common_vendor.o(($event) => goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId), request.id)
           } : request.status === "APPROVED" ? {
-            q: common_vendor.o(($event) => goToSharingDetail(request.orderId || request.sharingId), request.id)
+            v: common_vendor.o(($event) => goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId), request.id)
           } : request.status === "REJECTED" ? common_vendor.e({
-            s: request.rejectReason
+            x: request.rejectReason
           }, request.rejectReason ? {
-            t: common_vendor.t(request.rejectReason)
-          } : {}) : {}, {
-            p: request.status === "APPROVED",
-            r: request.status === "REJECTED",
-            v: request.id,
-            w: common_vendor.o(($event) => goToSharingDetail(request.orderId || request.sharingId), request.id)
+            y: common_vendor.t(request.rejectReason)
+          } : {}) : request.status === "TIMEOUT_CANCELLED" ? {} : {}, {
+            p: request.status === "APPROVED_PENDING_PAYMENT",
+            r: request.status === "PAID",
+            t: request.status === "APPROVED",
+            w: request.status === "REJECTED",
+            z: request.status === "TIMEOUT_CANCELLED",
+            A: request.id,
+            B: common_vendor.o(($event) => goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId), request.id)
           });
         })
       } : {

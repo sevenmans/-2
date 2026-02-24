@@ -49,14 +49,16 @@ const _sfc_main = {
       if (this.currentFilter === "all") {
         return this.requests;
       }
-      const statusMap = {
-        "pending": "PENDING",
-        "approved": "APPROVED",
-        "rejected": "REJECTED"
+      const status = (s) => (s || "").toString().toUpperCase();
+      const buckets = {
+        pending: /* @__PURE__ */ new Set(["PENDING"]),
+        approved: /* @__PURE__ */ new Set(["APPROVED_PENDING_PAYMENT", "PAID", "APPROVED"]),
+        rejected: /* @__PURE__ */ new Set(["REJECTED"])
       };
-      return this.requests.filter(
-        (request) => request.status === statusMap[this.currentFilter]
-      );
+      const bucket = buckets[this.currentFilter];
+      if (!bucket)
+        return this.requests;
+      return this.requests.filter((request) => bucket.has(status(request.status)));
     }
   },
   onLoad() {
@@ -113,13 +115,13 @@ const _sfc_main = {
       this.isRefreshing = true;
       try {
         this.error = "";
-        const response = await this.sharingStore.getReceivedRequestsList();
+        const response = await this.sharingStore.getReceivedRequestsList({ pageSize: 100 });
         const requests = (response == null ? void 0 : response.data) || (response == null ? void 0 : response.list) || response || [];
         this.requests = Array.isArray(requests) ? requests : [];
         this.updateFilterCounts();
         this.lastRefreshTime = Date.now();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/received.vue:362", "收到申请页面：加载申请列表失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/received.vue:365", "收到申请页面：加载申请列表失败:", error);
         this.error = error.message || "加载失败，请重试";
         this.requests = [];
       } finally {
@@ -128,15 +130,29 @@ const _sfc_main = {
     },
     // 更新筛选标签计数
     updateFilterCounts() {
+      const status = (s) => (s || "").toString().toUpperCase();
+      const approvedSet = /* @__PURE__ */ new Set(["APPROVED_PENDING_PAYMENT", "PAID", "APPROVED"]);
       const counts = {
         all: this.requests.length,
-        pending: this.requests.filter((r) => r.status === "PENDING").length,
-        approved: this.requests.filter((r) => r.status === "APPROVED").length,
-        rejected: this.requests.filter((r) => r.status === "REJECTED").length
+        pending: this.requests.filter((r) => status(r.status) === "PENDING").length,
+        approved: this.requests.filter((r) => approvedSet.has(status(r.status))).length,
+        rejected: this.requests.filter((r) => status(r.status) === "REJECTED").length
       };
       this.filterTabs.forEach((tab) => {
         tab.count = counts[tab.value] || 0;
       });
+    },
+    isApprovedStatus(status) {
+      const s = (status || "").toString().toUpperCase();
+      return s === "APPROVED_PENDING_PAYMENT" || s === "PAID" || s === "APPROVED";
+    },
+    getApprovedStatusText(status) {
+      const s = (status || "").toString().toUpperCase();
+      if (s === "APPROVED_PENDING_PAYMENT")
+        return "已同意(待支付)";
+      if (s === "PAID")
+        return "对方已支付";
+      return "已完成";
     },
     // 切换筛选
     switchFilter(filter) {
@@ -388,7 +404,7 @@ const _sfc_main = {
         this.approveTarget = null;
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/sharing/received.vue:712", "收到申请页面：同意申请失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/received.vue:730", "收到申请页面：同意申请失败:", error);
         common_vendor.index.showToast({
           title: error.message || "操作失败",
           icon: "error"
@@ -421,7 +437,7 @@ const _sfc_main = {
         this.closeRejectDialog();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/sharing/received.vue:755", "收到申请页面：拒绝申请失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/received.vue:773", "收到申请页面：拒绝申请失败:", error);
         common_vendor.index.showToast({
           title: error.message || "操作失败",
           icon: "error"
@@ -578,17 +594,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       }, request.status === "PENDING" ? {
         s: common_vendor.o(($event) => $options.showRejectDialog(request), request.id),
         t: common_vendor.o(($event) => $options.showApproveConfirm(request), request.id)
-      } : request.status === "APPROVED" ? {
-        w: common_vendor.t($options.formatDateTime(request.processedAt))
+      } : $options.isApprovedStatus(request.status) ? {
+        w: common_vendor.t($options.getApprovedStatusText(request.status)),
+        x: common_vendor.t($options.formatDateTime(request.processedAt || request.updatedAt))
       } : request.status === "REJECTED" ? common_vendor.e({
-        y: common_vendor.t($options.formatDateTime(request.processedAt)),
-        z: request.rejectReason
+        z: common_vendor.t($options.formatDateTime(request.processedAt || request.updatedAt)),
+        A: request.rejectReason
       }, request.rejectReason ? {
-        A: common_vendor.t(request.rejectReason)
+        B: common_vendor.t(request.rejectReason)
       } : {}) : {}, {
-        v: request.status === "APPROVED",
-        x: request.status === "REJECTED",
-        B: request.id
+        v: $options.isApprovedStatus(request.status),
+        y: request.status === "REJECTED",
+        C: request.id
       });
     })
   } : {

@@ -44,7 +44,7 @@
           v-for="request in filteredRequests" 
           :key="request.id"
           class="request-item"
-          @click="goToSharingDetail(request.orderId || request.sharingId)"
+          @click="goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId)"
         >
           <!-- 拼场信息 -->
           <view class="sharing-info">
@@ -100,11 +100,31 @@
                 </button>
               </view>
               
-              <view v-else-if="request.status === 'APPROVED'" class="approved-actions">
-                <text class="approved-text">申请已通过</text>
+              <view v-else-if="request.status === 'APPROVED_PENDING_PAYMENT'" class="approved-actions">
+                <text class="approved-text">已同意，待支付</text>
                 <button 
                   class="action-btn join-btn"
-                  @click.stop="goToSharingDetail(request.orderId || request.sharingId)"
+                  @click.stop="goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId)"
+                >
+                  查看详情
+                </button>
+              </view>
+
+              <view v-else-if="request.status === 'PAID'" class="approved-actions">
+                <text class="approved-text">已支付</text>
+                <button 
+                  class="action-btn join-btn"
+                  @click.stop="goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId)"
+                >
+                  查看详情
+                </button>
+              </view>
+
+              <view v-else-if="request.status === 'APPROVED'" class="approved-actions">
+                <text class="approved-text">已完成</text>
+                <button 
+                  class="action-btn join-btn"
+                  @click.stop="goToSharingDetail(request.sharingOrderId || request.sharingId || request.orderId)"
                 >
                   查看详情
                 </button>
@@ -115,6 +135,10 @@
                 <text v-if="request.rejectReason" class="reject-reason">
                   原因：{{ request.rejectReason }}
                 </text>
+              </view>
+
+              <view v-else-if="request.status === 'TIMEOUT_CANCELLED'" class="rejected-actions">
+                <text class="rejected-text">申请已超时</text>
               </view>
             </view>
           </view>
@@ -155,6 +179,7 @@
 import { ref, computed, nextTick } from 'vue'
 import { useSharingStore } from '@/stores/sharing.js'
 import { useUserStore } from '@/stores/user.js'
+import * as sharingApi from '@/api/sharing.js'
 import { formatDate, formatDateTime } from '@/utils/helpers.js'
 import { onShow, onPullDownRefresh, onLoad } from '@dcloudio/uni-app'
 
@@ -189,17 +214,18 @@ const filteredRequests = computed(() => {
     return requests.value
   }
   
-  const statusMap = {
-    'pending': 'PENDING',
-    'approved_pending_payment': 'APPROVED_PENDING_PAYMENT',
-    'approved': 'APPROVED',
-    'rejected': 'REJECTED',
-    'timeout_cancelled': 'TIMEOUT_CANCELLED'
+  const statusSets = {
+    pending: new Set(['PENDING']),
+    approved_pending_payment: new Set(['APPROVED_PENDING_PAYMENT']),
+    approved: new Set(['PAID', 'APPROVED']),
+    rejected: new Set(['REJECTED']),
+    timeout_cancelled: new Set(['TIMEOUT_CANCELLED'])
   }
-  
-  return requests.value.filter(request => 
-    request.status === statusMap[currentFilter.value]
-  )
+
+  const set = statusSets[currentFilter.value]
+  if (!set) return requests.value
+
+  return requests.value.filter(request => set.has((request.status || '').toString().toUpperCase()))
 })
 
 onLoad(() => {
@@ -275,20 +301,22 @@ const confirmCancel = async () => {
   }
 }
 
-const goToSharingDetail = (sharingId) => {
-
-  if (!sharingId) {
-    console.error('sharingId为空，无法跳转')
-    uni.showToast({
-      title: '订单ID不存在',
-      icon: 'error'
-    })
+const goToSharingDetail = async (sharingIdOrOrderId) => {
+  if (!sharingIdOrOrderId) {
+    uni.showToast({ title: '订单ID不存在', icon: 'none' })
     return
   }
 
-  uni.navigateTo({
-    url: `/pages/sharing/detail?id=${sharingId}`
-  })
+  let targetSharingId = sharingIdOrOrderId
+  try {
+    const resp = await sharingApi.getSharingOrderByMainOrderId(sharingIdOrOrderId)
+    const data = resp?.data || resp
+    if (data?.id) {
+      targetSharingId = data.id
+    }
+  } catch (_e) {}
+
+  uni.navigateTo({ url: `/pages/sharing/detail?id=${targetSharingId}` })
 }
 
 const goToSharingList = () => {
@@ -428,7 +456,8 @@ const loadRequests = async (forceRefresh = false) => {
   error.value = ''
   
   try {
-    const response = await sharingStore.getSentRequestsList({ forceRefresh })
+    // 增加 pageSize 以获取更多数据，确保前端过滤准确
+    const response = await sharingStore.getSentRequestsList({ forceRefresh, pageSize: 100 })
     const data = response.data
     requests.value = formatRequestsForDisplay(data || [])
     updateFilterCounts()
@@ -463,6 +492,7 @@ const updateFilterCounts = () => {
   const statusMap = {
     'PENDING': 'pending',
     'APPROVED_PENDING_PAYMENT': 'approved_pending_payment',
+    'PAID': 'approved',
     'APPROVED': 'approved',
     'REJECTED': 'rejected',
     'TIMEOUT_CANCELLED': 'timeout_cancelled'

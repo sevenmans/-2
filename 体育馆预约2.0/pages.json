@@ -114,6 +114,12 @@
 			}
 		},
 		{
+			"path": "pages/sharing/participants",
+			"style": {
+				"navigationBarTitleText": "拼场参与者"
+			}
+		},
+		{
 			"path": "pages/sharing/my-orders",
 			"style": {
 				"navigationBarTitleText": "我的拼场"

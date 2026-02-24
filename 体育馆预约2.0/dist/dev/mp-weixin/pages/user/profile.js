@@ -222,7 +222,7 @@ const _sfc_main = {
           this.bookingStore.getUserBookings({
             status: "pending",
             page: 1,
-            pageSize: 1
+            pageSize: 100
           }),
           this.createTimeoutPromise(5e3)
         ]);
@@ -239,9 +239,9 @@ const _sfc_main = {
         common_vendor.index.__f__("log", "at pages/user/profile.vue:421", "[Profile] 加载待处理拼场数量");
         const result = await Promise.race([
           this.bookingStore.getUserSharingOrders({
-            status: "pending",
+            status: "PENDING",
             page: 1,
-            pageSize: 1
+            pageSize: 100
           }),
           this.createTimeoutPromise(5e3)
         ]);
@@ -261,38 +261,46 @@ const _sfc_main = {
       try {
         common_vendor.index.__f__("log", "at pages/user/profile.vue:447", "[Profile] 加载我发出的待处理申请数量");
         const result = await Promise.race([
-          this.sharingStore.getSentRequestsList(),
+          this.sharingStore.getSentRequestsList({
+            status: "PENDING",
+            page: 1,
+            pageSize: 100
+          }),
           this.createTimeoutPromise(5e3)
         ]);
         const myRequests = (result == null ? void 0 : result.data) || (result == null ? void 0 : result.list) || result || [];
         if (Array.isArray(myRequests)) {
-          this.pendingRequests = myRequests.filter((req) => req.status === "pending").length;
+          this.pendingRequests = myRequests.filter((req) => (req.status || "").toString().toUpperCase() === "PENDING").length;
         } else {
           this.pendingRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:459", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:464", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:461", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:466", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
         this.pendingRequests = 0;
       }
     },
     // 加载收到的待处理申请数量
     async loadReceivedRequests() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:469", "[Profile] 加载收到的待处理申请数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:474", "[Profile] 加载收到的待处理申请数量");
         const result = await Promise.race([
-          this.sharingStore.getReceivedRequestsList(),
+          this.sharingStore.getReceivedRequestsList({
+            status: "PENDING",
+            page: 1,
+            pageSize: 100
+          }),
           this.createTimeoutPromise(5e3)
         ]);
         const receivedRequests = (result == null ? void 0 : result.data) || (result == null ? void 0 : result.list) || result || [];
         if (Array.isArray(receivedRequests)) {
-          this.receivedRequests = receivedRequests.filter((req) => req.status === "pending").length;
+          this.receivedRequests = receivedRequests.filter((req) => (req.status || "").toString().toUpperCase() === "PENDING").length;
         } else {
           this.receivedRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:481", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:490", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:483", "[Profile] 加载收到的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:492", "[Profile] 加载收到的待处理申请数量失败:", error.message);
         this.receivedRequests = 0;
       }
     },
@@ -326,7 +334,7 @@ const _sfc_main = {
         await this.userStore.getUserInfo();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:526", "上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:535", "上传头像失败:", error);
         common_vendor.index.showToast({
           title: "上传失败",
           icon: "error"
@@ -392,7 +400,7 @@ const _sfc_main = {
           });
         }, 500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:606", "[Profile] 退出登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:615", "[Profile] 退出登录失败:", error);
         common_vendor.index.showToast({
           title: "退出失败",
           icon: "error"

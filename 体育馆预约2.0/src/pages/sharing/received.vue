@@ -120,14 +120,14 @@
               </button>
             </view>
             
-            <view v-else-if="request.status === 'APPROVED'" class="processed-actions">
-              <text class="processed-text">已同意</text>
-              <text class="process-time">{{ formatDateTime(request.processedAt) }}</text>
+            <view v-else-if="isApprovedStatus(request.status)" class="processed-actions">
+              <text class="processed-text">{{ getApprovedStatusText(request.status) }}</text>
+              <text class="process-time">{{ formatDateTime(request.processedAt || request.updatedAt) }}</text>
             </view>
             
             <view v-else-if="request.status === 'REJECTED'" class="processed-actions">
               <text class="processed-text rejected">已拒绝</text>
-              <text class="process-time">{{ formatDateTime(request.processedAt) }}</text>
+              <text class="process-time">{{ formatDateTime(request.processedAt || request.updatedAt) }}</text>
               <text v-if="request.rejectReason" class="reject-reason">
                 拒绝原因：{{ request.rejectReason }}
               </text>
@@ -249,16 +249,18 @@ export default {
       if (this.currentFilter === 'all') {
         return this.requests
       }
-      
-      const statusMap = {
-        'pending': 'PENDING',
-        'approved': 'APPROVED',
-        'rejected': 'REJECTED'
+
+      const status = (s) => (s || '').toString().toUpperCase()
+      const buckets = {
+        pending: new Set(['PENDING']),
+        approved: new Set(['APPROVED_PENDING_PAYMENT', 'PAID', 'APPROVED']),
+        rejected: new Set(['REJECTED'])
       }
-      
-      return this.requests.filter(request => 
-        request.status === statusMap[this.currentFilter]
-      )
+
+      const bucket = buckets[this.currentFilter]
+      if (!bucket) return this.requests
+
+      return this.requests.filter((request) => bucket.has(status(request.status)))
     }
   },
   
@@ -346,7 +348,8 @@ export default {
         this.error = ''
         
         // 调用真实API
-        const response = await this.sharingStore.getReceivedRequestsList()
+        // 增加 pageSize 以获取更多数据，确保前端过滤准确
+        const response = await this.sharingStore.getReceivedRequestsList({ pageSize: 100 })
         // 从响应中提取数组数据
         const requests = response?.data || response?.list || response || []
         this.requests = Array.isArray(requests) ? requests : []
@@ -371,16 +374,31 @@ export default {
     
     // 更新筛选标签计数
     updateFilterCounts() {
+      const status = (s) => (s || '').toString().toUpperCase()
+      const approvedSet = new Set(['APPROVED_PENDING_PAYMENT', 'PAID', 'APPROVED'])
+
       const counts = {
         all: this.requests.length,
-        pending: this.requests.filter(r => r.status === 'PENDING').length,
-        approved: this.requests.filter(r => r.status === 'APPROVED').length,
-        rejected: this.requests.filter(r => r.status === 'REJECTED').length
+        pending: this.requests.filter(r => status(r.status) === 'PENDING').length,
+        approved: this.requests.filter(r => approvedSet.has(status(r.status))).length,
+        rejected: this.requests.filter(r => status(r.status) === 'REJECTED').length
       }
       
       this.filterTabs.forEach(tab => {
         tab.count = counts[tab.value] || 0
       })
+    },
+
+    isApprovedStatus(status) {
+      const s = (status || '').toString().toUpperCase()
+      return s === 'APPROVED_PENDING_PAYMENT' || s === 'PAID' || s === 'APPROVED'
+    },
+
+    getApprovedStatusText(status) {
+      const s = (status || '').toString().toUpperCase()
+      if (s === 'APPROVED_PENDING_PAYMENT') return '已同意(待支付)'
+      if (s === 'PAID') return '对方已支付'
+      return '已完成'
     },
     
     // 切换筛选

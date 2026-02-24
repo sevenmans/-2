@@ -402,7 +402,7 @@ export default {
           this.bookingStore.getUserBookings({
             status: 'pending',
             page: 1,
-            pageSize: 1
+            pageSize: 100
           }),
           this.createTimeoutPromise(5000)
         ])
@@ -421,9 +421,9 @@ export default {
         console.log('[Profile] 加载待处理拼场数量')
         const result = await Promise.race([
           this.bookingStore.getUserSharingOrders({
-            status: 'pending',
+            status: 'PENDING',
             page: 1,
-            pageSize: 1
+            pageSize: 100
           }),
           this.createTimeoutPromise(5000)
         ])
@@ -446,13 +446,18 @@ export default {
       try {
         console.log('[Profile] 加载我发出的待处理申请数量')
         const result = await Promise.race([
-          this.sharingStore.getSentRequestsList(),
+          this.sharingStore.getSentRequestsList({
+            status: 'PENDING',
+            page: 1,
+            pageSize: 100
+          }),
           this.createTimeoutPromise(5000)
         ])
         
         const myRequests = result?.data || result?.list || result || []
         if (Array.isArray(myRequests)) {
-          this.pendingRequests = myRequests.filter(req => req.status === 'pending').length
+          // 后端如果支持 status 过滤，这里返回的应该都是 PENDING，但为了保险再次过滤
+          this.pendingRequests = myRequests.filter(req => (req.status || '').toString().toUpperCase() === 'PENDING').length
         } else {
           this.pendingRequests = 0
         }
@@ -468,13 +473,17 @@ export default {
       try {
         console.log('[Profile] 加载收到的待处理申请数量')
         const result = await Promise.race([
-          this.sharingStore.getReceivedRequestsList(),
+          this.sharingStore.getReceivedRequestsList({
+            status: 'PENDING',
+            page: 1,
+            pageSize: 100
+          }),
           this.createTimeoutPromise(5000)
         ])
         
         const receivedRequests = result?.data || result?.list || result || []
         if (Array.isArray(receivedRequests)) {
-          this.receivedRequests = receivedRequests.filter(req => req.status === 'pending').length
+          this.receivedRequests = receivedRequests.filter(req => (req.status || '').toString().toUpperCase() === 'PENDING').length
         } else {
           this.receivedRequests = 0
         }
