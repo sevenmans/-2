@@ -1,0 +1,171 @@
+
+.test-container.data-v-a3608043 {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.header.data-v-a3608043 {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+.title.data-v-a3608043 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.subtitle.data-v-a3608043 {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+}
+.control-panel.data-v-a3608043, .results-section.data-v-a3608043, .timeslots-section.data-v-a3608043 {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+.input-group.data-v-a3608043 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.label.data-v-a3608043 {
+  width: 150rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.input.data-v-a3608043 {
+  flex: 1;
+  height: 70rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+.button-group.data-v-a3608043 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+  margin-top: 30rpx;
+}
+.test-btn.data-v-a3608043 {
+  flex: 1;
+  min-width: 200rpx;
+  height: 70rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  border: none;
+  color: white;
+}
+.primary.data-v-a3608043 { background: #007AFF;
+}
+.secondary.data-v-a3608043 { background: #5856D6;
+}
+.success.data-v-a3608043 { background: #34C759;
+}
+.warning.data-v-a3608043 { background: #FF9500;
+}
+.section-title.data-v-a3608043 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+.results-container.data-v-a3608043 {
+  height: 600rpx;
+}
+.result-item.data-v-a3608043 {
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+}
+.result-header.data-v-a3608043 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.result-title.data-v-a3608043 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.result-status.success.data-v-a3608043 {
+  color: #34C759;
+  font-size: 24rpx;
+}
+.result-status.error.data-v-a3608043 {
+  color: #FF3B30;
+  font-size: 24rpx;
+}
+.result-time.data-v-a3608043 {
+  font-size: 22rpx;
+  color: #999;
+}
+.detail-text.data-v-a3608043 {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.data-section.data-v-a3608043 {
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 15rpx;
+}
+.data-title.data-v-a3608043 {
+  font-size: 24rpx;
+  color: #333;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.data-content.data-v-a3608043 {
+  font-size: 22rpx;
+  color: #666;
+  font-family: monospace;
+  white-space: pre-wrap;
+  display: block;
+}
+.timeslot-grid.data-v-a3608043 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200rpx, 1fr));
+  gap: 15rpx;
+}
+.timeslot-item.data-v-a3608043 {
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 15rpx;
+  text-align: center;
+}
+.timeslot-item.status-available.data-v-a3608043 {
+  background: #e8f5e8;
+  border-color: #34C759;
+}
+.timeslot-item.status-reserved.data-v-a3608043 {
+  background: #ffe8e8;
+  border-color: #FF3B30;
+}
+.slot-time.data-v-a3608043 {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 5rpx;
+}
+.slot-price.data-v-a3608043 {
+  font-size: 22rpx;
+  color: #007AFF;
+  display: block;
+  margin-bottom: 5rpx;
+}
+.slot-status.data-v-a3608043 {
+  font-size: 20rpx;
+  color: #666;
+  display: block;
+}

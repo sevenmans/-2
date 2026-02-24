@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "拼场列表",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "countdown-timer": "../../components/CountdownTimer"
+  }
+}

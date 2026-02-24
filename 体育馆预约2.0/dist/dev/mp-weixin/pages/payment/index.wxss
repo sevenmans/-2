@@ -1,0 +1,285 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.payment-container.data-v-44be683b {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+.nav-bar.data-v-44be683b {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 32rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #e5e5e5;
+}
+.nav-bar .nav-left.data-v-44be683b, .nav-bar .nav-right.data-v-44be683b {
+  width: 80rpx;
+}
+.nav-bar .nav-icon.data-v-44be683b {
+  font-size: 36rpx;
+  color: #333333;
+}
+.nav-bar .nav-title.data-v-44be683b {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.loading-container.data-v-44be683b {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+.loading-container .loading-text.data-v-44be683b {
+  font-size: 28rpx;
+  color: #999999;
+}
+.order-section.data-v-44be683b {
+  margin: 20rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.order-header.data-v-44be683b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.order-header .order-title.data-v-44be683b {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.order-header .order-no.data-v-44be683b {
+  font-size: 24rpx;
+  color: #999999;
+}
+.order-details.data-v-44be683b {
+  padding: 0 32rpx;
+}
+.detail-item.data-v-44be683b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f8f8f8;
+}
+.detail-item.data-v-44be683b:last-child {
+  border-bottom: none;
+}
+.detail-item .detail-label.data-v-44be683b {
+  font-size: 28rpx;
+  color: #666666;
+}
+.detail-item .detail-value.data-v-44be683b {
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+  flex: 1;
+  margin-left: 32rpx;
+}
+.price-section.data-v-44be683b {
+  padding: 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  background-color: #fafafa;
+}
+.price-item.data-v-44be683b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.price-item .price-label.data-v-44be683b {
+  font-size: 32rpx;
+  color: #333333;
+  font-weight: 600;
+}
+.price-item .price-value.data-v-44be683b {
+  font-size: 36rpx;
+  color: #ff6b35;
+  font-weight: 700;
+}
+.price-note.data-v-44be683b {
+  margin-top: 16rpx;
+}
+.price-note .note-text.data-v-44be683b {
+  font-size: 24rpx;
+  color: #999999;
+}
+.payment-methods.data-v-44be683b {
+  margin: 20rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.method-header.data-v-44be683b {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.method-header .method-title.data-v-44be683b {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.method-list.data-v-44be683b {
+  padding: 0 32rpx;
+}
+.method-item.data-v-44be683b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 0;
+  border-bottom: 1rpx solid #f8f8f8;
+}
+.method-item.data-v-44be683b:last-child {
+  border-bottom: none;
+}
+.method-item.active .method-name.data-v-44be683b {
+  color: #ff6b35;
+}
+.method-info.data-v-44be683b {
+  display: flex;
+  align-items: center;
+}
+.method-info .method-icon.data-v-44be683b {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+.method-info .method-name.data-v-44be683b {
+  font-size: 28rpx;
+  color: #333333;
+}
+.method-radio.data-v-44be683b {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.method-radio .radio-checked.data-v-44be683b {
+  color: #ff6b35;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.payment-footer.data-v-44be683b {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background-color: #ffffff;
+  border-top: 1rpx solid #e5e5e5;
+  z-index: 100;
+}
+.footer-info.data-v-44be683b {
+  flex: 1;
+}
+.footer-info .footer-label.data-v-44be683b {
+  font-size: 24rpx;
+  color: #666666;
+  display: block;
+}
+.footer-info .footer-amount.data-v-44be683b {
+  font-size: 32rpx;
+  color: #ff6b35;
+  font-weight: 700;
+}
+.pay-button.data-v-44be683b {
+  width: 240rpx;
+  height: 80rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.pay-button.disabled.data-v-44be683b {
+  background-color: #cccccc;
+  color: #999999;
+}
+.result-popup.data-v-44be683b {
+  width: 560rpx;
+  padding: 60rpx 40rpx 40rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  text-align: center;
+}
+.result-icon.data-v-44be683b {
+  margin-bottom: 32rpx;
+}
+.result-icon .success-icon.data-v-44be683b {
+  display: inline-block;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #52c41a;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 48rpx;
+  font-weight: bold;
+}
+.result-icon .error-icon.data-v-44be683b {
+  display: inline-block;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 48rpx;
+  font-weight: bold;
+}
+.result-title.data-v-44be683b {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.result-message.data-v-44be683b {
+  display: block;
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+.result-button.data-v-44be683b {
+  width: 200rpx;
+  height: 72rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}

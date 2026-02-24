@@ -1,0 +1,437 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-da6f6252 {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 140rpx;
+}
+.navbar.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.navbar .nav-left.data-v-da6f6252 {
+  width: 60rpx;
+}
+.navbar .nav-left .nav-icon.data-v-da6f6252 {
+  font-size: 40rpx;
+  color: #333333;
+}
+.navbar .nav-title.data-v-da6f6252 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.navbar .nav-right.data-v-da6f6252 {
+  width: 60rpx;
+}
+.form-container.data-v-da6f6252 {
+  padding: 20rpx;
+}
+.form-section.data-v-da6f6252 {
+  margin-bottom: 30rpx;
+}
+.form-section .section-title.data-v-da6f6252 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 16rpx;
+  padding: 0 10rpx;
+}
+.booking-selector.data-v-da6f6252 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+}
+.booking-selector .booking-info.data-v-da6f6252 {
+  flex: 1;
+}
+.booking-selector .booking-info .booking-venue.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.booking-selector .booking-info .booking-venue .venue-name.data-v-da6f6252 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.booking-selector .booking-info .booking-venue .booking-status.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #52c41a;
+  background-color: #f6ffed;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+.booking-selector .booking-info .booking-time.data-v-da6f6252 {
+  margin-bottom: 8rpx;
+}
+.booking-selector .booking-info .booking-time .time-text.data-v-da6f6252 {
+  font-size: 26rpx;
+  color: #666666;
+}
+.booking-selector .booking-info .booking-price .price-text.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.booking-selector .booking-placeholder.data-v-da6f6252 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+.booking-selector .booking-placeholder .placeholder-icon.data-v-da6f6252 {
+  font-size: 48rpx;
+  color: #cccccc;
+  margin-bottom: 16rpx;
+}
+.booking-selector .booking-placeholder .placeholder-text.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.booking-selector .selector-arrow.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #cccccc;
+  margin-left: 20rpx;
+}
+.form-card.data-v-da6f6252 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx 30rpx;
+}
+.form-item.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.form-item.data-v-da6f6252:last-child {
+  border-bottom: none;
+}
+.form-item .form-label.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  min-width: 140rpx;
+}
+.form-item .form-input.data-v-da6f6252 {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+}
+.form-item .form-input.data-v-da6f6252::-webkit-input-placeholder {
+  color: #cccccc;
+}
+.form-item .form-input.data-v-da6f6252::placeholder {
+  color: #cccccc;
+}
+.number-selector.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+}
+.number-selector .number-btn.data-v-da6f6252 {
+  width: 60rpx;
+  height: 60rpx;
+  border: 2rpx solid #ff6b35;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #ff6b35;
+}
+.number-selector .number-btn.disabled.data-v-da6f6252 {
+  border-color: #cccccc;
+  color: #cccccc;
+}
+.number-selector .number-value.data-v-da6f6252 {
+  margin: 0 30rpx;
+  font-size: 28rpx;
+  color: #333333;
+}
+.mode-display.data-v-da6f6252 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.mode-display .mode-text.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+.mode-display .mode-desc.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+.price-input-wrapper.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+.price-input-wrapper .price-symbol.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  margin-right: 8rpx;
+}
+.price-input-wrapper .price-input.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+  min-width: 120rpx;
+}
+.price-input-wrapper .price-input.data-v-da6f6252::-webkit-input-placeholder {
+  color: #cccccc;
+}
+.price-input-wrapper .price-input.data-v-da6f6252::placeholder {
+  color: #cccccc;
+}
+.description-item.data-v-da6f6252 {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.description-item .form-label.data-v-da6f6252 {
+  margin-bottom: 16rpx;
+}
+.description-item .form-textarea.data-v-da6f6252 {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.5;
+}
+.description-item .form-textarea.data-v-da6f6252::-webkit-input-placeholder {
+  color: #cccccc;
+}
+.description-item .form-textarea.data-v-da6f6252::placeholder {
+  color: #cccccc;
+}
+.description-item .char-count.data-v-da6f6252 {
+  align-self: flex-end;
+  margin-top: 12rpx;
+}
+.description-item .char-count .count-text.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.switch-item.data-v-da6f6252 {
+  align-items: flex-start;
+}
+.switch-item .switch-info.data-v-da6f6252 {
+  flex: 1;
+  margin-right: 20rpx;
+}
+.switch-item .switch-info .switch-label.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.switch-item .switch-info .switch-desc.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.4;
+}
+.bottom-actions.data-v-da6f6252 {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+  display: flex;
+  align-items: center;
+}
+.bottom-actions .price-summary.data-v-da6f6252 {
+  flex: 1;
+}
+.bottom-actions .price-summary .summary-label.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 4rpx;
+}
+.bottom-actions .price-summary .summary-price.data-v-da6f6252 {
+  font-size: 32rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.bottom-actions .create-btn.data-v-da6f6252 {
+  width: 200rpx;
+  height: 80rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.bottom-actions .create-btn.disabled.data-v-da6f6252 {
+  background-color: #cccccc;
+  color: #ffffff;
+}
+.booking-modal.data-v-da6f6252 {
+  background-color: #ffffff;
+  border-radius: 20rpx 20rpx 0 0;
+  max-height: 80vh;
+}
+.booking-modal .modal-header.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.booking-modal .modal-header .modal-title.data-v-da6f6252 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.booking-modal .modal-header .modal-close.data-v-da6f6252 {
+  font-size: 40rpx;
+  color: #999999;
+}
+.booking-modal .booking-list.data-v-da6f6252 {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.booking-modal .booking-list .loading-state.data-v-da6f6252 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100rpx 0;
+}
+.booking-modal .booking-list .loading-state text.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.booking-modal .booking-list .empty-state.data-v-da6f6252 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 60rpx;
+}
+.booking-modal .booking-list .empty-state .empty-icon.data-v-da6f6252 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+.booking-modal .booking-list .empty-state .empty-text.data-v-da6f6252 {
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 12rpx;
+}
+.booking-modal .booking-list .empty-state .empty-desc.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #999999;
+  text-align: center;
+  line-height: 1.4;
+}
+.booking-modal .booking-list .booking-item.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.booking-modal .booking-list .booking-item.data-v-da6f6252:last-child {
+  border-bottom: none;
+}
+.booking-modal .booking-list .booking-item.selected.data-v-da6f6252 {
+  background-color: #fff7f0;
+}
+.booking-modal .booking-list .booking-item .booking-content.data-v-da6f6252 {
+  flex: 1;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-header.data-v-da6f6252 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-header .venue-name.data-v-da6f6252 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-header .booking-status.data-v-da6f6252 {
+  font-size: 22rpx;
+  color: #52c41a;
+  background-color: #f6ffed;
+  padding: 4rpx 8rpx;
+  border-radius: 8rpx;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-details.data-v-da6f6252 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-details .time-info.data-v-da6f6252 {
+  font-size: 24rpx;
+  color: #666666;
+}
+.booking-modal .booking-list .booking-item .booking-content .booking-details .price-info.data-v-da6f6252 {
+  font-size: 26rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.booking-modal .booking-list .booking-item .selected-icon.data-v-da6f6252 {
+  font-size: 32rpx;
+  color: #ff6b35;
+  margin-left: 20rpx;
+}
+.booking-modal .modal-actions.data-v-da6f6252 {
+  display: flex;
+  padding: 30rpx;
+  gap: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.booking-modal .modal-actions .modal-btn.data-v-da6f6252 {
+  flex: 1;
+  height: 80rpx;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+.booking-modal .modal-actions .modal-btn.cancel-btn.data-v-da6f6252 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+.booking-modal .modal-actions .modal-btn.confirm-btn.data-v-da6f6252 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.booking-modal .modal-actions .modal-btn.confirm-btn.disabled.data-v-da6f6252 {
+  background-color: #cccccc;
+}

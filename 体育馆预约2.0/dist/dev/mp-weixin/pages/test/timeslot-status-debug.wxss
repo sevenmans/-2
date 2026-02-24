@@ -1,0 +1,199 @@
+
+.debug-container.data-v-f2e0a606 {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.header.data-v-f2e0a606 {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+.title.data-v-f2e0a606 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.subtitle.data-v-f2e0a606 {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+}
+.control-panel.data-v-f2e0a606, .comparison-section.data-v-f2e0a606, .logs-section.data-v-f2e0a606, .analysis-section.data-v-f2e0a606 {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+.input-group.data-v-f2e0a606 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.label.data-v-f2e0a606 {
+  width: 150rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.input.data-v-f2e0a606 {
+  flex: 1;
+  height: 70rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+.button-group.data-v-f2e0a606 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+  margin-top: 30rpx;
+}
+.btn.data-v-f2e0a606 {
+  flex: 1;
+  min-width: 200rpx;
+  height: 70rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  border: none;
+  color: white;
+}
+.primary.data-v-f2e0a606 { background: #007AFF;
+}
+.secondary.data-v-f2e0a606 { background: #5856D6;
+}
+.success.data-v-f2e0a606 { background: #34C759;
+}
+.warning.data-v-f2e0a606 { background: #FF9500;
+}
+.section-title.data-v-f2e0a606 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+.comparison-grid.data-v-f2e0a606 {
+  display: flex;
+  gap: 20rpx;
+}
+.comparison-column.data-v-f2e0a606 {
+  flex: 1;
+}
+.column-title.data-v-f2e0a606 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 15rpx;
+  text-align: center;
+}
+.slots-list.data-v-f2e0a606 {
+  height: 400rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 10rpx;
+}
+.slot-item.data-v-f2e0a606 {
+  border-radius: 8rpx;
+  padding: 15rpx;
+  margin-bottom: 10rpx;
+}
+.slot-item.frontend.data-v-f2e0a606 {
+  background: #e3f2fd;
+  border-left: 4rpx solid #2196F3;
+}
+.slot-item.backend.data-v-f2e0a606 {
+  background: #e8f5e8;
+  border-left: 4rpx solid #4CAF50;
+}
+.slot-id.data-v-f2e0a606, .slot-time.data-v-f2e0a606, .slot-status.data-v-f2e0a606, .slot-type.data-v-f2e0a606 {
+  font-size: 24rpx;
+  display: block;
+  margin-bottom: 5rpx;
+}
+.slot-id.data-v-f2e0a606 {
+  color: #333;
+  font-weight: bold;
+}
+.slot-time.data-v-f2e0a606 {
+  color: #666;
+}
+.slot-status.data-v-f2e0a606 {
+  color: #007AFF;
+}
+.slot-type.data-v-f2e0a606 {
+  color: #999;
+  font-size: 22rpx;
+}
+.logs-container.data-v-f2e0a606 {
+  height: 400rpx;
+}
+.log-item.data-v-f2e0a606 {
+  border-radius: 8rpx;
+  padding: 15rpx;
+  margin-bottom: 10rpx;
+}
+.log-item.info.data-v-f2e0a606 { background: #e3f2fd;
+}
+.log-item.success.data-v-f2e0a606 { background: #e8f5e8;
+}
+.log-item.warning.data-v-f2e0a606 { background: #fff3e0;
+}
+.log-item.error.data-v-f2e0a606 { background: #ffebee;
+}
+.log-time.data-v-f2e0a606 {
+  font-size: 22rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 5rpx;
+}
+.log-message.data-v-f2e0a606 {
+  font-size: 26rpx;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.log-data.data-v-f2e0a606 {
+  background: #f5f5f5;
+  border-radius: 6rpx;
+  padding: 10rpx;
+}
+.data-content.data-v-f2e0a606 {
+  font-size: 22rpx;
+  color: #666;
+  font-family: monospace;
+  white-space: pre-wrap;
+  display: block;
+}
+.analysis-item.data-v-f2e0a606 {
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+}
+.analysis-title.data-v-f2e0a606 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.analysis-result.data-v-f2e0a606 {
+  font-size: 26rpx;
+  color: #007AFF;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.analysis-details.data-v-f2e0a606 {
+  background: #f8f8f8;
+  border-radius: 6rpx;
+  padding: 10rpx;
+}
+.details-content.data-v-f2e0a606 {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+}

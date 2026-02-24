@@ -1,0 +1,1 @@
+<view wx:if="{{a}}" class="{{['countdown-container', 'data-v-357e1131', d]}}"><view class="countdown-icon data-v-357e1131">⏰</view><view class="countdown-content data-v-357e1131"><text class="countdown-label data-v-357e1131">{{b}}</text><text class="countdown-time data-v-357e1131">{{c}}</text></view></view>

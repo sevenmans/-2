@@ -1,0 +1,285 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-c6066cac {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 120rpx;
+}
+.avatar-section.data-v-c6066cac {
+  background-color: #ffffff;
+  padding: 40rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+.avatar-section .avatar-wrapper.data-v-c6066cac {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16rpx;
+}
+.avatar-section .avatar-wrapper .avatar.data-v-c6066cac {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 80rpx;
+  border: 4rpx solid #f0f0f0;
+}
+.avatar-section .avatar-wrapper .avatar-edit.data-v-c6066cac {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #ff6b35;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid #ffffff;
+}
+.avatar-section .avatar-wrapper .avatar-edit .edit-icon.data-v-c6066cac {
+  font-size: 24rpx;
+  color: #ffffff;
+}
+.avatar-section .avatar-tip.data-v-c6066cac {
+  font-size: 24rpx;
+  color: #999999;
+}
+.form-section.data-v-c6066cac {
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+.form-section .form-item.data-v-c6066cac {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.form-section .form-item.data-v-c6066cac:last-child {
+  border-bottom: none;
+}
+.form-section .form-item .item-label.data-v-c6066cac {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #333333;
+  flex-shrink: 0;
+}
+.form-section .form-item .item-input.data-v-c6066cac {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+}
+.form-section .form-item .item-textarea.data-v-c6066cac {
+  flex: 1;
+  min-height: 120rpx;
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+}
+.form-section .form-item .picker-text.data-v-c6066cac {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  text-align: right;
+}
+.form-section .form-item .phone-wrapper.data-v-c6066cac {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-section .form-item .phone-wrapper .phone-text.data-v-c6066cac {
+  font-size: 28rpx;
+  color: #333333;
+}
+.form-section .form-item .phone-wrapper .change-phone-btn.data-v-c6066cac {
+  padding: 8rpx 16rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  font-size: 24rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+.form-section .form-item .change-password-btn.data-v-c6066cac {
+  flex: 1;
+  padding: 16rpx 24rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+  border: none;
+  text-align: center;
+}
+.form-section .form-item .sports-tags.data-v-c6066cac {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12rpx;
+}
+.form-section .form-item .sports-tags .sport-tag.data-v-c6066cac {
+  padding: 8rpx 16rpx;
+  background-color: #f5f5f5;
+  color: #666666;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s;
+}
+.form-section .form-item .sports-tags .sport-tag.active.data-v-c6066cac {
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-color: #ff6b35;
+}
+.privacy-section.data-v-c6066cac {
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+.privacy-section .section-title.data-v-c6066cac {
+  display: block;
+  padding: 30rpx 30rpx 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.privacy-section .privacy-item.data-v-c6066cac {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.privacy-section .privacy-item.data-v-c6066cac:last-child {
+  border-bottom: none;
+}
+.privacy-section .privacy-item .privacy-label.data-v-c6066cac {
+  font-size: 28rpx;
+  color: #333333;
+}
+.bottom-actions.data-v-c6066cac {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.bottom-actions .cancel-btn.data-v-c6066cac {
+  flex: 1;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  color: #666666;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+.bottom-actions .save-btn.data-v-c6066cac {
+  flex: 2;
+  height: 80rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.password-dialog.data-v-c6066cac {
+  width: 600rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.password-dialog .dialog-header.data-v-c6066cac {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.password-dialog .dialog-header .dialog-title.data-v-c6066cac {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.password-dialog .dialog-header .dialog-close.data-v-c6066cac {
+  font-size: 40rpx;
+  color: #999999;
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.password-dialog .dialog-content.data-v-c6066cac {
+  padding: 32rpx;
+}
+.password-dialog .dialog-content .password-item.data-v-c6066cac {
+  margin-bottom: 32rpx;
+}
+.password-dialog .dialog-content .password-item.data-v-c6066cac:last-child {
+  margin-bottom: 0;
+}
+.password-dialog .dialog-content .password-item .password-label.data-v-c6066cac {
+  display: block;
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.password-dialog .dialog-content .password-item .password-input.data-v-c6066cac {
+  width: 100%;
+  padding: 20rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+.password-dialog .dialog-content .password-item .password-input.data-v-c6066cac:focus {
+  border-color: #ff6b35;
+  background-color: #ffffff;
+}
+.password-dialog .dialog-actions.data-v-c6066cac {
+  display: flex;
+  border-top: 1rpx solid #f0f0f0;
+}
+.password-dialog .dialog-actions .cancel-btn.data-v-c6066cac,
+.password-dialog .dialog-actions .confirm-btn.data-v-c6066cac {
+  flex: 1;
+  padding: 32rpx;
+  font-size: 28rpx;
+  border: none;
+  background-color: transparent;
+}
+.password-dialog .dialog-actions .cancel-btn.data-v-c6066cac {
+  color: #666666;
+  border-right: 1rpx solid #f0f0f0;
+}
+.password-dialog .dialog-actions .confirm-btn.data-v-c6066cac {
+  color: #ff6b35;
+  font-weight: 600;
+}

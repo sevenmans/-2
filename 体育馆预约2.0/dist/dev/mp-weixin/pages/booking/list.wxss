@@ -1,0 +1,504 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-afb09895 {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.status-filter.data-v-afb09895 {
+  display: flex;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.status-filter .filter-item.data-v-afb09895 {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #666666;
+  position: relative;
+}
+.status-filter .filter-item.active.data-v-afb09895 {
+  color: #ff6b35;
+  font-weight: 600;
+}
+.status-filter .filter-item.active.data-v-afb09895::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background-color: #ff6b35;
+  border-radius: 2rpx;
+}
+.booking-list.data-v-afb09895 {
+  padding: 20rpx 30rpx;
+}
+.booking-list .booking-card.data-v-afb09895 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+.booking-list .booking-card .card-header.data-v-afb09895 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+.booking-list .booking-card .card-header .venue-info.data-v-afb09895 {
+  flex: 1;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row.data-v-afb09895 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .venue-name.data-v-afb09895 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-right: 12rpx;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .booking-type-tag.data-v-afb09895 {
+  display: inline-block;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .booking-type-tag .tag-text.data-v-afb09895 {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .booking-type-tag .tag-text.tag-shared.data-v-afb09895 {
+  color: #ff6b35;
+  background-color: #fff7e6;
+  border-color: #ff6b35;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .booking-type-tag .tag-text.tag-exclusive.data-v-afb09895 {
+  color: #1890ff;
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .booking-type-tag .tag-text.tag-default.data-v-afb09895 {
+  color: #666666;
+  background-color: #f5f5f5;
+  border-color: #d9d9d9;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .virtual-order-tag.data-v-afb09895 {
+  display: inline-block;
+  margin-left: 8rpx;
+}
+.booking-list .booking-card .card-header .venue-info .venue-name-row .virtual-order-tag .virtual-tag-text.data-v-afb09895 {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  color: #722ed1;
+  background-color: #f9f0ff;
+  border: 1rpx solid #722ed1;
+}
+.booking-list .booking-card .card-header .venue-info .booking-date.data-v-afb09895 {
+  font-size: 24rpx;
+  color: #666666;
+  margin-bottom: 8rpx;
+}
+.booking-list .booking-card .card-header .booking-status.data-v-afb09895 {
+  font-size: 22rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+}
+.booking-list .booking-card .card-header .booking-status.status-pending.data-v-afb09895 {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+.booking-list .booking-card .card-header .booking-status.status-paid.data-v-afb09895 {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+.booking-list .booking-card .card-header .booking-status.status-confirmed.data-v-afb09895 {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+.booking-list .booking-card .card-header .booking-status.status-verified.data-v-afb09895 {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.booking-list .booking-card .card-header .booking-status.status-completed.data-v-afb09895 {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.booking-list .booking-card .card-header .booking-status.status-cancelled.data-v-afb09895 {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+.booking-list .booking-card .card-header .booking-status.status-expired.data-v-afb09895 {
+  background-color: #f5f5f5;
+  color: #8c8c8c;
+}
+.booking-list .booking-card .card-header .booking-status.status-sharing.data-v-afb09895 {
+  background-color: #fff0f6;
+  color: #eb2f96;
+}
+.booking-list .booking-card .card-header .booking-status.status-sharing-success.data-v-afb09895 {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.booking-list .booking-card .card-header .booking-status.status-open.data-v-afb09895 {
+  background-color: #fff0f6;
+  color: #eb2f96;
+}
+.booking-list .booking-card .card-header .booking-status.status-pending-full.data-v-afb09895 {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+.booking-list .booking-card .card-header .booking-status.status-full.data-v-afb09895 {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.booking-list .booking-card .card-content.data-v-afb09895 {
+  margin-bottom: 24rpx;
+}
+.booking-list .booking-card .card-content .time-info.data-v-afb09895,
+.booking-list .booking-card .card-content .location-info.data-v-afb09895,
+.booking-list .booking-card .card-content .order-info.data-v-afb09895,
+.booking-list .booking-card .card-content .create-time-info.data-v-afb09895,
+.booking-list .booking-card .card-content .price-info.data-v-afb09895 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.booking-list .booking-card .card-content .time-info.data-v-afb09895:last-child,
+.booking-list .booking-card .card-content .location-info.data-v-afb09895:last-child,
+.booking-list .booking-card .card-content .order-info.data-v-afb09895:last-child,
+.booking-list .booking-card .card-content .create-time-info.data-v-afb09895:last-child,
+.booking-list .booking-card .card-content .price-info.data-v-afb09895:last-child {
+  margin-bottom: 0;
+}
+.booking-list .booking-card .card-content .time-icon.data-v-afb09895,
+.booking-list .booking-card .card-content .location-icon.data-v-afb09895,
+.booking-list .booking-card .card-content .order-icon.data-v-afb09895 {
+  font-size: 24rpx;
+  margin-right: 12rpx;
+}
+.booking-list .booking-card .card-content .time-text.data-v-afb09895,
+.booking-list .booking-card .card-content .location-text.data-v-afb09895,
+.booking-list .booking-card .card-content .order-text.data-v-afb09895,
+.booking-list .booking-card .card-content .create-time-text.data-v-afb09895 {
+  font-size: 26rpx;
+  color: #666666;
+}
+.booking-list .booking-card .card-content .price-info .price-label.data-v-afb09895 {
+  font-size: 26rpx;
+  color: #666666;
+}
+.booking-list .booking-card .card-content .price-info .price-value.data-v-afb09895 {
+  font-size: 28rpx;
+  color: #ff6b35;
+  font-weight: 600;
+  margin-left: 8rpx;
+}
+.booking-list .booking-card .card-content .countdown-container.data-v-afb09895 {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+}
+.booking-list .booking-card .card-content .countdown-container.simple.data-v-afb09895 {
+  padding: 8rpx 12rpx;
+  font-size: 22rpx;
+  border-radius: 8rpx;
+}
+.booking-list .booking-card .card-content .countdown-container.simple .countdown-icon.data-v-afb09895 {
+  font-size: 24rpx;
+  margin-right: 6rpx;
+}
+.booking-list .booking-card .card-content .countdown-container.simple .countdown-content.data-v-afb09895 {
+  display: flex;
+  align-items: center;
+}
+.booking-list .booking-card .card-content .countdown-container.simple .countdown-content .countdown-label.data-v-afb09895 {
+  font-size: 20rpx;
+  margin-right: 6rpx;
+}
+.booking-list .booking-card .card-content .countdown-container.simple .countdown-content .countdown-time.data-v-afb09895 {
+  font-size: 22rpx;
+  font-weight: bold;
+}
+.booking-list .booking-card .card-actions.data-v-afb09895 {
+  display: flex;
+  justify-content: flex-end;
+}
+.booking-list .booking-card .card-actions .action-btn.data-v-afb09895 {
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  margin-left: 16rpx;
+  border: 1rpx solid;
+}
+.booking-list .booking-card .card-actions .action-btn.cancel-btn.data-v-afb09895 {
+  background-color: transparent;
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+.booking-list .booking-card .card-actions .action-btn.pay-btn.data-v-afb09895 {
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-color: #ff6b35;
+}
+.booking-list .booking-card .card-actions .action-btn.info-btn.data-v-afb09895 {
+  background-color: transparent;
+  color: #1890ff;
+  border-color: #1890ff;
+}
+.booking-list .booking-card .card-actions .action-btn.share-btn.data-v-afb09895 {
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-color: #ff6b35;
+}
+.booking-list .booking-card .card-actions .action-btn.review-btn.data-v-afb09895 {
+  background-color: transparent;
+  color: #1890ff;
+  border-color: #1890ff;
+}
+.booking-list .booking-card .card-actions .action-btn.rebook-btn.data-v-afb09895 {
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-color: #ff6b35;
+}
+.booking-list .booking-card .card-actions .action-btn.participants-btn.data-v-afb09895 {
+  background-color: transparent;
+  color: #722ed1;
+  border-color: #722ed1;
+}
+.booking-list .booking-card .card-actions .action-btn.checkin-btn.data-v-afb09895 {
+  background-color: #52c41a;
+  color: #ffffff;
+  border-color: #52c41a;
+}
+.booking-list .booking-card .card-actions .action-btn.complete-btn.data-v-afb09895 {
+  background-color: #1890ff;
+  color: #ffffff;
+  border-color: #1890ff;
+}
+.empty-state.data-v-afb09895 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 60rpx;
+}
+.empty-state .empty-icon.data-v-afb09895 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.3;
+}
+.empty-state .empty-text.data-v-afb09895 {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 40rpx;
+}
+.empty-state .empty-btn.data-v-afb09895 {
+  padding: 16rpx 40rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+}
+.load-more.data-v-afb09895 {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 28rpx;
+  color: #666666;
+}
+.cancel-modal.data-v-afb09895,
+.share-modal.data-v-afb09895 {
+  width: 600rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.cancel-modal .modal-header.data-v-afb09895,
+.share-modal .modal-header.data-v-afb09895 {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.cancel-modal .modal-header .modal-title.data-v-afb09895,
+.share-modal .modal-header .modal-title.data-v-afb09895 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.cancel-modal .modal-actions.data-v-afb09895,
+.share-modal .modal-actions.data-v-afb09895 {
+  display: flex;
+  border-top: 1rpx solid #f0f0f0;
+}
+.cancel-modal .modal-actions .modal-btn.data-v-afb09895,
+.share-modal .modal-actions .modal-btn.data-v-afb09895 {
+  flex: 1;
+  height: 100rpx;
+  border: none;
+  font-size: 28rpx;
+}
+.cancel-modal .modal-actions .modal-btn.cancel-btn.data-v-afb09895,
+.share-modal .modal-actions .modal-btn.cancel-btn.data-v-afb09895 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+.cancel-modal .modal-actions .modal-btn.confirm-btn.data-v-afb09895,
+.share-modal .modal-actions .modal-btn.confirm-btn.data-v-afb09895 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.cancel-modal .modal-content.data-v-afb09895 {
+  padding: 40rpx 30rpx;
+  text-align: center;
+}
+.cancel-modal .modal-content .modal-text.data-v-afb09895 {
+  display: block;
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.cancel-modal .modal-content .modal-note.data-v-afb09895 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.share-modal .share-form.data-v-afb09895 {
+  padding: 30rpx;
+}
+.share-modal .share-form .form-item.data-v-afb09895 {
+  margin-bottom: 30rpx;
+}
+.share-modal .share-form .form-item.data-v-afb09895:last-child {
+  margin-bottom: 0;
+}
+.share-modal .share-form .form-item .form-label.data-v-afb09895 {
+  display: block;
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.share-modal .share-form .form-item .form-input.data-v-afb09895,
+.share-modal .share-form .form-item .picker-text.data-v-afb09895 {
+  width: 100%;
+  height: 80rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  background-color: #ffffff;
+}
+.share-modal .share-form .form-item .picker-text.data-v-afb09895 {
+  display: flex;
+  align-items: center;
+  color: #333333;
+}
+.share-modal .share-form .form-item .form-textarea.data-v-afb09895 {
+  width: 100%;
+  min-height: 120rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  background-color: #ffffff;
+}
+
+/* 骨架屏样式 */
+.skeleton-line.data-v-afb09895 {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  -webkit-animation: skeleton-loading-afb09895 1.5s infinite;
+          animation: skeleton-loading-afb09895 1.5s infinite;
+}
+.skeleton-load-more.data-v-afb09895 {
+  height: 20px;
+  border-radius: 10px;
+  margin: 10px auto;
+  width: 80px;
+}
+@-webkit-keyframes skeleton-loading-afb09895 {
+0% {
+    background-position: 200% 0;
+}
+100% {
+    background-position: -200% 0;
+}
+}
+@keyframes skeleton-loading-afb09895 {
+0% {
+    background-position: 200% 0;
+}
+100% {
+    background-position: -200% 0;
+}
+}
+/* 加载更多骨架屏 */
+.loading-more-skeleton.data-v-afb09895 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* 优化加载状态的过渡效果 */
+.booking-list.data-v-afb09895 {
+  transition: opacity 0.3s ease-in-out;
+}
+.empty-state.data-v-afb09895 {
+  transition: opacity 0.3s ease-in-out;
+}
+.load-more.data-v-afb09895 {
+  transition: all 0.3s ease-in-out;
+}
+
+/* 错误状态样式 */
+.error-state.data-v-afb09895 {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+.error-icon.data-v-afb09895 {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+.error-text.data-v-afb09895 {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #666;
+}
+.retry-btn.data-v-afb09895 {
+  background: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-size: 14px;
+}

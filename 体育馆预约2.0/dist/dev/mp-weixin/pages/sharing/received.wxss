@@ -1,0 +1,435 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-5b9a0501 {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.navbar.data-v-5b9a0501 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.navbar .nav-left.data-v-5b9a0501 {
+  width: 60rpx;
+}
+.navbar .nav-left .nav-icon.data-v-5b9a0501 {
+  font-size: 40rpx;
+  color: #333333;
+}
+.navbar .nav-title.data-v-5b9a0501 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.navbar .nav-right.data-v-5b9a0501 {
+  width: 60rpx;
+}
+.filter-tabs.data-v-5b9a0501 {
+  display: flex;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.filter-tabs .filter-tab.data-v-5b9a0501 {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  margin-right: 20rpx;
+  border-radius: 20rpx;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+.filter-tabs .filter-tab.data-v-5b9a0501:last-child {
+  margin-right: 0;
+}
+.filter-tabs .filter-tab.active.data-v-5b9a0501 {
+  background-color: #ff6b35;
+}
+.filter-tabs .filter-tab.active .tab-text.data-v-5b9a0501 {
+  color: #ffffff;
+}
+.filter-tabs .filter-tab.active .tab-count.data-v-5b9a0501 {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+.filter-tabs .filter-tab .tab-text.data-v-5b9a0501 {
+  font-size: 26rpx;
+  color: #666666;
+  transition: color 0.3s ease;
+}
+.filter-tabs .filter-tab .tab-count.data-v-5b9a0501 {
+  font-size: 20rpx;
+  color: #ff6b35;
+  background-color: #fff7f0;
+  padding: 2rpx 8rpx;
+  border-radius: 10rpx;
+  margin-left: 8rpx;
+  min-width: 32rpx;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.loading-state.data-v-5b9a0501 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 200rpx 0;
+}
+.loading-state text.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.error-state.data-v-5b9a0501 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 60rpx;
+}
+.error-state .error-icon.data-v-5b9a0501 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+.error-state .error-text.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 40rpx;
+  line-height: 1.4;
+}
+.error-state .retry-btn.data-v-5b9a0501 {
+  width: 200rpx;
+  height: 70rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+}
+.content.data-v-5b9a0501 {
+  padding: 20rpx;
+}
+.requests-list .request-item.data-v-5b9a0501 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.requests-list .request-item .sharing-info.data-v-5b9a0501 {
+  margin-bottom: 24rpx;
+}
+.requests-list .request-item .sharing-info .sharing-header.data-v-5b9a0501 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+.requests-list .request-item .sharing-info .sharing-header .venue-name.data-v-5b9a0501 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.data-v-5b9a0501 {
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge .status-text.data-v-5b9a0501 {
+  font-size: 22rpx;
+  font-weight: bold;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-pending.data-v-5b9a0501 {
+  background-color: #fff7e6;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-pending .status-text.data-v-5b9a0501 {
+  color: #fa8c16;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-approved.data-v-5b9a0501 {
+  background-color: #f6ffed;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-approved .status-text.data-v-5b9a0501 {
+  color: #52c41a;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-rejected.data-v-5b9a0501 {
+  background-color: #fff2f0;
+}
+.requests-list .request-item .sharing-info .sharing-header .status-badge.status-rejected .status-text.data-v-5b9a0501 {
+  color: #ff4d4f;
+}
+.requests-list .request-item .sharing-info .sharing-details.data-v-5b9a0501 {
+  margin-bottom: 16rpx;
+}
+.requests-list .request-item .sharing-info .sharing-details .team-name.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.requests-list .request-item .sharing-info .sharing-details .activity-time.data-v-5b9a0501 {
+  font-size: 24rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.requests-list .request-item .sharing-info .sharing-details .price.data-v-5b9a0501 {
+  font-size: 24rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.requests-list .request-item .sharing-info .participants-progress .progress-info.data-v-5b9a0501 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+.requests-list .request-item .sharing-info .participants-progress .progress-info .progress-text.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #666666;
+}
+.requests-list .request-item .sharing-info .participants-progress .progress-info .progress-percent.data-v-5b9a0501 {
+  font-size: 20rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.requests-list .request-item .sharing-info .participants-progress .progress-bar.data-v-5b9a0501 {
+  height: 6rpx;
+  background-color: #f0f0f0;
+  border-radius: 3rpx;
+  overflow: hidden;
+}
+.requests-list .request-item .sharing-info .participants-progress .progress-bar .progress-fill.data-v-5b9a0501 {
+  height: 100%;
+  background-color: #ff6b35;
+  transition: width 0.3s ease;
+}
+.requests-list .request-item .applicant-info.data-v-5b9a0501 {
+  margin-bottom: 24rpx;
+}
+.requests-list .request-item .applicant-info .applicant-header.data-v-5b9a0501 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-avatar.data-v-5b9a0501 {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  margin-right: 20rpx;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-avatar .avatar-img.data-v-5b9a0501 {
+  width: 100%;
+  height: 100%;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-avatar .avatar-placeholder.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #999999;
+  font-weight: bold;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-details.data-v-5b9a0501 {
+  flex: 1;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-details .applicant-name.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.requests-list .request-item .applicant-info .applicant-header .applicant-details .apply-time.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #999999;
+}
+.requests-list .request-item .applicant-info .apply-message.data-v-5b9a0501 {
+  background-color: #f8f9fa;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+.requests-list .request-item .applicant-info .apply-message .message-label.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.requests-list .request-item .applicant-info .apply-message .message-content.data-v-5b9a0501 {
+  font-size: 26rpx;
+  color: #333333;
+  line-height: 1.4;
+}
+.requests-list .request-item .request-actions .pending-actions.data-v-5b9a0501 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+}
+.requests-list .request-item .request-actions .pending-actions .action-btn.data-v-5b9a0501 {
+  padding: 12rpx 24rpx;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+.requests-list .request-item .request-actions .pending-actions .action-btn.reject-btn.data-v-5b9a0501 {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+.requests-list .request-item .request-actions .pending-actions .action-btn.approve-btn.data-v-5b9a0501 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.requests-list .request-item .request-actions .processed-actions .processed-text.data-v-5b9a0501 {
+  font-size: 24rpx;
+  color: #52c41a;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.requests-list .request-item .request-actions .processed-actions .processed-text.rejected.data-v-5b9a0501 {
+  color: #ff4d4f;
+}
+.requests-list .request-item .request-actions .processed-actions .process-time.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.requests-list .request-item .request-actions .processed-actions .reject-reason.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #666666;
+}
+.empty-state.data-v-5b9a0501 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 60rpx;
+}
+.empty-state .empty-icon.data-v-5b9a0501 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+.empty-state .empty-title.data-v-5b9a0501 {
+  font-size: 32rpx;
+  color: #333333;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+.empty-state .empty-desc.data-v-5b9a0501 {
+  font-size: 26rpx;
+  color: #999999;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 40rpx;
+}
+.empty-state .create-btn.data-v-5b9a0501 {
+  width: 200rpx;
+  height: 70rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+}
+.reject-dialog.data-v-5b9a0501 {
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 30rpx;
+}
+.reject-dialog .dialog-header.data-v-5b9a0501 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+.reject-dialog .dialog-header .dialog-title.data-v-5b9a0501 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.reject-dialog .dialog-header .close-btn.data-v-5b9a0501 {
+  font-size: 32rpx;
+  color: #999999;
+  padding: 10rpx;
+}
+.reject-dialog .dialog-content.data-v-5b9a0501 {
+  margin-bottom: 40rpx;
+}
+.reject-dialog .dialog-content .applicant-info.data-v-5b9a0501 {
+  margin-bottom: 30rpx;
+}
+.reject-dialog .dialog-content .applicant-info .applicant-name.data-v-5b9a0501 {
+  font-size: 28rpx;
+  color: #333333;
+}
+.reject-dialog .dialog-content .reason-section .reason-label.data-v-5b9a0501 {
+  font-size: 26rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 16rpx;
+}
+.reject-dialog .dialog-content .reason-section .reason-input.data-v-5b9a0501 {
+  width: 100%;
+  min-height: 200rpx;
+  padding: 20rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #333333;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  resize: none;
+}
+.reject-dialog .dialog-content .reason-section .char-count.data-v-5b9a0501 {
+  font-size: 22rpx;
+  color: #999999;
+  text-align: right;
+  display: block;
+  margin-top: 8rpx;
+}
+.reject-dialog .dialog-actions.data-v-5b9a0501 {
+  display: flex;
+  gap: 20rpx;
+}
+.reject-dialog .dialog-actions .cancel-btn.data-v-5b9a0501 {
+  flex: 1;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  color: #333333;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+.reject-dialog .dialog-actions .confirm-btn.data-v-5b9a0501 {
+  flex: 1;
+  height: 80rpx;
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}

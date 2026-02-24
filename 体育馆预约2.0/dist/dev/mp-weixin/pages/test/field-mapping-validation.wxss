@@ -1,0 +1,180 @@
+
+.validation-container.data-v-8dbbe3e5 {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.header.data-v-8dbbe3e5 {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+.title.data-v-8dbbe3e5 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.subtitle.data-v-8dbbe3e5 {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+}
+.control-panel.data-v-8dbbe3e5, .results-section.data-v-8dbbe3e5, .stats-section.data-v-8dbbe3e5 {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+.input-group.data-v-8dbbe3e5 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.label.data-v-8dbbe3e5 {
+  width: 150rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.input.data-v-8dbbe3e5 {
+  flex: 1;
+  height: 70rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+.button-group.data-v-8dbbe3e5 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+  margin-top: 30rpx;
+}
+.btn.data-v-8dbbe3e5 {
+  flex: 1;
+  min-width: 180rpx;
+  height: 70rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  border: none;
+  color: white;
+}
+.primary.data-v-8dbbe3e5 { background: #007AFF;
+}
+.secondary.data-v-8dbbe3e5 { background: #5856D6;
+}
+.success.data-v-8dbbe3e5 { background: #34C759;
+}
+.warning.data-v-8dbbe3e5 { background: #FF9500;
+}
+.error.data-v-8dbbe3e5 { background: #FF3B30;
+}
+.section-title.data-v-8dbbe3e5 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+.results-container.data-v-8dbbe3e5 {
+  height: 600rpx;
+}
+.result-item.data-v-8dbbe3e5 {
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+  border-left: 6rpx solid;
+}
+.result-item.success.data-v-8dbbe3e5 { 
+  background: #e8f5e8; 
+  border-left-color: #34C759;
+}
+.result-item.warning.data-v-8dbbe3e5 { 
+  background: #fff3e0; 
+  border-left-color: #FF9500;
+}
+.result-item.error.data-v-8dbbe3e5 { 
+  background: #ffebee; 
+  border-left-color: #FF3B30;
+}
+.result-item.info.data-v-8dbbe3e5 { 
+  background: #e3f2fd; 
+  border-left-color: #2196F3;
+}
+.result-header.data-v-8dbbe3e5 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+.result-title.data-v-8dbbe3e5 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.result-status.data-v-8dbbe3e5 {
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.result-status.success.data-v-8dbbe3e5 { color: #34C759;
+}
+.result-status.warning.data-v-8dbbe3e5 { color: #FF9500;
+}
+.result-status.error.data-v-8dbbe3e5 { color: #FF3B30;
+}
+.result-status.info.data-v-8dbbe3e5 { color: #2196F3;
+}
+.result-time.data-v-8dbbe3e5 {
+  font-size: 22rpx;
+  color: #999;
+}
+.result-message.data-v-8dbbe3e5 {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 15rpx;
+}
+.mapping-details.data-v-8dbbe3e5, .errors-section.data-v-8dbbe3e5, .warnings-section.data-v-8dbbe3e5 {
+  background: rgba(0,0,0,0.05);
+  border-radius: 8rpx;
+  padding: 15rpx;
+  margin-bottom: 10rpx;
+}
+.mapping-title.data-v-8dbbe3e5, .errors-title.data-v-8dbbe3e5, .warnings-title.data-v-8dbbe3e5, .additions-title.data-v-8dbbe3e5 {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.mapping-item.data-v-8dbbe3e5, .error-item.data-v-8dbbe3e5, .warning-item.data-v-8dbbe3e5, .addition-item.data-v-8dbbe3e5 {
+  margin-bottom: 8rpx;
+}
+.mapping-text.data-v-8dbbe3e5, .error-text.data-v-8dbbe3e5, .warning-text.data-v-8dbbe3e5, .addition-text.data-v-8dbbe3e5 {
+  font-size: 22rpx;
+  color: #666;
+  display: block;
+  font-family: monospace;
+}
+.stats-grid.data-v-8dbbe3e5 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+}
+.stat-item.data-v-8dbbe3e5 {
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  color: white;
+}
+.stat-number.data-v-8dbbe3e5 {
+  font-size: 36rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.stat-label.data-v-8dbbe3e5 {
+  font-size: 24rpx;
+  display: block;
+}

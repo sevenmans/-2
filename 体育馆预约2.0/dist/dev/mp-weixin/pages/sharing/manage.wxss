@@ -1,0 +1,439 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-1df554a0 {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+.navbar.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.navbar .nav-left.data-v-1df554a0 {
+  width: 60rpx;
+}
+.navbar .nav-left .nav-icon.data-v-1df554a0 {
+  font-size: 40rpx;
+  color: #333333;
+}
+.navbar .nav-title.data-v-1df554a0 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.navbar .nav-right.data-v-1df554a0 {
+  width: 60rpx;
+}
+.loading-state.data-v-1df554a0 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 200rpx 0;
+}
+.loading-state text.data-v-1df554a0 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.error-state.data-v-1df554a0 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 60rpx;
+}
+.error-state .error-icon.data-v-1df554a0 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+.error-state .error-text.data-v-1df554a0 {
+  font-size: 28rpx;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 40rpx;
+  line-height: 1.4;
+}
+.error-state .retry-btn.data-v-1df554a0 {
+  width: 200rpx;
+  height: 70rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+}
+.content.data-v-1df554a0 {
+  padding: 20rpx;
+}
+.info-section.data-v-1df554a0 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.info-section .venue-header.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+.info-section .venue-header .venue-name.data-v-1df554a0 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.info-section .venue-header .status-badge.data-v-1df554a0 {
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+}
+.info-section .venue-header .status-badge .status-text.data-v-1df554a0 {
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.info-section .venue-header .status-badge.status-open.data-v-1df554a0 {
+  background-color: #e6f7ff;
+}
+.info-section .venue-header .status-badge.status-open .status-text.data-v-1df554a0 {
+  color: #1890ff;
+}
+.info-section .venue-header .status-badge.status-full.data-v-1df554a0 {
+  background-color: #fff7e6;
+}
+.info-section .venue-header .status-badge.status-full .status-text.data-v-1df554a0 {
+  color: #fa8c16;
+}
+.info-section .venue-header .status-badge.status-confirmed.data-v-1df554a0 {
+  background-color: #f6ffed;
+}
+.info-section .venue-header .status-badge.status-confirmed .status-text.data-v-1df554a0 {
+  color: #52c41a;
+}
+.info-section .venue-header .status-badge.status-cancelled.data-v-1df554a0 {
+  background-color: #fff2f0;
+}
+.info-section .venue-header .status-badge.status-cancelled .status-text.data-v-1df554a0 {
+  color: #ff4d4f;
+}
+.info-section .venue-header .status-badge.status-expired.data-v-1df554a0 {
+  background-color: #f5f5f5;
+}
+.info-section .venue-header .status-badge.status-expired .status-text.data-v-1df554a0 {
+  color: #999999;
+}
+.info-section .team-info.data-v-1df554a0 {
+  margin-bottom: 24rpx;
+}
+.info-section .team-info .team-header.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+.info-section .team-info .team-header .team-name.data-v-1df554a0 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.info-section .team-info .team-header .creator-label.data-v-1df554a0 {
+  font-size: 22rpx;
+  color: #ff6b35;
+  background-color: #fff7f0;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+.info-section .team-info .participants-progress .progress-info.data-v-1df554a0 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.info-section .team-info .participants-progress .progress-info .progress-text.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #666666;
+}
+.info-section .team-info .participants-progress .progress-info .progress-percent.data-v-1df554a0 {
+  font-size: 24rpx;
+  color: #ff6b35;
+  font-weight: bold;
+}
+.info-section .team-info .participants-progress .progress-bar.data-v-1df554a0 {
+  height: 8rpx;
+  background-color: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.info-section .team-info .participants-progress .progress-bar .progress-fill.data-v-1df554a0 {
+  height: 100%;
+  background-color: #ff6b35;
+  transition: width 0.3s ease;
+}
+.info-section .activity-info.data-v-1df554a0 {
+  margin-bottom: 24rpx;
+}
+.info-section .activity-info .info-row.data-v-1df554a0 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.info-section .activity-info .info-row.data-v-1df554a0:last-child {
+  border-bottom: none;
+}
+.info-section .activity-info .info-row .info-label.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #666666;
+}
+.info-section .activity-info .info-row .info-value.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #333333;
+}
+.info-section .activity-info .info-row .info-value.price.data-v-1df554a0 {
+  color: #ff6b35;
+  font-weight: bold;
+}
+.info-section .activity-info .info-row .info-value.order-no.data-v-1df554a0 {
+  font-family: monospace;
+  font-size: 22rpx;
+}
+.info-section .description .description-label.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.info-section .description .description-text.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #333333;
+  line-height: 1.5;
+}
+.section-title.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.section-title .title-text.data-v-1df554a0 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.section-title .count-text.data-v-1df554a0 {
+  font-size: 24rpx;
+  color: #999999;
+  margin-left: 12rpx;
+}
+.participants-section.data-v-1df554a0 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.participants-section .participants-list .participant-item.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.participants-section .participants-list .participant-item.data-v-1df554a0:last-child {
+  border-bottom: none;
+}
+.participants-section .participants-list .participant-item .participant-info.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.participants-section .participants-list .participant-item .participant-info .participant-avatar.data-v-1df554a0 {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.participants-section .participants-list .participant-item .participant-info .participant-details .participant-name.data-v-1df554a0 {
+  font-size: 28rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.participants-section .participants-list .participant-item .participant-info .participant-details .participant-role.data-v-1df554a0 {
+  font-size: 22rpx;
+  color: #999999;
+}
+.participants-section .participants-list .participant-item .remove-btn.data-v-1df554a0 {
+  padding: 12rpx 24rpx;
+  background-color: #fff2f0;
+  border-radius: 20rpx;
+}
+.participants-section .participants-list .participant-item .remove-btn .remove-text.data-v-1df554a0 {
+  font-size: 24rpx;
+  color: #ff4d4f;
+}
+.participants-section .empty-participants.data-v-1df554a0 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+}
+.participants-section .empty-participants .empty-icon.data-v-1df554a0 {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+.participants-section .empty-participants .empty-text.data-v-1df554a0 {
+  font-size: 26rpx;
+  color: #999999;
+}
+.settings-section.data-v-1df554a0 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.settings-section .settings-list .setting-item.data-v-1df554a0 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.settings-section .settings-list .setting-item.data-v-1df554a0:last-child {
+  border-bottom: none;
+}
+.settings-section .settings-list .setting-item .setting-info.data-v-1df554a0 {
+  flex: 1;
+  margin-right: 20rpx;
+}
+.settings-section .settings-list .setting-item .setting-info .setting-label.data-v-1df554a0 {
+  font-size: 28rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.settings-section .settings-list .setting-item .setting-info .setting-desc.data-v-1df554a0 {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.4;
+}
+.requests-section.data-v-1df554a0 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+.requests-section .requests-list .request-item.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.requests-section .requests-list .request-item.data-v-1df554a0:last-child {
+  border-bottom: none;
+}
+.requests-section .requests-list .request-item .request-info.data-v-1df554a0 {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.requests-section .requests-list .request-item .request-info .request-avatar.data-v-1df554a0 {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.requests-section .requests-list .request-item .request-info .request-details .request-name.data-v-1df554a0 {
+  font-size: 28rpx;
+  color: #333333;
+  display: block;
+  margin-bottom: 6rpx;
+}
+.requests-section .requests-list .request-item .request-info .request-details .request-time.data-v-1df554a0 {
+  font-size: 22rpx;
+  color: #999999;
+}
+.requests-section .requests-list .request-item .request-actions .action-buttons.data-v-1df554a0 {
+  display: flex;
+  gap: 12rpx;
+}
+.requests-section .requests-list .request-item .request-actions .action-buttons .action-btn.data-v-1df554a0 {
+  padding: 12rpx 20rpx;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+.requests-section .requests-list .request-item .request-actions .action-buttons .action-btn.reject-btn.data-v-1df554a0 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+.requests-section .requests-list .request-item .request-actions .action-buttons .action-btn.approve-btn.data-v-1df554a0 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.requests-section .requests-list .request-item .request-actions .request-status .status-text.data-v-1df554a0 {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+}
+.requests-section .requests-list .request-item .request-actions .request-status .status-text.request-pending.data-v-1df554a0 {
+  background-color: #fff7e6;
+  color: #fa8c16;
+}
+.requests-section .requests-list .request-item .request-actions .request-status .status-text.request-approved.data-v-1df554a0 {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+.requests-section .requests-list .request-item .request-actions .request-status .status-text.request-rejected.data-v-1df554a0 {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+.bottom-actions.data-v-1df554a0 {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+  display: flex;
+  gap: 20rpx;
+}
+.bottom-actions .action-btn.data-v-1df554a0 {
+  flex: 1;
+  height: 80rpx;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.bottom-actions .action-btn.confirm-btn.data-v-1df554a0 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.bottom-actions .action-btn.cancel-btn.data-v-1df554a0 {
+  background-color: #f5f5f5;
+  color: #666666;
+}

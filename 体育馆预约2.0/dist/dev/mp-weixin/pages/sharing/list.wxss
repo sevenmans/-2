@@ -1,0 +1,560 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container.data-v-f3dce692 {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+.mode-switch.data-v-f3dce692 {
+  display: flex;
+  background-color: #ffffff;
+  margin: 20rpx 30rpx;
+  border-radius: 12rpx;
+  padding: 8rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+.mode-switch .mode-item.data-v-f3dce692 {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #666666;
+  transition: all 0.3s ease;
+}
+.mode-switch .mode-item.active.data-v-f3dce692 {
+  background-color: #007aff;
+  color: #333333;
+  font-weight: bold;
+}
+.container.data-v-f3dce692 {
+  padding-bottom: 120rpx;
+}
+.floating-btn.data-v-f3dce692 {
+  position: fixed;
+  bottom: 120rpx;
+  right: 30rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background-color: #ff6b35;
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
+  z-index: 999;
+}
+.floating-btn .floating-btn-text.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #ffffff;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+.filter-section.data-v-f3dce692 {
+  display: flex;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.filter-section .filter-scroll.data-v-f3dce692 {
+  flex: 1;
+  white-space: nowrap;
+}
+.filter-section .filter-scroll .filter-item.data-v-f3dce692 {
+  display: inline-block;
+  padding: 12rpx 24rpx;
+  margin-right: 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  color: #666666;
+}
+.filter-section .filter-scroll .filter-item.active.data-v-f3dce692 {
+  background-color: #ff6b35;
+  color: #666666;
+}
+.filter-section .filter-more.data-v-f3dce692 {
+  padding: 12rpx 24rpx;
+  background-color: #f5f5f5;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  color: #666666;
+}
+.sharing-list.data-v-f3dce692 {
+  padding: 20rpx 30rpx;
+}
+.sharing-list .sharing-card.data-v-f3dce692 {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+.sharing-list .sharing-card.full-card.data-v-f3dce692 {
+  background-color: #f8f8f8;
+  opacity: 0.7;
+}
+.sharing-list .sharing-card.full-card .venue-name.data-v-f3dce692 {
+  color: #999999 !important;
+}
+.sharing-list .sharing-card.full-card .time-text.data-v-f3dce692, .sharing-list .sharing-card.full-card .team-name.data-v-f3dce692 {
+  color: #999999 !important;
+}
+.sharing-list .sharing-card .card-header.data-v-f3dce692 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+.sharing-list .sharing-card .card-header .venue-info.data-v-f3dce692 {
+  flex: 1;
+}
+.sharing-list .sharing-card .card-header .venue-info .venue-name.data-v-f3dce692 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+.sharing-list .sharing-card .card-header .venue-info .venue-location.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.sharing-list .sharing-card .card-header .my-sharing-badge.data-v-f3dce692 {
+  padding: 6rpx 12rpx;
+  background-color: #ff6b35;
+  border-radius: 16rpx;
+  margin-right: 12rpx;
+}
+.sharing-list .sharing-card .card-header .my-sharing-badge .badge-text.data-v-f3dce692 {
+  font-size: 20rpx;
+  color: #666666;
+  font-weight: bold;
+}
+.sharing-list .sharing-card .card-header .full-badge.data-v-f3dce692 {
+  padding: 6rpx 12rpx;
+  background-color: #999999;
+  border-radius: 16rpx;
+  margin-right: 12rpx;
+}
+.sharing-list .sharing-card .card-header .full-badge .badge-text.data-v-f3dce692 {
+  font-size: 20rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+.sharing-list .sharing-card .card-header .sharing-status.data-v-f3dce692 {
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+.sharing-list .sharing-card .card-header .sharing-status.status-open.data-v-f3dce692 {
+  background-color: #e8f5e8;
+  color: #52c41a;
+}
+.sharing-list .sharing-card .card-header .sharing-status.status-full.data-v-f3dce692 {
+  background-color: #fff2e8;
+  color: #fa8c16;
+}
+.sharing-list .sharing-card .card-header .sharing-status.status-confirmed.data-v-f3dce692 {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+.sharing-list .sharing-card .card-header .sharing-status.status-cancelled.data-v-f3dce692 {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+.sharing-list .sharing-card .card-header .sharing-status.status-expired.data-v-f3dce692 {
+  background-color: #f6f6f6;
+  color: #999999;
+}
+.sharing-list .sharing-card .card-content .time-info.data-v-f3dce692, .sharing-list .sharing-card .card-content .team-info.data-v-f3dce692 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.sharing-list .sharing-card .card-content .time-info .time-icon.data-v-f3dce692, .sharing-list .sharing-card .card-content .time-info .team-icon.data-v-f3dce692, .sharing-list .sharing-card .card-content .team-info .time-icon.data-v-f3dce692, .sharing-list .sharing-card .card-content .team-info .team-icon.data-v-f3dce692 {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+.sharing-list .sharing-card .card-content .time-info .time-text.data-v-f3dce692, .sharing-list .sharing-card .card-content .time-info .team-name.data-v-f3dce692, .sharing-list .sharing-card .card-content .team-info .time-text.data-v-f3dce692, .sharing-list .sharing-card .card-content .team-info .team-name.data-v-f3dce692 {
+  font-size: 28rpx;
+  color: #333333;
+}
+.sharing-list .sharing-card .card-content .participants-info.data-v-f3dce692 {
+  margin-bottom: 16rpx;
+}
+.sharing-list .sharing-card .card-content .participants-info .participants-text.data-v-f3dce692 {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 8rpx;
+}
+.sharing-list .sharing-card .card-content .participants-info .progress-bar.data-v-f3dce692 {
+  height: 8rpx;
+  background-color: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.sharing-list .sharing-card .card-content .participants-info .progress-bar .progress-fill.data-v-f3dce692 {
+  height: 100%;
+  background-color: #ff6b35;
+  transition: width 0.3s ease;
+}
+.sharing-list .sharing-card .card-content .price-info.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info.data-v-f3dce692 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.sharing-list .sharing-card .card-content .price-info .price-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .price-info .creator-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .price-info .create-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .price-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .creator-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .create-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .price-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .creator-label.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .create-label.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #999999;
+  margin-right: 8rpx;
+}
+.sharing-list .sharing-card .card-content .price-info .price-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .price-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .price-value.data-v-f3dce692 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #ff6b35;
+}
+.sharing-list .sharing-card .card-content .price-info .price-note.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .price-note.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .price-note.data-v-f3dce692 {
+  font-size: 20rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+.sharing-list .sharing-card .card-content .price-info .creator-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .price-info .create-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .creator-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .creator-info .create-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .creator-value.data-v-f3dce692, .sharing-list .sharing-card .card-content .create-info .create-value.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #666666;
+}
+.sharing-list .sharing-card .card-content .description.data-v-f3dce692 {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background-color: #f8f8f8;
+  border-radius: 8rpx;
+}
+.sharing-list .sharing-card .card-content .description text.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+.sharing-list .sharing-card .card-actions.data-v-f3dce692 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.sharing-list .sharing-card .card-actions .organizer-info.data-v-f3dce692 {
+  display: flex;
+  align-items: center;
+}
+.sharing-list .sharing-card .card-actions .organizer-info .organizer-name.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #666666;
+}
+.sharing-list .sharing-card .card-actions .join-btn.data-v-f3dce692 {
+  padding: 12rpx 24rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  border: none;
+}
+.sharing-list .sharing-card .card-actions .join-disabled.data-v-f3dce692 {
+  padding: 12rpx 24rpx;
+  background-color: #f0f0f0;
+  color: #999999;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+}
+.sharing-list .sharing-card .card-actions .join-disabled.applied.data-v-f3dce692 {
+  background-color: #e8f4fd;
+  color: #1890ff;
+  border: 1rpx solid #91d5ff;
+}
+.sharing-list .sharing-card .card-actions .join-disabled.my-sharing.data-v-f3dce692 {
+  background-color: #fff2e8;
+  color: #ff6b35;
+  border: 1rpx solid #ffb366;
+  font-weight: bold;
+}
+.sharing-list .sharing-card .countdown-container.simple.data-v-f3dce692 {
+  margin-top: 12rpx;
+  padding: 6rpx 10rpx;
+  font-size: 20rpx;
+}
+.sharing-list .sharing-card .countdown-container.simple .countdown-icon.data-v-f3dce692 {
+  font-size: 22rpx;
+}
+.sharing-list .sharing-card .countdown-container.simple .countdown-content .countdown-time.data-v-f3dce692 {
+  font-size: 20rpx;
+}
+.empty-state.data-v-f3dce692 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 60rpx;
+}
+.empty-state .empty-icon.data-v-f3dce692 {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+.empty-state .empty-text.data-v-f3dce692 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.loading-state.data-v-f3dce692 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx;
+}
+.loading-state text.data-v-f3dce692 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.load-more.data-v-f3dce692 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx;
+}
+.load-more text.data-v-f3dce692 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.filter-modal.data-v-f3dce692 {
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 40rpx 30rpx;
+  max-height: 80vh;
+}
+.filter-modal .modal-header.data-v-f3dce692 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+.filter-modal .modal-header .modal-title.data-v-f3dce692 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.filter-modal .modal-header .modal-close.data-v-f3dce692 {
+  font-size: 40rpx;
+  color: #999999;
+}
+.filter-modal .filter-content .filter-group.data-v-f3dce692 {
+  margin-bottom: 40rpx;
+}
+.filter-modal .filter-content .filter-group .group-title.data-v-f3dce692 {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 20rpx;
+}
+.filter-modal .filter-content .filter-group .date-options.data-v-f3dce692, .filter-modal .filter-content .filter-group .participants-options.data-v-f3dce692 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.filter-modal .filter-content .filter-group .date-options .date-item.data-v-f3dce692, .filter-modal .filter-content .filter-group .date-options .participants-item.data-v-f3dce692, .filter-modal .filter-content .filter-group .participants-options .date-item.data-v-f3dce692, .filter-modal .filter-content .filter-group .participants-options .participants-item.data-v-f3dce692 {
+  padding: 16rpx 24rpx;
+  background-color: #f5f5f5;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  color: #666666;
+}
+.filter-modal .filter-content .filter-group .date-options .date-item.active.data-v-f3dce692, .filter-modal .filter-content .filter-group .date-options .participants-item.active.data-v-f3dce692, .filter-modal .filter-content .filter-group .participants-options .date-item.active.data-v-f3dce692, .filter-modal .filter-content .filter-group .participants-options .participants-item.active.data-v-f3dce692 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.filter-modal .filter-content .filter-group .price-range.data-v-f3dce692 {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.filter-modal .filter-content .filter-group .price-range .price-input.data-v-f3dce692 {
+  flex: 1;
+  padding: 16rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+}
+.filter-modal .filter-content .filter-group .price-range .price-separator.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.filter-modal .modal-footer.data-v-f3dce692 {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+.filter-modal .modal-footer .reset-btn.data-v-f3dce692, .filter-modal .modal-footer .confirm-btn.data-v-f3dce692 {
+  flex: 1;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: none;
+}
+.filter-modal .modal-footer .reset-btn.data-v-f3dce692 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+.filter-modal .modal-footer .confirm-btn.data-v-f3dce692 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+
+/* 申请拼场弹窗 */
+.apply-modal.data-v-f3dce692 {
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 0;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000002;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+.apply-modal .modal-header.data-v-f3dce692 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40rpx 40rpx 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.apply-modal .modal-header .modal-title.data-v-f3dce692 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.apply-modal .modal-header .close-btn.data-v-f3dce692 {
+  font-size: 36rpx;
+  color: #999999;
+  padding: 10rpx;
+}
+.apply-modal .modal-content.data-v-f3dce692 {
+  padding: 40rpx;
+  max-height: calc(80vh - 180rpx);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.apply-modal .modal-content .form-item.data-v-f3dce692 {
+  margin-bottom: 40rpx;
+}
+.apply-modal .modal-content .form-item .form-label.data-v-f3dce692 {
+  display: block;
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.apply-modal .modal-content .form-item .form-label .required.data-v-f3dce692 {
+  color: #ff4d4f;
+}
+.apply-modal .modal-content .form-item .form-hint.data-v-f3dce692 {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.5;
+}
+.apply-modal .modal-content .form-item .form-input.data-v-f3dce692 {
+  width: 100%;
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background-color: #ffffff;
+}
+.apply-modal .modal-content .form-item .form-input.data-v-f3dce692:focus {
+  border-color: #ff6b35;
+}
+.apply-modal .modal-content .form-item .form-textarea.data-v-f3dce692 {
+  width: 100%;
+  padding: 24rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background-color: #ffffff;
+  min-height: 120rpx;
+  resize: none;
+}
+.apply-modal .modal-content .form-item .form-textarea.data-v-f3dce692:focus {
+  border-color: #ff6b35;
+}
+.apply-modal .modal-content .form-item .char-count.data-v-f3dce692 {
+  display: block;
+  text-align: right;
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+.apply-modal .modal-actions.data-v-f3dce692 {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 40rpx 40rpx;
+}
+.apply-modal .modal-actions .modal-btn.data-v-f3dce692 {
+  flex: 1;
+  padding: 28rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: none;
+}
+.apply-modal .modal-actions .cancel-btn.data-v-f3dce692 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+.apply-modal .modal-actions .confirm-btn.data-v-f3dce692 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.apply-modal .modal-actions .confirm-btn.data-v-f3dce692:disabled {
+  background-color: #ffcab3;
+  color: #ffffff;
+}
+
+/* uni-popup 弹窗容器样式 */
+.data-v-f3dce692 .uni-popup {
+  z-index: 1000000 !important;
+  position: fixed !important;
+}
+.data-v-f3dce692 .uni-popup__wrapper {
+  z-index: 1000002 !important;
+  position: fixed !important;
+}
+.data-v-f3dce692 .uni-popup__mask {
+  z-index: 1000001 !important;
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}

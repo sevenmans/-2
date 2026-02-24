@@ -1,0 +1,133 @@
+
+.test-container.data-v-f9c2d39b {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+.test-header.data-v-f9c2d39b {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.test-title.data-v-f9c2d39b {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10px;
+}
+.test-subtitle.data-v-f9c2d39b {
+  font-size: 14px;
+  color: #666;
+  display: block;
+}
+.section-title.data-v-f9c2d39b {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  display: block;
+}
+.test-section.data-v-f9c2d39b {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.status-grid.data-v-f9c2d39b, .test-grid.data-v-f9c2d39b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.status-item.data-v-f9c2d39b, .test-item.data-v-f9c2d39b {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #ddd;
+}
+.status-item.success.data-v-f9c2d39b {
+  background-color: #d4edda;
+  border-color: #28a745;
+}
+.status-item.error.data-v-f9c2d39b {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+}
+.test-item.success.data-v-f9c2d39b {
+  background-color: #d4edda;
+  border-color: #28a745;
+}
+.test-item.error.data-v-f9c2d39b {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+}
+.function-tests.data-v-f9c2d39b {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.function-group.data-v-f9c2d39b {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+.group-title.data-v-f9c2d39b {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  display: block;
+}
+.test-btn.data-v-f9c2d39b, .nav-btn.data-v-f9c2d39b, .full-test-btn.data-v-f9c2d39b {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  font-size: 14px;
+  margin: 5px;
+}
+.test-btn.data-v-f9c2d39b:disabled, .full-test-btn.data-v-f9c2d39b:disabled {
+  background-color: #6c757d;
+}
+.full-test-btn.data-v-f9c2d39b {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #28a745;
+}
+.nav-tests.data-v-f9c2d39b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.log-section.data-v-f9c2d39b {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.log-container.data-v-f9c2d39b {
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+.log-item.data-v-f9c2d39b {
+  display: block;
+  padding: 5px 0;
+  font-family: monospace;
+  font-size: 12px;
+}
+.log-item.success.data-v-f9c2d39b {
+  color: #28a745;
+}
+.log-item.error.data-v-f9c2d39b {
+  color: #dc3545;
+}
+.log-item.info.data-v-f9c2d39b {
+  color: #17a2b8;
+}
