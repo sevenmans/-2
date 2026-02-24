@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "拼场详情",
+  "usingComponents": {
+    "countdown-timer": "../../components/CountdownTimer"
+  }
+}

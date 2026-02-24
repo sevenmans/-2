@@ -1,0 +1,1 @@
+"use strict";const e=require("../utils/request.js");exports.getOrderDetail=function(t){return e.get(`/bookings/${t}`)},exports.payOrder=function(t,r="wechat"){return e.post(`/payments/orders/${t}/pay`,{paymentMethod:r})};

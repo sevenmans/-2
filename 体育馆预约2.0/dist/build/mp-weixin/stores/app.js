@@ -1,0 +1,1 @@
+"use strict";const t=require("../common/vendor.js").defineStore("app",{state:()=>({loading:!1,networkStatus:!0}),actions:{setLoading(t){this.loading=t},setNetworkStatus(t){this.networkStatus=t}},getters:{isLoading:t=>t.loading,isOnline:t=>t.networkStatus}});exports.useAppStore=t;

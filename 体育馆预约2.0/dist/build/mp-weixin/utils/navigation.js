@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),s=["/pages/index/index","/pages/venue/list","/pages/sharing/list","/pages/booking/list","/pages/user/profile"];exports.smartNavigate=function(i,n={}){return function(i,n={}){const t=i.split("?")[0];s.includes(t)?e.index.switchTab({url:i,...n}):e.index.navigateTo({url:i,...n})}(i,n)};

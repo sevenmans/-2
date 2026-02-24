@@ -1,0 +1,1 @@
+"use strict";const o=require("../common/vendor.js");exports.showError=function(r,s=3e3,e=!1){if(r)try{o.index.showToast({title:String(r),icon:"error",duration:s,mask:e}),console.log("[Toast] 显示错误提示:",r)}catch(t){console.error("[Toast] showError失败:",t),console.log("错误:",r)}else console.warn("[Toast] showError: title参数不能为空")};

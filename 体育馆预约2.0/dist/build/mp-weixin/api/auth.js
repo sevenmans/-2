@@ -1,0 +1,1 @@
+"use strict";const t=require("../utils/request.js");exports.login=function(u){return t.post("/auth/signin",u)},exports.logout=function(){return t.post("/auth/logout")},exports.register=function(u){return t.post("/auth/signup",u)};

@@ -1,0 +1,1 @@
+"use strict";exports.quickPriceCheck=function(e){const s=parseFloat(e);return isNaN(s)?{valid:!1,message:"价格不是有效数字"}:s<=0?{valid:!1,message:"价格必须大于0"}:s<30?{valid:!0,message:"价格偏低，请确认",level:"warning"}:s>500?{valid:!0,message:"价格偏高，请确认",level:"warning"}:{valid:!0,message:"价格正常",level:"success"}};
