@@ -38,8 +38,8 @@ public class TimeSlotController {
      */
     @GetMapping("/venue/{venueId}/date/{date}")
     public ResponseEntity<List<TimeSlot>> getTimeSlotsByVenueAndDate(
-            @PathVariable Long venueId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @PathVariable("venueId") Long venueId,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
             System.out.println("[DEBUG] Controller接收到请求 - venueId: " + venueId + ", date: " + date);
             logger.info("[DEBUG] Controller接收到请求 - venueId: {}, date: {}", venueId, date);
@@ -63,8 +63,8 @@ public class TimeSlotController {
      */
     @GetMapping("/venue/{venueId}/date/{date}/available")
     public ResponseEntity<List<TimeSlot>> getAvailableTimeSlots(
-            @PathVariable Long venueId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @PathVariable("venueId") Long venueId,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         
         List<TimeSlot> slots = timeSlotService.getAvailableTimeSlots(venueId, date);
         return ResponseEntity.ok(slots);
@@ -75,8 +75,8 @@ public class TimeSlotController {
      */
     @PostMapping("/venue/{venueId}/date/{date}/generate")
     public ResponseEntity<List<TimeSlot>> generateTimeSlotsForVenue(
-            @PathVariable Long venueId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @PathVariable("venueId") Long venueId,
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         
         try {
             List<TimeSlot> slots = timeSlotService.generateTimeSlotsForVenue(venueId, date);
@@ -90,7 +90,7 @@ public class TimeSlotController {
      * 批量生成未来一周的时间段
      */
     @PostMapping("/venue/{venueId}/generate-week")
-    public ResponseEntity<Map<String, String>> generateTimeSlotsForWeek(@PathVariable Long venueId) {
+    public ResponseEntity<Map<String, String>> generateTimeSlotsForWeek(@PathVariable("venueId") Long venueId) {
         try {
             timeSlotService.generateTimeSlotsForWeek(venueId);
             Map<String, String> response = new HashMap<>();
@@ -108,7 +108,7 @@ public class TimeSlotController {
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<TimeSlot> updateTimeSlotStatus(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody Map<String, String> statusMap) {
         
         try {

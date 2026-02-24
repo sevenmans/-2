@@ -192,9 +192,9 @@ public class SharingController {
      */
     @GetMapping("/my-requests")
     public ResponseEntity<Map<String, Object>> getMyRequests(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         try {
             // 获取当前用户
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -349,9 +349,9 @@ public class SharingController {
      */
     @GetMapping("/received-requests")
     public ResponseEntity<Map<String, Object>> getReceivedRequests(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         try {
             // 获取当前用户
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

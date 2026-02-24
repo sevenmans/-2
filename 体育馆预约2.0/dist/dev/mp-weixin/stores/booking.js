@@ -700,7 +700,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
     async createSharingOrderNew(sharingData) {
       try {
         this.setLoading(true);
-        const response = await (void 0)(sharingData);
+        const response = await api_sharing.createSharingOrderNew(sharingData);
         utils_ui.showSuccess("创建拼场订单成功");
         return response;
       } catch (error) {
@@ -715,7 +715,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
     async getSharingOrderDetail(orderId) {
       try {
         this.setLoading(true);
-        const response = await (void 0)(orderId);
+        const response = await api_sharing.getSharingOrderDetail(orderId);
         this.setSharingDetail(response.data || response);
         return response;
       } catch (error) {
@@ -760,7 +760,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
     async handleSharingRequest({ requestId, data }) {
       try {
         this.setLoading(true);
-        const response = await (void 0)({ requestId, data });
+        const response = await api_sharing.handleSharingRequest({ requestId, data });
         utils_ui.showSuccess("处理拼场申请成功");
         return response;
       } catch (error) {
@@ -790,7 +790,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
     async getUserJoinedSharingOrders(params = {}) {
       try {
         this.setLoading(true);
-        const response = await (void 0)(params);
+        const response = await api_sharing.getUserJoinedSharingOrders(params);
         this.setJoinedSharingOrders(response.data || []);
         return response;
       } catch (error) {
@@ -805,7 +805,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
     async getSharingDetail(sharingId) {
       try {
         this.setLoading(true);
-        const response = await (void 0)(sharingId);
+        const response = await api_sharing.getSharingDetail(sharingId);
         this.setSharingDetail(response.data || response);
         return response;
       } catch (error) {

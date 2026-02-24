@@ -236,11 +236,6 @@ function request(options, retryCount = 0) {
             } catch (error) {
               // 检查是否需要重试
               if (retryCount < config.retryTimes && shouldRetry(error)) {
-                // 隐藏当前加载状态
-                if (options.loading !== false) {
-                  hideLoading()
-                }
-                
                 // 🔥 优化：根据网络状态调整重试延迟
                 const retryDelay = networkMonitor.isWeakNetwork() 
                   ? config.retryDelay * 2 
@@ -276,11 +271,6 @@ function request(options, retryCount = 0) {
             
             // 检查是否需要重试
             if (retryCount < config.retryTimes && shouldRetry(error)) {
-              // 隐藏当前加载状态
-              if (options.loading !== false) {
-                hideLoading()
-              }
-              
               // 🔥 优化：根据网络状态调整重试延迟
               const retryDelay = networkMonitor.isWeakNetwork() 
                 ? config.retryDelay * 3 

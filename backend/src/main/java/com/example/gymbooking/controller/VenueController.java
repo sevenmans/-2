@@ -28,12 +28,12 @@ public class VenueController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getVenueList(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Venue.VenueStatus status,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice) {
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "status", required = false) Venue.VenueStatus status,
+            @RequestParam(name = "minPrice", required = false) Double minPrice,
+            @RequestParam(name = "maxPrice", required = false) Double maxPrice) {
         
         try {
             System.out.println("获取场馆列表请求 - page: " + page + ", pageSize: " + pageSize + ", type: " + type + ", status: " + status);
@@ -121,7 +121,7 @@ public class VenueController {
     @GetMapping("/{venueId}/slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(
             @PathVariable Long venueId,
-            @RequestParam String date) {
+            @RequestParam(name = "date") String date) {
         
         try {
             LocalDate localDate = LocalDate.parse(date);
@@ -141,8 +141,8 @@ public class VenueController {
     @GetMapping("/{venueId}/timeslots")
     public ResponseEntity<Map<String, Object>> getVenueTimeSlots(
             @PathVariable Long venueId,
-            @RequestParam String date,
-            @RequestParam(required = false, defaultValue = "false") boolean refresh) {
+            @RequestParam(name = "date") String date,
+            @RequestParam(name = "refresh", required = false, defaultValue = "false") boolean refresh) {
         
         try {
             LocalDate localDate = LocalDate.parse(date);
@@ -188,12 +188,12 @@ public class VenueController {
      */
     @GetMapping("/search")
     public ResponseEntity<List<Venue>> searchVenues(
-            @RequestParam String keyword,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String date,
-            @RequestParam(required = false) String timeSlot,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice) {
+            @RequestParam(name = "keyword") String keyword,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "date", required = false) String date,
+            @RequestParam(name = "timeSlot", required = false) String timeSlot,
+            @RequestParam(name = "minPrice", required = false) Double minPrice,
+            @RequestParam(name = "maxPrice", required = false) Double maxPrice) {
         
         List<Venue> venues = venueService.searchVenues(keyword);
         
@@ -228,7 +228,7 @@ public class VenueController {
      */
     @GetMapping("/popular")
     public ResponseEntity<List<Venue>> getPopularVenues(
-            @RequestParam(defaultValue = "5") int limit) {
+            @RequestParam(name = "limit", defaultValue = "5") int limit) {
         
         List<Venue> venues = venueService.getAllVenues();
         

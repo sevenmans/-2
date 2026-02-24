@@ -322,9 +322,9 @@ return ResponseEntity.ok(result);
      */
     @GetMapping
     public ResponseEntity<?> getAllSharingOrders(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "false") boolean all) {
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "all", defaultValue = "false") boolean all) {
         try {
             logger.info("获取所有拼场订单列表，页码: {}, 页大小: {}, 获取全部: {}", page, pageSize, all);
             
@@ -387,8 +387,8 @@ return ResponseEntity.ok(result);
      */
     @GetMapping("/joinable")
     public ResponseEntity<?> getJoinableSharingOrders(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         try {
             logger.info("获取可加入的拼场订单列表，页码: {}, 页大小: {}", page, pageSize);
             List<SharingOrder> allJoinableOrders = sharingOrderService.getJoinableSharingOrders();

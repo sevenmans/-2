@@ -60,7 +60,6 @@ com/example/gymbooking/model/SharingOrder$SharingOrderStatus.class
 com/example/gymbooking/scheduler/OrderStatusScheduler.class
 com/example/gymbooking/config/WebSocketConfig.class
 com/example/gymbooking/service/OrderService.class
-com/example/gymbooking/model/Order$1.class
 com/example/gymbooking/service/FileUploadService.class
 com/example/gymbooking/service/VenueService.class
 com/example/gymbooking/repository/AnnouncementRepository.class

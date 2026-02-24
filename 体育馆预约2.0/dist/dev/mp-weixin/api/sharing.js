@@ -40,8 +40,12 @@ function cancelSharingOrder(id) {
   return utils_request.post(`/sharing-orders/${id}/cancel`);
 }
 function updateSharingSettings(sharingId, settings) {
+  if (sharingId && typeof sharingId === "object" && !Array.isArray(sharingId)) {
+    settings = sharingId.settings;
+    sharingId = sharingId.sharingId;
+  }
   {
-    common_vendor.index.__f__("debug", "at api/sharing.js:186", "[SharingAPI] updateSharingSettings", { sharingId, settings });
+    common_vendor.index.__f__("debug", "at api/sharing.js:190", "[SharingAPI] updateSharingSettings", { sharingId, settings });
   }
   return utils_request.default({
     url: `/sharing-orders/${sharingId}/settings`,
@@ -68,11 +72,34 @@ function cancelSharingRequest(requestId) {
   });
 }
 function removeSharingParticipant(sharingId, participantId) {
-  common_vendor.index.__f__("warn", "at api/sharing.js:265", "[SharingAPI] removeSharingParticipant 接口在后端未找到对应实现，可能已废弃");
+  if (sharingId && typeof sharingId === "object" && !Array.isArray(sharingId)) {
+    participantId = sharingId.participantId;
+    sharingId = sharingId.sharingId;
+  }
+  common_vendor.index.__f__("warn", "at api/sharing.js:273", "[SharingAPI] removeSharingParticipant 接口在后端未找到对应实现，可能已废弃");
   return utils_request.default({
     url: `/sharing-orders/${sharingId}/participants/${participantId}/remove`,
     method: "post"
   });
+}
+function createSharingOrderNew(data) {
+  return createSharingOrder(data);
+}
+function getSharingOrderDetail(id) {
+  return getSharingOrderById(id);
+}
+function getSharingDetail(id) {
+  return getSharingOrderById(id);
+}
+function handleSharingRequest(requestId, data) {
+  if (requestId && typeof requestId === "object" && !Array.isArray(requestId)) {
+    data = requestId.data;
+    requestId = requestId.requestId;
+  }
+  return handleSharedRequest(requestId, data);
+}
+function getUserJoinedSharingOrders(params) {
+  return utils_request.get("/sharing-orders/my-joined", params, { cache: false });
 }
 function getUserSharingOrders(params) {
   return getMySharedRequests(params);
@@ -83,15 +110,20 @@ exports.cancelSharingOrder = cancelSharingOrder;
 exports.cancelSharingRequest = cancelSharingRequest;
 exports.confirmSharingOrder = confirmSharingOrder;
 exports.createSharingOrder = createSharingOrder;
+exports.createSharingOrderNew = createSharingOrderNew;
 exports.getAllSharingOrders = getAllSharingOrders;
 exports.getJoinableSharingOrders = getJoinableSharingOrders;
 exports.getMyCreatedSharingOrders = getMyCreatedSharingOrders;
 exports.getMySharedRequests = getMySharedRequests;
 exports.getReceivedSharedRequests = getReceivedSharedRequests;
+exports.getSharingDetail = getSharingDetail;
 exports.getSharingOrderById = getSharingOrderById;
 exports.getSharingOrderByMainOrderId = getSharingOrderByMainOrderId;
+exports.getSharingOrderDetail = getSharingOrderDetail;
+exports.getUserJoinedSharingOrders = getUserJoinedSharingOrders;
 exports.getUserSharingOrders = getUserSharingOrders;
 exports.handleSharedRequest = handleSharedRequest;
+exports.handleSharingRequest = handleSharingRequest;
 exports.joinSharingOrder = joinSharingOrder;
 exports.removeSharingParticipant = removeSharingParticipant;
 exports.updateSharingSettings = updateSharingSettings;

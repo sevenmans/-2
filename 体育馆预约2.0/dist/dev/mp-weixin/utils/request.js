@@ -157,9 +157,6 @@ function request(options, retryCount = 0) {
               resolve(result);
             } catch (error) {
               if (retryCount < config_index.config.retryTimes && shouldRetry(error)) {
-                if (options.loading !== false) {
-                  utils_ui.hideLoading();
-                }
                 const retryDelay = utils_requestOptimizer.networkMonitor.isWeakNetwork() ? config_index.config.retryDelay * 2 : config_index.config.retryDelay;
                 setTimeout(() => {
                   request(options, retryCount + 1).then(resolve).catch(reject);
@@ -173,7 +170,7 @@ function request(options, retryCount = 0) {
             }
           },
           fail: (error) => {
-            common_vendor.index.__f__("error", "at utils/request.js:267", "[Request] ❌ 请求失败:", error);
+            common_vendor.index.__f__("error", "at utils/request.js:262", "[Request] ❌ 请求失败:", error);
             let errorMsg = "网络请求失败，请检查网络连接";
             if (!networkStatus.isOnline) {
               errorMsg = "网络连接已断开，请检查网络设置";
@@ -181,9 +178,6 @@ function request(options, retryCount = 0) {
               errorMsg = "网络信号较弱，请稍后重试";
             }
             if (retryCount < config_index.config.retryTimes && shouldRetry(error)) {
-              if (options.loading !== false) {
-                utils_ui.hideLoading();
-              }
               const retryDelay = utils_requestOptimizer.networkMonitor.isWeakNetwork() ? config_index.config.retryDelay * 3 : config_index.config.retryDelay;
               setTimeout(() => {
                 request(options, retryCount + 1).then(resolve).catch(reject);
@@ -268,7 +262,7 @@ function upload(url, filePath, formData = {}, options = {}) {
         }
       },
       fail: (error) => {
-        common_vendor.index.__f__("error", "at utils/request.js:404", "上传失败:", error);
+        common_vendor.index.__f__("error", "at utils/request.js:394", "上传失败:", error);
         reject(new Error("文件上传失败"));
       }
     });

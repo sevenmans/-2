@@ -182,6 +182,10 @@ export function cancelSharingOrder(id) {
  * @returns {Promise}
  */
 export function updateSharingSettings(sharingId, settings) {
+  if (sharingId && typeof sharingId === 'object' && !Array.isArray(sharingId)) {
+    settings = sharingId.settings
+    sharingId = sharingId.sharingId
+  }
   if (config.debug) {
     console.debug('[SharingAPI] updateSharingSettings', { sharingId, settings })
   }
@@ -262,11 +266,39 @@ export function cancelSharingRequest(requestId) {
  * 暂保留以防报错，但在后端未找到对应 path
  */
 export function removeSharingParticipant(sharingId, participantId) {
+  if (sharingId && typeof sharingId === 'object' && !Array.isArray(sharingId)) {
+    participantId = sharingId.participantId
+    sharingId = sharingId.sharingId
+  }
   console.warn('[SharingAPI] removeSharingParticipant 接口在后端未找到对应实现，可能已废弃')
   return request({
     url: `/sharing-orders/${sharingId}/participants/${participantId}/remove`,
     method: 'post'
   })
+}
+
+export function createSharingOrderNew(data) {
+  return createSharingOrder(data)
+}
+
+export function getSharingOrderDetail(id) {
+  return getSharingOrderById(id)
+}
+
+export function getSharingDetail(id) {
+  return getSharingOrderById(id)
+}
+
+export function handleSharingRequest(requestId, data) {
+  if (requestId && typeof requestId === 'object' && !Array.isArray(requestId)) {
+    data = requestId.data
+    requestId = requestId.requestId
+  }
+  return handleSharedRequest(requestId, data)
+}
+
+export function getUserJoinedSharingOrders(params) {
+  return get('/sharing-orders/my-joined', params, { cache: false })
 }
 
 /**
@@ -286,7 +318,9 @@ export function getAvailableSharedBookings(params) {
 // 默认导出
 export default {
   createSharingOrder,
+  createSharingOrderNew,
   getSharingOrderById,
+  getSharingOrderDetail,
   getSharingOrderByMainOrderId,
   getSharingOrderByOrderNo,
   getJoinableSharingOrders,
@@ -304,12 +338,15 @@ export default {
   
   applySharedBooking,
   handleSharedRequest,
+  handleSharingRequest,
   getMySharedRequests,
   getReceivedSharedRequests,
   cancelSharingRequest,
   
   // Aliases
   getUserSharingOrders,
+  getUserJoinedSharingOrders,
+  getSharingDetail,
   getAvailableSharedBookings,
   removeSharingParticipant
 }

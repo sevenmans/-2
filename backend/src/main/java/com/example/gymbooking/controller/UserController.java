@@ -236,9 +236,9 @@ public class UserController {
      */
     @GetMapping("/me/bookings")
     public ResponseEntity<Map<String, Object>> getMyBookings(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String status) {
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(name = "status", required = false) String status) {
 
         try {
             // 获取当前认证信息

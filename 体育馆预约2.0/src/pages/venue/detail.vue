@@ -1228,17 +1228,13 @@ export default {
     async forceRefreshTimeSlots() {
       try {
         console.log('[VenueDetail] 🔄 用户手动触发强制刷新时间段')
-        
-        uni.showLoading({ title: '刷新中...' })
-        
+
         // 清空选中的时间段
         this.selectedTimeSlots = []
         
         // 强制刷新时间段数据
         await this.loadTimeSlots(true)
-        
-        uni.hideLoading()
-        
+
         uni.showToast({
           title: '刷新成功',
           icon: 'success',
@@ -1248,7 +1244,6 @@ export default {
         console.log('[VenueDetail] ✅ 手动刷新完成')
         
       } catch (error) {
-        uni.hideLoading()
         console.error('[VenueDetail] ❌ 手动刷新失败:', error)
         
         uni.showToast({
