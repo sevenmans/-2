@@ -1,0 +1,1060 @@
+import { defineStore } from 'pinia'
+import * as bookingApi from '@/api/booking.js'
+import * as userApi from '@/api/user.js'
+import * as sharingApi from '@/api/sharing.js'
+import { showSuccess, showError } from '@/utils/ui.js'
+// 🔧 移除直接导入，改用动态导入避免循环依赖
+// import { useVenueStore } from '@/stores/venue.js'
+
+// 🔥 修复问题1: 改进 venue store 获取逻辑
+async function getVenueStore() {
+  try {
+    // 动态导入 venue store 模块
+    const venueStoreModule = await import('./venue.js');
+
+    // 检查模块是否正确加载并且包含 useVenueStore
+    // 注意：ES模块导入时，命名导出在模块对象上
+    if (venueStoreModule && typeof venueStoreModule.useVenueStore === 'function') {
+      return venueStoreModule.useVenueStore();
+    }
+    // 🔥 修复：有些打包工具可能将导出放在 default 中
+    else if (venueStoreModule.default && typeof venueStoreModule.default.useVenueStore === 'function') {
+      return venueStoreModule.default.useVenueStore();
+    }
+    // 🔥 修复：直接检查 default 是否是函数
+    else if (typeof venueStoreModule.default === 'function') {
+      return venueStoreModule.default();
+    }
+    else {
+      console.error('[BookingStore] 动态导入的 venue.js 模块中未找到 useVenueStore 函数');
+      console.error('[BookingStore] 可用的导出:', Object.keys(venueStoreModule));
+      return null;
+    }
+  } catch (error) {
+    console.error('[BookingStore] 动态导入 venue store 失败:', error);
+    return null;
+  }
+}
+
+export const useBookingStore = defineStore('booking', {
+  state: () => ({
+    bookingList: [],
+    bookingDetail: null,
+    sharingOrders: [],
+    userSharingOrders: [],
+    joinedSharingOrders: [],
+    sharingDetail: null,
+    loading: false,
+    loadingMore: false, // 🔥 修复问题2: 添加加载更多状态
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+      totalPages: 1,
+      currentPage: 1
+    },
+    // 缓存相关状态
+    cache: {
+      bookingList: {
+        data: null,
+        timestamp: 0,
+        expiry: 5 * 60 * 1000 // 5分钟缓存
+      },
+      bookingDetails: new Map(), // 预约详情缓存
+      lastRefreshTime: 0
+    },
+
+    // 最近一次取消（跨页强制刷新使用）
+    lastCancelled: null
+  }),
+
+  getters: {
+    // 基础getters - 修复命名冲突，避免与actions同名
+    bookingListGetter: (state) => state.bookingList,
+    bookingDetailGetter: (state) => state.bookingDetail,
+    sharingOrdersGetter: (state) => state.sharingOrders,
+    userSharingOrdersGetter: (state) => state.userSharingOrders,
+    joinedSharingOrdersGetter: (state) => state.joinedSharingOrders,
+    sharingDetailGetter: (state) => state.sharingDetail,
+    isLoading: (state) => state.loading,
+    getPagination: (state) => state.pagination,
+    
+    // 计算属性
+    totalBookings: (state) => state.bookingList.length,
+    totalSharingOrders: (state) => state.sharingOrders.length,
+    totalUserSharingOrders: (state) => state.userSharingOrders.length,
+    totalJoinedSharingOrders: (state) => state.joinedSharingOrders.length,
+    
+    // 按状态筛选预订
+    getBookingsByStatus: (state) => (status) => {
+      return state.bookingList.filter(booking => booking.status === status)
+    },
+    
+    // 待确认的预订
+    getPendingBookings: (state) => {
+      return state.bookingList.filter(booking => booking.status === 'PENDING')
+    },
+    
+    // 已确认的预订
+    getConfirmedBookings: (state) => {
+      return state.bookingList.filter(booking => booking.status === 'CONFIRMED')
+    },
+    
+    // 是否有更多数据
+    hasMoreData: (state) => {
+      return state.pagination.current < state.pagination.totalPages
+    },
+    
+    // 缓存相关getters
+    isCacheValid: (state) => (cacheKey) => {
+      const cache = state.cache[cacheKey]
+      if (!cache || !cache.data) return false
+      return Date.now() - cache.timestamp < cache.expiry
+    },
+    
+    getCachedData: (state) => (cacheKey) => {
+      const cache = state.cache[cacheKey]
+      return cache && cache.data ? cache.data : null
+    }
+  },
+
+  actions: {
+    // 🔥 新增：设置事件监听器
+    setupEventListeners() {
+      
+      try {
+        // 检查uni对象是否可用
+        if (typeof uni === 'undefined' || !uni.$on) {
+          setTimeout(() => this.setupEventListeners(), 1000)
+          return
+        }
+        
+        // 监听订单过期事件
+        uni.$on('order-expired', this.onOrderExpired.bind(this))
+        
+        // 监听订单取消事件
+        uni.$on('order-cancelled', this.onOrderCancelled.bind(this))
+        
+        // 监听预约成功事件
+        uni.$on('booking-success', this.onBookingSuccess.bind(this))
+        
+      } catch (error) {
+        console.error('[BookingStore] ❌ 设置事件监听器失败:', error)
+      }
+    },
+
+    // 清理事件监听器
+    cleanupEventListeners() {
+      try {
+        if (typeof uni !== 'undefined' && uni.$off) {
+          uni.$off('order-expired', this.onOrderExpired)
+          uni.$off('order-cancelled', this.onOrderCancelled)
+          uni.$off('booking-success', this.onBookingSuccess)
+        }
+      } catch (error) {
+        console.error('[BookingStore] 清理事件监听器失败:', error)
+      }
+    },
+
+    // 处理订单过期事件
+    async onOrderExpired(eventData) {
+      
+      if (!eventData || !eventData.orderNo) {
+        return
+      }
+      
+      // 在本地立即更新订单状态
+      const bookingIndex = this.bookingList.findIndex(b => b.orderNo === eventData.orderNo)
+      if (bookingIndex !== -1) {
+        this.bookingList[bookingIndex].status = 'CANCELLED'
+      }
+      
+      // 可选：触发一次后台数据刷新，确保数据一致性
+      await this.refreshBookingList()
+    },
+
+    // 处理订单取消事件
+    async onOrderCancelled(eventData) {
+      try {
+        if (eventData && (eventData.orderType === 'BOOKING' || eventData.orderType === 'booking')) {
+          // 刷新预约列表
+          await this.refreshBookingList()
+        }
+      } catch (error) {
+        console.error('[BookingStore] 处理订单取消失败:', error)
+      }
+    },
+
+    // 处理预约成功事件
+    async onBookingSuccess(eventData) {
+      try {
+        // 刷新预约列表
+        await this.refreshBookingList()
+        
+        // 通知venue store更新时间段状态
+        if (eventData && eventData.venueId && eventData.date) {
+          try {
+            const venueStore = await getVenueStore()
+            if (venueStore) {
+              // 通知venue store有新的预约成功
+              await venueStore.onTimeslotStatusUpdate({
+                venueId: eventData.venueId,
+                date: eventData.date,
+                slotIds: eventData.slotIds || [eventData.slotId],
+                action: 'booking-success'
+              })
+            }
+          } catch (error) {
+            console.error('[BookingStore] 通知venue store失败:', error)
+          }
+        }
+      } catch (error) {
+        console.error('[BookingStore] 处理预约成功失败:', error)
+      }
+    },
+
+    // 清除缓存
+    clearCache() {
+      try {
+        uni.removeStorageSync('booking_list_cache')
+        uni.removeStorageSync('booking_detail_cache')
+      } catch (error) {
+        console.error('[BookingStore] 清除缓存失败:', error)
+      }
+    },
+
+    // 设置加载状态
+    setLoading(loading) {
+      this.loading = loading
+    },
+    
+    // 设置预订列表
+    setBookingList({ list, pagination }) {
+      this.bookingList = Array.isArray(list) ? list : []
+      if (pagination) {
+        this.pagination = { ...this.pagination, ...pagination }
+      }
+    },
+    
+    // 追加预订列表
+    appendBookingList(list) {
+      const newList = Array.isArray(list) ? list : []
+      this.bookingList = [...this.bookingList, ...newList]
+    },
+    
+    // 设置预订详情
+    setBookingDetail(detail) {
+      this.bookingDetail = detail
+    },
+    
+    // 设置分享订单列表
+    setSharingOrders(orders) {
+      this.sharingOrders = Array.isArray(orders) ? orders : []
+    },
+    
+    // 设置用户分享订单
+    setUserSharingOrders(orders) {
+      this.userSharingOrders = Array.isArray(orders) ? orders : []
+    },
+    
+    // 设置加入的分享订单
+    setJoinedSharingOrders(orders) {
+      this.joinedSharingOrders = Array.isArray(orders) ? orders : []
+    },
+    
+    // 设置分享详情
+    setSharingDetail(detail) {
+      this.sharingDetail = detail
+    },
+    
+    // 设置分页信息
+    setPagination(pagination) {
+      this.pagination = { ...this.pagination, ...pagination }
+    },
+    
+    // 更新预订状态
+    updateBookingStatus({ bookingId, status }) {
+      const booking = this.bookingList.find(b => b.id === bookingId)
+      if (booking) {
+        booking.status = status
+      }
+    },
+    
+    // 创建预订
+    async createBooking(bookingData) {
+      try {
+        this.setLoading(true)
+
+        const response = await bookingApi.createBooking(bookingData)
+        showSuccess('预约成功')
+
+        // 预约成功后刷新时间段状态
+        if (bookingData.venueId && bookingData.date) {
+          try {
+            // 使用辅助函数获取 venue store
+            const venueStore = await getVenueStore()
+
+            // 检查 venueStore 是否可用
+            if (!venueStore) {
+              return response.data || response
+            }
+
+            // 支持单个时间段和多个时间段的情况
+            let slotIds = []
+            if (bookingData.slotIds) {
+              slotIds = bookingData.slotIds
+            } else if (bookingData.slotId) {
+              slotIds = [bookingData.slotId]
+            }
+
+            // 预约成功后立即清除缓存并刷新时间段状态
+            try {
+              // 动态导入缓存管理器并清除相关缓存
+              const { default: cacheManager } = await import('../utils/cache-manager.js')
+              if (cacheManager && typeof cacheManager.clearTimeSlotCache === 'function') {
+                cacheManager.clearTimeSlotCache(bookingData.venueId, bookingData.date)
+              }
+            } catch (error) {
+            }
+
+            if (slotIds.length > 0) {
+              // 构建选中的时间段信息用于时间匹配
+              const selectedSlots = []
+              if (bookingData.startTime && bookingData.endTime) {
+                selectedSlots.push({
+                  startTime: bookingData.startTime,
+                  endTime: bookingData.endTime
+                })
+              }
+              
+              await venueStore.onBookingSuccess(bookingData.venueId, bookingData.date, slotIds, selectedSlots)
+            } else {
+              // 如果没有具体的时间段ID，刷新整个日期的时间段
+              await venueStore.refreshTimeSlotStatus(bookingData.venueId, bookingData.date)
+            }
+          } catch (refreshError) {
+          }
+        }
+
+        // 返回响应数据，确保包含订单ID
+        const result = response.data || response
+        return result
+      } catch (error) {
+        console.error('[BookingStore] 创建预约失败:', error)
+        showError(error.message || '预约失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 获取我的预订列表（别名方法，用于测试兼容性）
+    async getMyBookings(params = {}) {
+      return await this.getBookingList(params)
+    },
+
+    // 获取预订详情（修复API调用错误）
+    async getBookingDetails(bookingId) {
+      try {
+        this.setLoading(true)
+
+        // 修复：使用正确的API方法名
+        const response = await bookingApi.getBookingDetail(bookingId)
+
+        // 设置到store状态中
+        this.setBookingDetail(response.data || response)
+
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取预订详情失败:', error)
+        showError(error.message || '获取预订详情失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 创建拼场预约
+    async createSharedBooking(bookingData) {
+      try {
+        this.setLoading(true)
+
+        const response = await bookingApi.createSharedBooking(bookingData)
+        showSuccess('拼场预约成功')
+
+        // 🔥 修复问题2: 拼场预约成功后立即清除预约列表缓存
+        this.clearCache('bookingList')
+
+        // 拼场预约成功后也要刷新时间段状态
+        if (bookingData.venueId && bookingData.date) {
+          try {
+            // 使用统一时间段管理器清除缓存
+            try {
+              const { default: unifiedTimeSlotManager } = await import('../utils/unified-timeslot-manager.js')
+              if (unifiedTimeSlotManager && typeof unifiedTimeSlotManager.clearCache === 'function') {
+                unifiedTimeSlotManager.clearCache(bookingData.venueId, bookingData.date)
+              } else {
+                // 备用方案：使用缓存管理器
+                const { default: cacheManager } = await import('../utils/cache-manager.js')
+                if (cacheManager && typeof cacheManager.clearTimeSlotCache === 'function') {
+                  cacheManager.clearTimeSlotCache(bookingData.venueId, bookingData.date)
+                }
+              }
+            } catch (importError) {
+            }
+          } catch (error) {
+          }
+          
+          try {
+            // 使用辅助函数获取 venue store
+            const venueStore = await getVenueStore()
+
+            // 检查 venueStore 是否可用
+            if (venueStore) {
+              // 支持单个时间段和多个时间段的情况
+              let slotIds = []
+              if (bookingData.slotIds) {
+                slotIds = bookingData.slotIds
+              } else if (bookingData.slotId) {
+                slotIds = [bookingData.slotId]
+              }
+
+              if (slotIds.length > 0) {
+                // 构建选中的时间段信息用于时间匹配
+                const selectedSlots = []
+                if (bookingData.startTime && bookingData.endTime) {
+                  selectedSlots.push({
+                    startTime: bookingData.startTime,
+                    endTime: bookingData.endTime
+                  })
+                }
+                
+                await venueStore.onBookingSuccess(bookingData.venueId, bookingData.date, slotIds, selectedSlots)
+              } else {
+                // 如果没有具体的时间段ID，刷新整个日期的时间段
+                await venueStore.refreshTimeSlotStatus(bookingData.venueId, bookingData.date)
+              }
+            }
+          } catch (refreshError) {
+          }
+        }
+
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 创建拼场预约失败:', error)
+        showError(error.message || '拼场预约失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+    
+    // 获取用户预约列表（带缓存）
+    async getUserBookings(params = {}) {
+      // 🔥 修复问题2: 判断是否是加载更多
+      const isFirstPage = !params.page || params.page === 1
+      const isLoadingMore = !isFirstPage
+      const isForceRefresh = params.force === true
+
+      try {
+        // 🔥 修复问题2: 根据是否是加载更多设置不同的loading状态
+        // 如果是强制刷新，跳过loading检查
+        if (!isForceRefresh) {
+          if (isLoadingMore) {
+            this.loadingMore = true
+          } else {
+            this.setLoading(true)
+          }
+        } else {
+        }
+
+        // 检查缓存（仅对第一页且非强制刷新的请求使用缓存）
+        const useCache = isFirstPage && !params.refresh && !params.force
+
+        if (useCache && this.isCacheValid('bookingList')) {
+          const cachedData = this.getCachedData('bookingList')
+          if (cachedData) {
+            this.setBookingList(cachedData)
+            return { success: true, fromCache: true }
+          }
+        }
+
+        // 🔥 修复问题2: 移除超时逻辑，完全依赖API层面的超时处理
+
+        const response = await userApi.getUserBookings(params)
+
+
+        const { data, total, page, pageSize, totalPages } = response
+
+        const pagination = {
+          current: page,
+          pageSize: pageSize,
+          total: total,
+          totalPages: totalPages,
+          currentPage: page
+        }
+
+        const listData = { list: data || [], pagination: pagination }
+
+        if (params.page === 1 || params.refresh) {
+          this.setBookingList(listData)
+
+          // 缓存第一页数据
+          if (isFirstPage) {
+            this.setCacheData('bookingList', listData)
+          }
+        } else {
+          // 🔥 修复问题2: 加载更多时追加数据
+          this.appendBookingList(data || [])
+          this.setPagination(pagination)
+        }
+
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取用户预约列表失败:', error)
+
+        // 如果是超时错误，显示特定提示
+        if (error.message === '请求超时') {
+          showError('加载超时，请检查网络连接')
+        } else {
+          showError(error.message || '获取预约列表失败')
+        }
+
+        // 🔥 修复问题2: 只在加载第一页失败时清空列表
+        if (isFirstPage) {
+          this.setBookingList({
+            list: [],
+            pagination: { current: 1, pageSize: 10, total: 0, totalPages: 1, currentPage: 1 }
+          })
+        }
+        throw error
+      } finally {
+        // 🔥 修复问题2: 根据是否是加载更多重置不同的loading状态
+        // 如果是强制刷新，也要重置loading状态
+        if (!isForceRefresh) {
+          if (isLoadingMore) {
+            this.loadingMore = false
+          } else {
+            this.setLoading(false)
+          }
+        } else {
+        }
+      }
+    },
+    
+    // 获取预约详情（带缓存）
+    async getBookingDetail(bookingId, useCache = true) {
+      try {
+        this.setLoading(true)
+        
+        if (!bookingId) {
+          throw new Error('订单ID不能为空')
+        }
+        
+        // 检查缓存
+        if (useCache && this.cache.bookingDetails.has(bookingId)) {
+          const cachedDetail = this.cache.bookingDetails.get(bookingId)
+          const now = Date.now()
+          // 详情缓存2分钟
+          if (now - cachedDetail.timestamp < 2 * 60 * 1000) {
+            this.setBookingDetail(cachedDetail.data)
+            return { success: true, fromCache: true }
+          } else {
+            // 缓存过期，删除
+            this.cache.bookingDetails.delete(bookingId)
+          }
+        }
+        
+        // 添加超时处理
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('请求超时')), 10000) // 10秒超时
+        })
+
+        const apiPromise = bookingApi.getBookingDetail(bookingId)
+        const response = await Promise.race([apiPromise, timeoutPromise])
+        
+        // 处理不同的响应数据结构
+        let bookingData = null
+        if (response && typeof response === 'object') {
+          // 如果response直接是数据对象
+          if (response.id || response.orderNo) {
+            bookingData = response
+          }
+          // 如果response有data属性
+          else if (response.data) {
+            bookingData = response.data
+          }
+          // 如果response有result属性
+          else if (response.result) {
+            bookingData = response.result
+          }
+          else {
+            // 尝试直接使用response
+            bookingData = response
+          }
+        } else {
+          throw new Error('服务器返回的数据格式不正确')
+        }
+        
+        if (!bookingData) {
+          throw new Error('未能获取到有效的订单数据')
+        }
+        
+        // 字段映射：如果后端返回的是orderNumber，映射为orderNo
+        if (bookingData.orderNumber && !bookingData.orderNo) {
+          bookingData.orderNo = bookingData.orderNumber
+        }
+        
+        this.setBookingDetail(bookingData)
+        
+        // 缓存详情数据
+        this.cache.bookingDetails.set(bookingId, {
+          data: bookingData,
+          timestamp: Date.now()
+        })
+        
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取预约详情失败:', error)
+        
+        // 清空详情数据
+        this.setBookingDetail(null)
+        
+        // 如果是超时错误，显示特定提示
+        if (error.message === '请求超时') {
+          showError('加载超时，请检查网络连接')
+        } else {
+          showError(error.message || '获取预约详情失败')
+        }
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+    
+    // 取消预约
+    async cancelBooking(bookingId) {
+      try {
+
+        // 先获取预约详情，以便获取场馆和时间段信息
+        let bookingDetail = null
+        try {
+          const detailResponse = await bookingApi.getBookingDetail(bookingId)
+          bookingDetail = detailResponse.data || detailResponse
+        } catch (detailError) {
+        }
+
+        // 添加超时处理
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('请求超时')), 10000) // 10秒超时
+        })
+
+        const apiPromise = bookingApi.cancelBooking(bookingId)
+        const response = await Promise.race([apiPromise, timeoutPromise])
+
+        // 立即更新本地状态（列表 + 详情）
+        this.updateBookingStatus({ bookingId, status: 'CANCELLED' })
+        try {
+          const currentDetailId = this.bookingDetail?.id || this.bookingDetail?.orderId
+          if (currentDetailId && String(currentDetailId) === String(bookingId)) {
+            this.setBookingDetail({ ...this.bookingDetail, status: 'CANCELLED' })
+          }
+        } catch (_) {}
+
+        // 🔥 关键修复：使用后端返回的信息立即清除缓存
+        const responseData = response.data || response
+        const releasedTimeSlotIds = responseData.releasedTimeSlotIds || []
+        const venueId = responseData.venueId || (bookingDetail && bookingDetail.venueId)
+        const bookingDate = responseData.bookingDate || (bookingDetail && bookingDetail.bookingDate)
+
+          releasedTimeSlotIds,
+          venueId,
+          bookingDate
+        })
+
+          bookingDetail,
+          venueId: bookingDetail?.venueId,
+          bookingDate: bookingDetail?.bookingDate,
+          booking_date: bookingDetail?.booking_date,
+          bookingTime: bookingDetail?.bookingTime,
+          booking_time: bookingDetail?.booking_time
+        })
+
+        // 🔥 关键修复：直接清除 venueStore 中的缓存AND状态
+        // 这是解决时间段不及时更新的根本原因
+        // 注意：bookingDate 可能是 booking_date 或 bookingTime
+        const actualBookingDate = bookingDetail?.bookingDate || bookingDetail?.booking_date || bookingDate
+        const actualVenueId = bookingDetail?.venueId || bookingDetail?.venue_id || venueId
+
+        if (actualVenueId && actualBookingDate) {
+          try {
+
+            // 记录最近一次取消，用于跨页onShow强制刷新
+            this.lastCancelled = {
+              venueId: actualVenueId,
+              date: actualBookingDate,
+              timestamp: Date.now()
+            }
+            try { uni.setStorageSync && uni.setStorageSync('lastCancelledTimeslot', this.lastCancelled) } catch (_) {}
+
+            // 获取 venueStore 实例
+            const venueStore = await getVenueStore()
+
+            // 直接清除 venueStore 中的缓存
+            const cacheKey = `${actualVenueId}_${actualBookingDate}`
+            if (venueStore && venueStore.cache && venueStore.cache.timeSlots) {
+              venueStore.cache.timeSlots.delete(cacheKey)
+            }
+
+            // 🔥 关键：也要清空 venueStore.timeSlots 状态
+            // 这样才能强制重新加载，而不是使用旧的状态值
+            if (venueStore && typeof venueStore.setTimeSlots === 'function') {
+              venueStore.setTimeSlots([])
+            }
+
+
+            // 使用统一时间段管理器立即释放时间段
+            const startTime = bookingDetail?.startTime || bookingDetail?.start_time
+            const endTime = bookingDetail?.endTime || bookingDetail?.end_time
+            if (startTime && endTime) {
+              const { default: unifiedTimeSlotManager } = await import('../utils/unified-timeslot-manager.js')
+              if (unifiedTimeSlotManager && typeof unifiedTimeSlotManager.immediateReleaseTimeSlots === 'function') {
+                await unifiedTimeSlotManager.immediateReleaseTimeSlots(
+                  actualVenueId,
+                  actualBookingDate,
+                  startTime,
+                  endTime,
+                  bookingDetail?.bookingType || bookingDetail?.booking_type || 'EXCLUSIVE'
+                )
+              } else {
+              }
+            }
+
+            // 发送全局事件通知时间段状态更新
+            if (typeof uni !== 'undefined' && uni.$emit) {
+              uni.$emit('timeslot-updated', {
+                venueId: actualVenueId,
+                date: actualBookingDate,
+                action: 'booking-cancelled',
+                // 添加时间信息，用于拼场订单的时间段匹配
+                startTime: startTime,
+                endTime: endTime,
+                bookingType: bookingDetail?.bookingType || bookingDetail?.booking_type,
+                releasedTimeSlotIds: releasedTimeSlotIds, // 🔥 传递释放的时间段ID
+                immediate: true, // 标记为立即更新
+                timestamp: new Date().toISOString()
+              })
+            }
+
+          } catch (eventError) {
+            console.error('[BookingStore] 使用统一时间段管理器释放时间段失败:', eventError)
+          }
+        }
+
+        // 发送全局事件通知拼场大厅刷新（如果是拼场订单）
+        uni.$emit('orderCancelled', {
+          orderId: bookingId,
+          type: 'booking'
+        })
+
+        // 延迟重新获取数据以确保服务器状态同步
+        setTimeout(() => {
+          this.getUserBookings({ page: 1, pageSize: 10, refresh: true })
+        }, 1000)
+
+        showSuccess('预约已取消')
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 取消预约失败:', error)
+        
+        // 如果是超时错误，显示特定提示
+        if (error.message === '请求超时') {
+          showError('操作超时，请检查网络连接')
+        } else {
+          showError(error.message || '取消预约失败')
+        }
+        throw error
+      }
+    },
+    
+    // 清空预订详情
+    clearBookingDetail() {
+      this.bookingDetail = null
+    },
+    
+    // 重置分页
+    resetPagination() {
+      this.pagination = {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 1,
+        currentPage: 1
+      }
+    },
+
+    // === 分享相关功能 ===
+
+    // 申请拼场
+    async createSharingOrder({ orderId, data }) {
+      try {
+        this.setLoading(true)
+
+        const response = await sharingApi.applySharedBooking(orderId, data)
+
+        showSuccess('拼场申请已发送')
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 申请拼场失败:', error)
+        showError(error.message || '申请拼场失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 获取可拼场的订单列表
+    async getSharingOrdersList(params = {}) {
+      try {
+        this.setLoading(true)
+        const response = await sharingApi.getJoinableSharingOrders(params)
+
+        if (response && (response.list || response.data)) {
+          // 处理两种可能的响应格式：直接返回数据 或 包装在data中
+          const responseData = response.list ? response : response.data
+          const orders = responseData.list || responseData.data || []
+
+          if (params.page === 1 || params.refresh) {
+            this.setSharingOrders(orders)
+          } else {
+            // 追加数据
+            this.sharingOrders = [...this.sharingOrders, ...orders]
+          }
+
+          // 更新分页信息
+          if (responseData.pagination) {
+            this.setPagination(responseData.pagination)
+          }
+        }
+
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取拼场订单失败:', error)
+        showError(error.message || '获取拼场订单失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 获取场馆可用时间段
+    async getVenueAvailableSlots(venueId, date) {
+      try {
+        this.setLoading(true)
+        const response = await bookingApi.getVenueAvailableSlots(venueId, date)
+        return response.data || response
+      } catch (error) {
+        console.error('[BookingStore] 获取场馆可用时间段失败:', error)
+        showError('获取可用时间段失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 申请拼场预约
+    async applySharedBooking(orderId, data) {
+      try {
+        this.setLoading(true)
+        const response = await bookingApi.applySharedBooking(orderId, data)
+        showSuccess('拼场申请已发送')
+        return response.data || response
+      } catch (error) {
+        console.error('[BookingStore] 拼场预约申请失败:', error)
+        showError('拼场申请失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 创建拼场订单
+    async createSharingOrderNew(sharingData) {
+      try {
+        const response = await sharingApi.createSharingOrder(sharingData)
+        showSuccess('拼场订单创建成功')
+        return response.data
+      } catch (error) {
+        console.error('[BookingStore] 创建拼场订单失败:', error)
+        showError(error.message || '创建拼场订单失败')
+        throw error
+      }
+    },
+
+    // 获取拼场订单详情
+    async getSharingOrderDetail(orderId) {
+      try {
+        const response = await sharingApi.getSharingOrderById(orderId)
+        this.setSharingDetail(response.data)
+        return response.data
+      } catch (error) {
+        console.error('[BookingStore] 获取拼场订单详情失败:', error)
+        showError(error.message || '获取拼场订单详情失败')
+        throw error
+      }
+    },
+
+    // 加入拼场订单
+    async joinSharingOrder(orderId) {
+      try {
+        const response = await sharingApi.joinSharingOrder(orderId)
+        showSuccess('加入拼场成功')
+        return response.data
+      } catch (error) {
+        console.error('[BookingStore] 加入拼场失败:', error)
+        showError(error.message || '加入拼场失败')
+        throw error
+      }
+    },
+
+    // 获取我创建的拼场订单
+    async getMyCreatedSharingOrders() {
+      try {
+        const response = await sharingApi.getMyCreatedSharingOrders()
+        this.setUserSharingOrders(response.data || [])
+        return response.data
+      } catch (error) {
+        console.error('[BookingStore] 获取我创建的拼场订单失败:', error)
+        showError(error.message || '获取我创建的拼场订单失败')
+        throw error
+      }
+    },
+
+    // 处理拼场申请
+    async handleSharingRequest({ requestId, data }) {
+      try {
+        const response = await sharingApi.handleSharedRequest(requestId, data)
+        showSuccess(data.status === 'APPROVED' ? '已同意拼场申请' : '已拒绝拼场申请')
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 处理拼场申请失败:', error)
+        showError(error.message || '处理拼场申请失败')
+        throw error
+      }
+    },
+
+    // 获取我发出的拼场申请
+    async getUserSharingOrders(params = {}) {
+      try {
+        const response = await sharingApi.getMySharedRequests(params)
+        this.setUserSharingOrders(response.data || [])
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取拼场申请失败:', error)
+        showError(error.message || '获取拼场申请失败')
+        throw error
+      }
+    },
+
+    // 获取我收到的拼场申请
+    async getUserJoinedSharingOrders(params = {}) {
+      try {
+        const response = await sharingApi.getReceivedSharedRequests(params)
+        this.setJoinedSharingOrders(response.data || [])
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取拼场申请失败:', error)
+        showError(error.message || '获取拼场申请失败')
+        throw error
+      }
+    },
+
+    // 获取拼场详情
+    async getSharingDetail(sharingId) {
+      try {
+        this.setLoading(true)
+        const response = await sharingApi.getSharingOrderById(sharingId)
+        this.setSharingDetail(response.data)
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 获取拼场详情失败:', error)
+        showError(error.message || '获取拼场详情失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 移除拼场参与者
+    async removeSharingParticipant({ sharingId, participantId }) {
+      try {
+        this.setLoading(true)
+        // 调用API移除参与者
+        const response = await sharingApi.removeSharingParticipant(sharingId, participantId)
+        // 重新获取拼场详情以确保数据同步
+        await this.getSharingDetail(sharingId)
+        showSuccess('参与者已移除')
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 移除拼场参与者失败:', error)
+        showError(error.message || '移除参与者失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    // 更新拼场设置
+    async updateSharingSettings({ sharingId, settings }) {
+      try {
+        this.setLoading(true)
+        // 调用API更新设置
+        const response = await sharingApi.updateSharingSettings(sharingId, settings)
+        // 重新获取拼场详情以确保数据同步
+        await this.getSharingDetail(sharingId)
+        showSuccess('拼场设置已更新')
+        return response
+      } catch (error) {
+        console.error('[BookingStore] 更新拼场设置失败:', error)
+        showError(error.message || '更新拼场设置失败')
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+    
+    // 缓存管理方法
+    setCacheData(cacheKey, data) {
+      if (this.cache[cacheKey]) {
+        this.cache[cacheKey].data = data
+        this.cache[cacheKey].timestamp = Date.now()
+      }
+    },
+    
+    clearCache(cacheKey = null) {
+      if (cacheKey) {
+        // 清除特定缓存
+        if (this.cache[cacheKey]) {
+          this.cache[cacheKey].data = null
+          this.cache[cacheKey].timestamp = 0
+        }
+      } else {
+        // 清除所有缓存
+        this.cache.bookingList.data = null
+        this.cache.bookingList.timestamp = 0
+        this.cache.bookingDetails.clear()
+        this.cache.lastRefreshTime = 0
+      }
+    },
+    
+    // 刷新预约列表（清除缓存）
+    async refreshBookingList() {
+      this.clearCache('bookingList')
+      return await this.getUserBookings({
+        page: 1,
+        refresh: true,
+        _t: Date.now() // 🔥 添加时间戳，确保每次请求都有唯一的key，避免被去重机制阻塞
+      })
+    }
+  }
+})

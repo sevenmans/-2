@@ -1,0 +1,329 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "体育馆预约",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/venue/list",
+			"style": {
+				"navigationBarTitleText": "场馆列表",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/venue/detail",
+			"style": {
+				"navigationBarTitleText": "场馆详情"
+			}
+		},
+		{
+			"path": "pages/sharing/list",
+			"style": {
+				"navigationBarTitleText": "拼场列表",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/test/index",
+			"style": {
+				"navigationBarTitleText": "🧪 测试中心"
+			}
+		},
+		{
+			"path": "pages/test/migration-validation",
+			"style": {
+				"navigationBarTitleText": "🧪 Pinia迁移验证"
+			}
+		},
+		{
+			"path": "pages/test/api-diagnosis",
+			"style": {
+				"navigationBarTitleText": "🔍 API诊断工具"
+			}
+		},
+		{
+			"path": "pages/test/quick-fix-validation",
+			"style": {
+				"navigationBarTitleText": "🔧 快速修复验证"
+			}
+		},
+		{
+			"path": "pages/test/comprehensive-migration-check",
+			"style": {
+				"navigationBarTitleText": "🔍 全面迁移错误排查"
+			}
+		},
+		{
+			"path": "pages/test/naming-conflict-fix",
+			"style": {
+				"navigationBarTitleText": "🔧 命名冲突修复验证"
+			}
+		},
+		{
+			"path": "pages/booking/list",
+			"style": {
+				"navigationBarTitleText": "我的预约",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/user/profile",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/booking/create",
+			"style": {
+				"navigationBarTitleText": "创建预约"
+			}
+		},
+
+		{
+			"path": "pages/booking/detail",
+			"style": {
+				"navigationBarTitleText": "预约详情"
+			}
+		},
+		{
+			"path": "pages/sharing/create",
+			"style": {
+				"navigationBarTitleText": "创建拼场"
+			}
+		},
+		{
+			"path": "pages/sharing/detail",
+			"style": {
+				"navigationBarTitleText": "拼场详情"
+			}
+		},
+		{
+			"path": "pages/sharing/manage",
+			"style": {
+				"navigationBarTitleText": "拼场管理"
+			}
+		},
+		{
+			"path": "pages/sharing/my-orders",
+			"style": {
+				"navigationBarTitleText": "我的拼场"
+			}
+		},
+		{
+			"path": "pages/user/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/user/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/user/edit-profile",
+			"style": {
+				"navigationBarTitleText": "编辑资料"
+			}
+		},
+		{
+			"path": "pages/test/auth-test",
+			"style": {
+				"navigationBarTitleText": "认证测试"
+			}
+		},
+		{
+			"path": "pages/sharing/requests",
+			"style": {
+				"navigationBarTitleText": "我的申请",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/sharing/received",
+			"style": {
+				"navigationBarTitleText": "收到的申请",
+				"enablePullDownRefresh": true
+			}
+		},
+
+		{
+			"path": "pages/test/simple-test",
+			"style": {
+				"navigationBarTitleText": "简单测试"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-sync",
+			"style": {
+				"navigationBarTitleText": "时间段同步测试"
+			}
+		},
+		{
+			"path": "pages/test/sharing-test",
+			"style": {
+				"navigationBarTitleText": "拼场功能测试"
+			}
+		},
+		{
+			"path": "pages/test/order-field-test",
+			"style": {
+				"navigationBarTitleText": "Order字段测试"
+			}
+		},
+		{
+			"path": "pages/test/payment-test",
+			"style": {
+				"navigationBarTitleText": "支付功能测试"
+			}
+		},
+		{
+			"path": "pages/test/order-status-test",
+			"style": {
+				"navigationBarTitleText": "订单状态流程测试"
+			}
+		},
+		{
+			"path": "pages/test/payment-fix",
+			"style": {
+				"navigationBarTitleText": "💰 支付问题修复测试"
+			}
+		},
+		{
+			"path": "pages/test/pinia-migration-final-check",
+			"style": {
+				"navigationBarTitleText": "🔍 Pinia迁移最终验证"
+			}
+		},
+
+		{
+			"path": "pages/test/timeslot-api-debug",
+			"style": {
+				"navigationBarTitleText": "🔍 时间段API调试"
+			}
+		},
+		{
+			"path": "pages/test/api-direct-test",
+			"style": {
+				"navigationBarTitleText": "🔍 API直接测试"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-status-fix",
+			"style": {
+				"navigationBarTitleText": "🔧 时间段状态修复"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-fix-test",
+			"style": {
+				"navigationBarTitleText": "🔧 时间段修复测试"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-sync-debug",
+			"style": {
+				"navigationBarTitleText": "🔍 时间段同步调试"
+			}
+		},
+		{
+			"path": "pages/test/booking-data-fix-test",
+			"style": {
+				"navigationBarTitleText": "🔧 预约数据修复测试"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-status-debug",
+			"style": {
+				"navigationBarTitleText": "🔍 时间段状态刷新深度调试"
+			}
+		},
+		{
+			"path": "pages/test/field-mapping-validation",
+			"style": {
+				"navigationBarTitleText": "🔍 字段映射完整性验证"
+			}
+		},
+		{
+			"path": "pages/test/pinia-migration-final-validation",
+			"style": {
+				"navigationBarTitleText": "🎉 Pinia迁移最终验证"
+			}
+		},
+		{
+			"path": "pages/test/timeslot-display-fix-test",
+			"style": {
+				"navigationBarTitleText": "🔧 时间段显示修复测试"
+			}
+		},
+
+		{
+			"path": "pages/payment/index",
+			"style": {
+				"navigationBarTitleText": "订单支付"
+			}
+		},
+		{
+			"path": "pages/payment/success",
+			"style": {
+				"navigationBarTitleText": "支付成功"
+			}
+		},
+		{
+			"path": "pages/payment/failed",
+			"style": {
+				"navigationBarTitleText": "支付失败"
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#666666",
+		"selectedColor": "#ff6b35",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png"
+			},
+			{
+				"pagePath": "pages/venue/list",
+				"text": "场馆",
+				"iconPath": "static/tabbar/venue.png",
+				"selectedIconPath": "static/tabbar/venue-active.png"
+			},
+			{
+				"pagePath": "pages/sharing/list",
+				"text": "拼场",
+				"iconPath": "static/tabbar/sharing.png",
+				"selectedIconPath": "static/tabbar/sharing-active.png"
+			},
+			{
+				"pagePath": "pages/booking/list",
+				"text": "预约",
+				"iconPath": "static/tabbar/booking.png",
+				"selectedIconPath": "static/tabbar/booking-active.png"
+			},
+			{
+				"pagePath": "pages/user/profile",
+				"text": "我的",
+				"iconPath": "static/tabbar/user.png",
+				"selectedIconPath": "static/tabbar/user-active.png"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "体育馆预约",
+		"navigationBarBackgroundColor": "#ff6b35",
+		"backgroundColor": "#f5f5f5"
+	},
+	"uniIdRouter": {}
+}

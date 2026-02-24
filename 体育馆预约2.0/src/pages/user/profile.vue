@@ -1,0 +1,1042 @@
+<template>
+  <view class="container">
+    <!-- 头部用户信息 -->
+    <view class="header">
+      <view class="user-info">
+        <view class="avatar-wrapper" @click="changeAvatar">
+          <image 
+            :src="userInfo?.avatar || '/static/images/default-avatar.svg'" 
+            class="avatar"
+            mode="aspectFill"
+          />
+          <view class="avatar-edit">
+            <text class="edit-icon">📷</text>
+          </view>
+        </view>
+        
+        <view class="user-details">
+          <text class="nickname">{{ userInfo?.nickname || userInfo?.username || '未设置昵称' }}</text>
+          <text class="username">用户名: {{ userInfo?.username || '未设置用户名' }}</text>
+          <text class="phone">{{ formatPhone(userInfo?.phone || '') }}</text>
+        </view>
+        
+        <view class="edit-btn" @click="editProfile">
+          <text class="edit-text">编辑</text>
+        </view>
+      </view>
+      
+      <!-- 统计信息 -->
+      <view class="stats">
+        <view class="stat-item" @click="navigateTo('/pages/booking/list')">
+          <text class="stat-number">{{ userStats.totalBookings || 0 }}</text>
+          <text class="stat-label">总预约</text>
+        </view>
+        <view class="stat-item" @click="navigateTo('/pages/sharing/list?tab=my')">
+          <text class="stat-number">{{ userStats.totalSharings || 0 }}</text>
+          <text class="stat-label">拼场次数</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <!-- 我的订单 -->
+      <view class="menu-group">
+        <view class="group-title">
+          <text class="title-text">我的订单</text>
+        </view>
+        
+        <view class="menu-item" @click="navigateTo('/pages/booking/list')">
+          <view class="item-left">
+            <text class="item-icon">📅</text>
+            <text class="item-text">我的预约</text>
+          </view>
+          <view class="item-right">
+            <text v-if="pendingBookings > 0" class="badge">{{ pendingBookings }}</text>
+            <text class="arrow">›</text>
+          </view>
+        </view>
+
+        <view class="menu-item" @click="navigateTo('/pages/sharing/list?tab=my')">
+          <view class="item-left">
+            <text class="item-icon">👥</text>
+            <text class="item-text">我的拼场</text>
+          </view>
+          <view class="item-right">
+            <text v-if="pendingSharings > 0" class="badge">{{ pendingSharings }}</text>
+            <text class="arrow">›</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 拼场申请 -->
+      <view class="menu-group">
+        <view class="group-title">
+          <text class="title-text">拼场申请</text>
+        </view>
+        
+        <view class="menu-item" @click="navigateTo('/pages/sharing/requests')">
+          <view class="item-left">
+            <text class="item-icon">📝</text>
+            <text class="item-text">我的申请</text>
+          </view>
+          <view class="item-right">
+            <text v-if="pendingRequests > 0" class="badge">{{ pendingRequests }}</text>
+            <text class="arrow">›</text>
+          </view>
+        </view>
+
+        <view class="menu-item" @click="navigateTo('/pages/sharing/received')">
+          <view class="item-left">
+            <text class="item-icon">📬</text>
+            <text class="item-text">收到的申请</text>
+          </view>
+          <view class="item-right">
+            <text v-if="receivedRequests > 0" class="badge">{{ receivedRequests }}</text>
+            <text class="arrow">›</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 设置 -->
+      <view class="menu-group">
+        <view class="group-title">
+          <text class="title-text">设置</text>
+        </view>
+
+        <view class="menu-item" @click="showLogoutConfirm">
+          <view class="item-left">
+            <text class="item-icon">🚪</text>
+            <text class="item-text">退出登录</text>
+          </view>
+          <view class="item-right">
+            <text class="arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 退出登录确认弹窗 -->
+    <uni-popup ref="logoutPopup" type="dialog" v-show="internalLogoutPopupOpened" :class="logoutPopupPosition">
+      <uni-popup-dialog 
+        type="warn"
+        title="确认退出"
+        content="确定要退出登录吗？"
+        :before-close="true"
+        @close="handleLogoutCancel"
+        @confirm="handleLogoutConfirm"
+      ></uni-popup-dialog>
+    </uni-popup>
+  </view>
+</template>
+
+<script>
+import { useUserStore } from '@/stores/user.js'
+import { useBookingStore } from '@/stores/booking.js'
+import { useSharingStore } from '@/stores/sharing.js'
+import requestQueue from '@/utils/request-queue.js'
+
+export default {
+  name: 'UserProfile',
+
+  data() {
+    return {
+      userStore: null,
+      bookingStore: null,
+      sharingStore: null,
+      pendingBookings: 0,
+      pendingSharings: 0,
+      pendingRequests: 0,
+      receivedRequests: 0,
+      isLoading: false,
+      // 防重复请求标记
+      loadingFlags: {
+        userInfo: false,
+        userStats: false,
+        pendingCounts: false
+      },
+      // 请求缓存时间戳
+      lastLoadTime: {
+        userInfo: 0,
+        userStats: 0,
+        pendingCounts: 0
+      },
+      // 缓存有效期（毫秒）
+      cacheTimeout: 30000, // 30秒
+      // 整体缓存时间戳
+      lastRefreshTime: 0,
+      isRefreshing: false,
+      // 退出登录弹窗状态（已移除showLogoutPopup变量，改用ref方式）
+      logoutPopupShown: false,
+      // 弹窗状态控制变量
+      internalLogoutPopupOpened: false,
+      logoutPopupPosition: '',
+      // 弹窗实例缓存
+      _logoutPopupRef: null
+    }
+  },
+  
+  computed: {
+    userInfo() {
+      return this.userStore?.userInfoGetter || {}
+    },
+
+    userStats() {
+      return this.userStore?.userStats || {}
+    },
+
+    isLoggedIn() {
+      return this.userStore?.getIsLoggedIn || false
+    }
+  },
+
+  onLoad() {
+    // 重置弹窗状态
+    this.logoutPopupShown = false
+    this.internalLogoutPopupOpened = false
+    
+    // 初始化Pinia stores
+    this.userStore = useUserStore()
+    this.bookingStore = useBookingStore()
+    this.sharingStore = useSharingStore()
+
+    // 缓存弹窗实例
+    this.$nextTick(() => {
+      try {
+        if (this.$refs.logoutPopup) {
+          this._logoutPopupRef = this.$refs.logoutPopup
+        }
+      } catch (e) {
+        console.warn('[Profile] 缓存弹窗实例失败:', e)
+      }
+      
+      // 延迟重试缓存
+      setTimeout(() => {
+        try {
+          if (!this._logoutPopupRef && this.$refs.logoutPopup) {
+            this._logoutPopupRef = this.$refs.logoutPopup
+          }
+        } catch (e) {
+          console.warn('[Profile] 延迟缓存弹窗实例失败:', e)
+        }
+      }, 500)
+    })
+
+    // 加载用户数据
+    this.loadUserData();
+  },
+  
+  onShow() {
+    // 页面显示时使用缓存优化，避免频繁刷新
+    this.loadUserDataWithCache();
+  },
+  
+  onUnload() {
+    // 清理弹窗缓存引用
+    this._logoutPopupRef = null
+  },
+  
+  methods: {
+    
+    // 缓存优化的数据加载方法
+    async loadUserDataWithCache() {
+      // 防重复请求
+      if (this.isRefreshing) {
+        console.log('[Profile] 正在刷新中，跳过重复请求')
+        return
+      }
+
+      // 检查缓存有效性
+      const now = Date.now()
+      const hasData = this.userInfo && Object.keys(this.userInfo).length > 0
+      
+      if (hasData && this.lastRefreshTime && 
+          (now - this.lastRefreshTime) < this.cacheTimeout) {
+        console.log('[Profile] 使用缓存数据，跳过请求')
+        return
+      }
+
+      // 执行数据加载
+      await this.loadUserData()
+    },
+    
+    // 检查缓存是否有效
+    isCacheValid(type) {
+      const now = Date.now()
+      const lastTime = this.lastLoadTime[type]
+      return (now - lastTime) < this.cacheTimeout
+    },
+
+    // 加载用户数据
+    async loadUserData() {
+      console.log('[Profile] 开始加载用户数据')
+      
+      // 防止重复加载
+      if (this.isLoading || this.isRefreshing) {
+        console.log('[Profile] 正在加载中，跳过重复请求')
+        return
+      }
+      
+      this.isLoading = true
+      this.isRefreshing = true
+      
+      try {
+        // 加载用户信息
+        await this.loadUserInfo()
+        
+        // 加载用户统计（可选）
+        await this.loadUserStats()
+        
+        // 延迟加载待处理数量，避免与基础数据请求冲突
+        setTimeout(async () => {
+          try {
+            console.log('[Profile] 延迟加载待处理数量')
+            await this.loadPendingCounts()
+          } catch (error) {
+            console.warn('[Profile] 加载待处理数量失败:', error.message)
+          }
+        }, 500)
+        
+        console.log('[Profile] 用户数据加载完成')
+        
+        // 更新缓存时间
+        this.lastRefreshTime = Date.now()
+        
+      } catch (error) {
+        console.error('[Profile] 加载用户数据失败:', error)
+        uni.showToast({
+          title: '加载用户信息失败',
+          icon: 'none',
+          duration: 2000
+        })
+      } finally {
+        this.isLoading = false
+        this.isRefreshing = false
+      }
+    },
+
+    // 加载用户信息
+    async loadUserInfo() {
+      // 检查是否正在加载或缓存有效
+      if (this.loadingFlags.userInfo) {
+        console.log('[Profile] 用户信息正在加载中，跳过')
+        return
+      }
+      
+      if (this.isCacheValid('userInfo') && this.userInfo && Object.keys(this.userInfo).length > 0) {
+        console.log('[Profile] 使用缓存的用户信息')
+        return
+      }
+      
+      this.loadingFlags.userInfo = true
+      
+      try {
+        console.log('[Profile] 开始加载用户信息')
+        await this.userStore.getUserInfo()
+        this.lastLoadTime.userInfo = Date.now()
+        console.log('[Profile] 用户信息加载成功')
+      } catch (error) {
+        console.error('[Profile] 用户信息加载失败:', error)
+        throw error
+      } finally {
+        this.loadingFlags.userInfo = false
+      }
+    },
+
+    // 加载用户统计
+    async loadUserStats() {
+      // 检查是否正在加载或缓存有效
+      if (this.loadingFlags.userStats) {
+        console.log('[Profile] 用户统计正在加载中，跳过')
+        return
+      }
+      
+      if (this.isCacheValid('userStats') && this.userStats && Object.keys(this.userStats).length > 0) {
+        console.log('[Profile] 使用缓存的用户统计')
+        return
+      }
+      
+      this.loadingFlags.userStats = true
+      
+      try {
+        console.log('[Profile] 开始加载用户统计')
+        await this.userStore.getUserStats()
+        this.lastLoadTime.userStats = Date.now()
+        console.log('[Profile] 用户统计加载成功')
+      } catch (error) {
+        console.warn('[Profile] 用户统计加载失败，使用默认值:', error.message)
+        // 设置默认统计数据
+        this.userStats = {
+          totalBookings: 0,
+          pendingBookings: 0,
+          completedBookings: 0,
+          totalSpent: 0
+        }
+      } finally {
+        this.loadingFlags.userStats = false
+      }
+    },
+    
+    // 加载待处理数量
+    async loadPendingCounts() {
+      // 检查是否正在加载或缓存有效
+      if (this.loadingFlags.pendingCounts) {
+        console.log('[Profile] 待处理数量正在加载中，跳过重复请求')
+        return
+      }
+      
+      if (this.isCacheValid('pendingCounts')) {
+        console.log('[Profile] 使用缓存的待处理数量')
+        return
+      }
+      
+      console.log('[Profile] 开始加载待处理数量')
+      this.loadingFlags.pendingCounts = true
+      
+      // 设置默认值
+      this.pendingBookings = 0
+      this.pendingSharings = 0
+      this.pendingRequests = 0
+      this.receivedRequests = 0
+      
+      try {
+        // 串行执行，避免并发请求导致超时
+        await this.loadPendingBookings()
+        await this.delay(200) // 请求间隔
+        
+        await this.loadPendingSharings()
+        await this.delay(200)
+        
+        await this.loadPendingRequests()
+        await this.delay(200)
+        
+        await this.loadReceivedRequests()
+        
+        this.lastLoadTime.pendingCounts = Date.now()
+        
+        console.log('[Profile] 所有待处理数量加载完成:', {
+          pendingBookings: this.pendingBookings,
+          pendingSharings: this.pendingSharings,
+          pendingRequests: this.pendingRequests,
+          receivedRequests: this.receivedRequests
+        })
+        
+      } catch (error) {
+        console.error('[Profile] 加载待处理数量失败:', error)
+      } finally {
+        this.loadingFlags.pendingCounts = false
+      }
+    },
+
+    // 延迟函数
+    delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    },
+
+    // 创建超时Promise
+    createTimeoutPromise(timeout = 5000) {
+      return new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('请求超时')), timeout)
+      })
+    },
+
+    // 加载待确认预约数量
+    async loadPendingBookings() {
+      try {
+        console.log('[Profile] 加载待确认预约数量')
+        const result = await Promise.race([
+          this.bookingStore.getUserBookings({
+            status: 'pending',
+            page: 1,
+            pageSize: 1
+          }),
+          this.createTimeoutPromise(5000)
+        ])
+        
+        this.pendingBookings = result.total || 0
+        console.log('[Profile] 待确认预约数量:', this.pendingBookings)
+      } catch (error) {
+        console.warn('[Profile] 加载待确认预约数量失败:', error.message)
+        this.pendingBookings = 0
+      }
+    },
+
+    // 加载待处理拼场数量
+    async loadPendingSharings() {
+      try {
+        console.log('[Profile] 加载待处理拼场数量')
+        const result = await Promise.race([
+          this.bookingStore.getUserSharingOrders({
+            status: 'pending',
+            page: 1,
+            pageSize: 1
+          }),
+          this.createTimeoutPromise(5000)
+        ])
+        
+        // 处理拼场数据，可能是数组格式
+        if (Array.isArray(result.data)) {
+          this.pendingSharings = result.data.length
+        } else {
+          this.pendingSharings = result.total || 0
+        }
+        console.log('[Profile] 待处理拼场数量:', this.pendingSharings)
+      } catch (error) {
+        console.warn('[Profile] 加载待处理拼场数量失败:', error.message)
+        this.pendingSharings = 0
+      }
+    },
+
+    // 加载我发出的待处理申请数量
+    async loadPendingRequests() {
+      try {
+        console.log('[Profile] 加载我发出的待处理申请数量')
+        const result = await Promise.race([
+          this.sharingStore.getSentRequestsList(),
+          this.createTimeoutPromise(5000)
+        ])
+        
+        const myRequests = result?.data || result?.list || result || []
+        if (Array.isArray(myRequests)) {
+          this.pendingRequests = myRequests.filter(req => req.status === 'pending').length
+        } else {
+          this.pendingRequests = 0
+        }
+        console.log('[Profile] 我发出的待处理申请数量:', this.pendingRequests)
+      } catch (error) {
+        console.warn('[Profile] 加载我发出的待处理申请数量失败:', error.message)
+        this.pendingRequests = 0
+      }
+    },
+
+    // 加载收到的待处理申请数量
+    async loadReceivedRequests() {
+      try {
+        console.log('[Profile] 加载收到的待处理申请数量')
+        const result = await Promise.race([
+          this.sharingStore.getReceivedRequestsList(),
+          this.createTimeoutPromise(5000)
+        ])
+        
+        const receivedRequests = result?.data || result?.list || result || []
+        if (Array.isArray(receivedRequests)) {
+          this.receivedRequests = receivedRequests.filter(req => req.status === 'pending').length
+        } else {
+          this.receivedRequests = 0
+        }
+        console.log('[Profile] 收到的待处理申请数量:', this.receivedRequests)
+      } catch (error) {
+        console.warn('[Profile] 加载收到的待处理申请数量失败:', error.message)
+        this.receivedRequests = 0
+      }
+    },
+    
+    // 格式化手机号
+    formatPhone(phone) {
+      if (!phone) return ''
+      return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1****$3')
+    },
+    
+    // 更换头像
+    changeAvatar() {
+      uni.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          const tempFilePath = res.tempFilePaths[0]
+          this.uploadAvatar(tempFilePath)
+        }
+      })
+    },
+    
+    // 上传头像
+    async uploadAvatar(filePath) {
+      try {
+        uni.showLoading({ title: '上传中...' })
+        
+        // 这里应该调用上传头像的API
+        // const result = await this.uploadUserAvatar(filePath)
+        
+        uni.hideLoading()
+        uni.showToast({
+          title: '头像更新成功',
+          icon: 'success'
+        })
+        
+        // 重新获取用户信息
+        await this.userStore.getUserInfo()
+        
+      } catch (error) {
+        uni.hideLoading()
+        console.error('上传头像失败:', error)
+        uni.showToast({
+          title: '上传失败',
+          icon: 'error'
+        })
+      }
+    },
+    
+    // 编辑资料
+    editProfile() {
+      // 确保用户信息已加载
+      if (!this.userInfo) {
+        this.loadUserData()
+      }
+      uni.navigateTo({
+        url: '/pages/user/edit-profile'
+      })
+    },
+    
+    // 页面跳转
+    navigateTo(url) {
+      // 检查是否为tabbar页面
+      const tabbarPages = [
+        '/pages/index/index',
+        '/pages/venue/list', 
+        '/pages/sharing/list',
+        '/pages/booking/list',
+        '/pages/user/profile'
+      ]
+      
+      // 提取页面路径（去掉查询参数）
+      const pagePath = url.split('?')[0]
+      
+      if (tabbarPages.includes(pagePath)) {
+        // 如果是tabbar页面，使用switchTab
+        uni.switchTab({ url: pagePath })
+      } else {
+        // 普通页面使用navigateTo
+        uni.navigateTo({ url })
+      }
+    },
+    
+    // 显示退出登录确认
+    showLogoutConfirm() {
+      // 防止重复显示弹窗
+      if (this.logoutPopupShown) {
+        console.log('[Profile] 退出登录弹窗已显示，跳过重复操作')
+        return
+      }
+      
+      this.showLogoutPopup()
+      this.logoutPopupShown = true
+      console.log('[Profile] 显示退出登录确认弹窗')
+    },
+    
+    // 取消退出登录
+    handleLogoutCancel() {
+      this.closeLogoutPopup()
+      this.logoutPopupShown = false
+      console.log('[Profile] 取消退出登录')
+    },
+    
+    // 显示退出登录弹窗（兼容微信小程序）
+    showLogoutPopup() {
+      const debugEnabled = false // 调试开关
+      
+      try {
+        // 获取环境信息
+        let windowInfo, deviceInfo, appInfo
+        try {
+          windowInfo = uni.getWindowInfo ? uni.getWindowInfo() : {}
+          deviceInfo = uni.getDeviceInfo ? uni.getDeviceInfo() : {}
+          appInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
+        } catch (e) {
+          if (debugEnabled) console.warn('showLogoutPopup - 获取环境信息失败:', e)
+        }
+        
+        let popup = null
+        
+        // 方法1: 优先使用 $refs
+        if (this.$refs.logoutPopup) {
+          popup = this.$refs.logoutPopup
+          if (Array.isArray(popup)) {
+            popup = popup[0]
+          }
+        }
+        
+        // 方法2: 使用缓存的引用
+        if (!popup && this._logoutPopupRef) {
+          popup = this._logoutPopupRef
+        }
+        
+        // 方法3: 微信小程序环境下使用 $scope.selectComponent
+        if (!popup && this.$scope && typeof this.$scope.selectComponent === 'function') {
+          try {
+            popup = this.$scope.selectComponent('#logoutPopup')
+          } catch (e) {
+            if (debugEnabled) console.warn('showLogoutPopup - $scope.selectComponent失败:', e)
+          }
+        }
+        
+        // 方法4: 从组件实例中查找 uni-popup 子组件
+        if (!popup && this.$children && this.$children.length > 0) {
+          for (let child of this.$children) {
+            if (child.$options && child.$options.name === 'UniPopup') {
+              popup = child
+              break
+            }
+          }
+        }
+        
+        // 尝试打开弹窗
+        if (popup && typeof popup.open === 'function') {
+          popup.open()
+          this.internalLogoutPopupOpened = true
+          
+          // 尝试应用样式
+          try {
+            if (this.logoutPopupPosition) {
+              this.$nextTick(() => {
+                // 样式应用逻辑
+              })
+            }
+          } catch (e) {
+            if (debugEnabled) console.warn('showLogoutPopup - 应用样式失败:', e)
+          }
+          
+          if (debugEnabled) console.log('showLogoutPopup - 成功打开弹窗')
+          return
+        }
+        
+        // 重试机制
+        setTimeout(() => {
+          try {
+            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef
+            if (retryPopup && typeof retryPopup.open === 'function') {
+              retryPopup.open()
+              this.internalLogoutPopupOpened = true
+              if (debugEnabled) console.log('showLogoutPopup - 重试成功打开弹窗')
+              return
+            }
+          } catch (e) {
+            if (debugEnabled) console.warn('showLogoutPopup - 重试失败:', e)
+          }
+        }, 100)
+        
+        // 备选方案：强制显示
+        if (debugEnabled) console.warn('showLogoutPopup - 使用备选方案强制显示弹窗')
+        this.internalLogoutPopupOpened = false
+        this.$forceUpdate()
+        
+      } catch (error) {
+        if (debugEnabled) console.error('showLogoutPopup - 显示退出登录弹窗失败:', error)
+      }
+    },
+    
+    // 关闭退出登录弹窗（兼容微信小程序）
+    closeLogoutPopup() {
+      const debugEnabled = false // 调试开关
+      
+      try {
+        // 获取环境信息
+        let windowInfo, deviceInfo, appInfo
+        try {
+          windowInfo = uni.getWindowInfo ? uni.getWindowInfo() : {}
+          deviceInfo = uni.getDeviceInfo ? uni.getDeviceInfo() : {}
+          appInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
+        } catch (e) {
+          if (debugEnabled) console.warn('closeLogoutPopup - 获取环境信息失败:', e)
+        }
+        
+        let popup = null
+        
+        // 方法1: 优先使用 $refs
+        if (this.$refs.logoutPopup) {
+          popup = this.$refs.logoutPopup
+          if (Array.isArray(popup)) {
+            popup = popup[0]
+          }
+        }
+        
+        // 方法2: 使用缓存的引用
+        if (!popup && this._logoutPopupRef) {
+          popup = this._logoutPopupRef
+        }
+        
+        // 方法3: 微信小程序环境下使用 $scope.selectComponent
+        if (!popup && this.$scope && typeof this.$scope.selectComponent === 'function') {
+          try {
+            popup = this.$scope.selectComponent('#logoutPopup')
+          } catch (e) {
+            if (debugEnabled) console.warn('closeLogoutPopup - $scope.selectComponent失败:', e)
+          }
+        }
+        
+        // 方法4: 从组件实例中查找 uni-popup 子组件
+        if (!popup && this.$children && this.$children.length > 0) {
+          for (let child of this.$children) {
+            if (child.$options && child.$options.name === 'UniPopup') {
+              popup = child
+              break
+            }
+          }
+        }
+        
+        // 尝试关闭弹窗
+        if (popup && typeof popup.close === 'function') {
+          popup.close()
+          this.internalLogoutPopupOpened = false
+          
+          // 尝试应用样式
+          try {
+            if (this.logoutPopupPosition) {
+              this.$nextTick(() => {
+                // 样式应用逻辑
+              })
+            }
+          } catch (e) {
+            if (debugEnabled) console.warn('closeLogoutPopup - 应用样式失败:', e)
+          }
+          
+          if (debugEnabled) console.log('closeLogoutPopup - 成功关闭弹窗')
+          return
+        }
+        
+        // 重试机制
+        setTimeout(() => {
+          try {
+            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef
+            if (retryPopup && typeof retryPopup.close === 'function') {
+              retryPopup.close()
+              this.internalLogoutPopupOpened = false
+              if (debugEnabled) console.log('closeLogoutPopup - 重试成功关闭弹窗')
+              return
+            }
+          } catch (e) {
+            if (debugEnabled) console.warn('closeLogoutPopup - 重试失败:', e)
+          }
+        }, 100)
+        
+        // 备选方案：强制隐藏
+        if (debugEnabled) console.warn('closeLogoutPopup - 使用备选方案强制隐藏弹窗')
+        this.internalLogoutPopupOpened = true
+        this.$forceUpdate()
+        
+      } catch (error) {
+        if (debugEnabled) console.error('closeLogoutPopup - 关闭退出登录弹窗失败:', error)
+      }
+    },
+    
+    // 确认退出登录
+    async handleLogoutConfirm() {
+      try {
+        await this.userStore.logout()
+        
+        // 关闭弹窗并重置状态
+        this.handleLogoutCancel()
+        
+        uni.showToast({
+          title: '已退出登录',
+          icon: 'success'
+        })
+        
+        // 跳转到登录页
+        setTimeout(() => {
+          uni.reLaunch({
+            url: '/pages/user/login'
+          })
+        }, 1000)
+        
+      } catch (error) {
+        console.error('[Profile] 退出登录失败:', error)
+        uni.showToast({
+          title: '退出失败',
+          icon: 'error'
+        })
+      } finally {
+        // 确保重置弹窗状态
+        this.logoutPopupShown = false
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+// 头部
+.header {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8f65 100%);
+  padding: 40rpx 40rpx 30rpx;
+  
+  // 用户信息
+  .user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40rpx;
+    
+    .avatar-wrapper {
+      position: relative;
+      margin-right: 24rpx;
+      
+      .avatar {
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 60rpx;
+        border: 4rpx solid rgba(255, 255, 255, 0.3);
+      }
+      
+      .avatar-edit {
+        position: absolute;
+        bottom: -8rpx;
+        right: -8rpx;
+        width: 40rpx;
+        height: 40rpx;
+        background-color: #ffffff;
+        border-radius: 20rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+        
+        .edit-icon {
+          font-size: 20rpx;
+        }
+      }
+    }
+    
+    .user-details {
+      flex: 1;
+      
+      .nickname {
+        display: block;
+        font-size: 36rpx;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 8rpx;
+      }
+      
+      .username {
+        display: block;
+        font-size: 24rpx;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 8rpx;
+      }
+      
+      .phone {
+        display: block;
+        font-size: 26rpx;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 12rpx;
+      }
+      
+
+    }
+    
+    .edit-btn {
+      padding: 12rpx 24rpx;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 20rpx;
+      
+      .edit-text {
+        font-size: 24rpx;
+        color: #ffffff;
+      }
+    }
+  }
+  
+  // 统计信息
+  .stats {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 16rpx;
+    padding: 20rpx 0;
+    
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      
+      .stat-number {
+        display: block;
+        font-size: 32rpx;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 8rpx;
+      }
+      
+      .stat-label {
+        font-size: 22rpx;
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+}
+
+// 菜单区域
+.menu-section {
+  padding: 20rpx;
+  
+  .menu-group {
+    background-color: #ffffff;
+    border-radius: 16rpx;
+    margin-bottom: 20rpx;
+    overflow: hidden;
+    
+    .group-title {
+      padding: 24rpx 32rpx 16rpx;
+      
+      .title-text {
+        font-size: 28rpx;
+        font-weight: 600;
+        color: #333333;
+      }
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24rpx 32rpx;
+      border-bottom: 1rpx solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .item-left {
+        display: flex;
+        align-items: center;
+        
+        .item-icon {
+          font-size: 32rpx;
+          margin-right: 20rpx;
+        }
+        
+        .item-text {
+          font-size: 28rpx;
+          color: #333333;
+        }
+      }
+      
+      .item-right {
+        display: flex;
+        align-items: center;
+        
+        .badge {
+          background-color: #ff4d4f;
+          color: #ffffff;
+          font-size: 20rpx;
+          padding: 4rpx 8rpx;
+          border-radius: 10rpx;
+          margin-right: 12rpx;
+          min-width: 32rpx;
+          text-align: center;
+        }
+        
+
+        
+        .arrow {
+          font-size: 24rpx;
+          color: #cccccc;
+        }
+      }
+    }
+  }
+}
+</style>
