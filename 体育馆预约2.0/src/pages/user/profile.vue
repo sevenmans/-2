@@ -115,18 +115,6 @@
         </view>
       </view>
     </view>
-    
-    <!-- 退出登录确认弹窗 -->
-    <uni-popup ref="logoutPopup" type="dialog" v-show="internalLogoutPopupOpened" :class="logoutPopupPosition">
-      <uni-popup-dialog 
-        type="warn"
-        title="确认退出"
-        content="确定要退出登录吗？"
-        :before-close="true"
-        @close="handleLogoutCancel"
-        @confirm="handleLogoutConfirm"
-      ></uni-popup-dialog>
-    </uni-popup>
   </view>
 </template>
 
@@ -166,13 +154,7 @@ export default {
       // 整体缓存时间戳
       lastRefreshTime: 0,
       isRefreshing: false,
-      // 退出登录弹窗状态（已移除showLogoutPopup变量，改用ref方式）
-      logoutPopupShown: false,
-      // 弹窗状态控制变量
-      internalLogoutPopupOpened: false,
-      logoutPopupPosition: '',
-      // 弹窗实例缓存
-      _logoutPopupRef: null
+      isLoggingOut: false
     }
   },
   
@@ -191,36 +173,10 @@ export default {
   },
 
   onLoad() {
-    // 重置弹窗状态
-    this.logoutPopupShown = false
-    this.internalLogoutPopupOpened = false
-    
     // 初始化Pinia stores
     this.userStore = useUserStore()
     this.bookingStore = useBookingStore()
     this.sharingStore = useSharingStore()
-
-    // 缓存弹窗实例
-    this.$nextTick(() => {
-      try {
-        if (this.$refs.logoutPopup) {
-          this._logoutPopupRef = this.$refs.logoutPopup
-        }
-      } catch (e) {
-        console.warn('[Profile] 缓存弹窗实例失败:', e)
-      }
-      
-      // 延迟重试缓存
-      setTimeout(() => {
-        try {
-          if (!this._logoutPopupRef && this.$refs.logoutPopup) {
-            this._logoutPopupRef = this.$refs.logoutPopup
-          }
-        } catch (e) {
-          console.warn('[Profile] 延迟缓存弹窗实例失败:', e)
-        }
-      }, 500)
-    })
 
     // 加载用户数据
     this.loadUserData();
@@ -232,8 +188,6 @@ export default {
   },
   
   onUnload() {
-    // 清理弹窗缓存引用
-    this._logoutPopupRef = null
   },
   
   methods: {
@@ -613,219 +567,28 @@ export default {
     
     // 显示退出登录确认
     showLogoutConfirm() {
-      // 防止重复显示弹窗
-      if (this.logoutPopupShown) {
-        console.log('[Profile] 退出登录弹窗已显示，跳过重复操作')
+      if (this.isLoggingOut) {
         return
       }
-      
-      this.showLogoutPopup()
-      this.logoutPopupShown = true
-      console.log('[Profile] 显示退出登录确认弹窗')
-    },
-    
-    // 取消退出登录
-    handleLogoutCancel() {
-      this.closeLogoutPopup()
-      this.logoutPopupShown = false
-      console.log('[Profile] 取消退出登录')
-    },
-    
-    // 显示退出登录弹窗（兼容微信小程序）
-    showLogoutPopup() {
-      const debugEnabled = false // 调试开关
-      
-      try {
-        // 获取环境信息
-        let windowInfo, deviceInfo, appInfo
-        try {
-          windowInfo = uni.getWindowInfo ? uni.getWindowInfo() : {}
-          deviceInfo = uni.getDeviceInfo ? uni.getDeviceInfo() : {}
-          appInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
-        } catch (e) {
-          if (debugEnabled) console.warn('showLogoutPopup - 获取环境信息失败:', e)
-        }
-        
-        let popup = null
-        
-        // 方法1: 优先使用 $refs
-        if (this.$refs.logoutPopup) {
-          popup = this.$refs.logoutPopup
-          if (Array.isArray(popup)) {
-            popup = popup[0]
+      uni.showModal({
+        title: '确认退出',
+        content: '确定要退出登录吗？',
+        confirmText: '退出',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            this.handleLogoutConfirm()
           }
         }
-        
-        // 方法2: 使用缓存的引用
-        if (!popup && this._logoutPopupRef) {
-          popup = this._logoutPopupRef
-        }
-        
-        // 方法3: 微信小程序环境下使用 $scope.selectComponent
-        if (!popup && this.$scope && typeof this.$scope.selectComponent === 'function') {
-          try {
-            popup = this.$scope.selectComponent('#logoutPopup')
-          } catch (e) {
-            if (debugEnabled) console.warn('showLogoutPopup - $scope.selectComponent失败:', e)
-          }
-        }
-        
-        // 方法4: 从组件实例中查找 uni-popup 子组件
-        if (!popup && this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && child.$options.name === 'UniPopup') {
-              popup = child
-              break
-            }
-          }
-        }
-        
-        // 尝试打开弹窗
-        if (popup && typeof popup.open === 'function') {
-          popup.open()
-          this.internalLogoutPopupOpened = true
-          
-          // 尝试应用样式
-          try {
-            if (this.logoutPopupPosition) {
-              this.$nextTick(() => {
-                // 样式应用逻辑
-              })
-            }
-          } catch (e) {
-            if (debugEnabled) console.warn('showLogoutPopup - 应用样式失败:', e)
-          }
-          
-          if (debugEnabled) console.log('showLogoutPopup - 成功打开弹窗')
-          return
-        }
-        
-        // 重试机制
-        setTimeout(() => {
-          try {
-            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef
-            if (retryPopup && typeof retryPopup.open === 'function') {
-              retryPopup.open()
-              this.internalLogoutPopupOpened = true
-              if (debugEnabled) console.log('showLogoutPopup - 重试成功打开弹窗')
-              return
-            }
-          } catch (e) {
-            if (debugEnabled) console.warn('showLogoutPopup - 重试失败:', e)
-          }
-        }, 100)
-        
-        // 备选方案：强制显示
-        if (debugEnabled) console.warn('showLogoutPopup - 使用备选方案强制显示弹窗')
-        this.internalLogoutPopupOpened = false
-        this.$forceUpdate()
-        
-      } catch (error) {
-        if (debugEnabled) console.error('showLogoutPopup - 显示退出登录弹窗失败:', error)
-      }
-    },
-    
-    // 关闭退出登录弹窗（兼容微信小程序）
-    closeLogoutPopup() {
-      const debugEnabled = false // 调试开关
-      
-      try {
-        // 获取环境信息
-        let windowInfo, deviceInfo, appInfo
-        try {
-          windowInfo = uni.getWindowInfo ? uni.getWindowInfo() : {}
-          deviceInfo = uni.getDeviceInfo ? uni.getDeviceInfo() : {}
-          appInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
-        } catch (e) {
-          if (debugEnabled) console.warn('closeLogoutPopup - 获取环境信息失败:', e)
-        }
-        
-        let popup = null
-        
-        // 方法1: 优先使用 $refs
-        if (this.$refs.logoutPopup) {
-          popup = this.$refs.logoutPopup
-          if (Array.isArray(popup)) {
-            popup = popup[0]
-          }
-        }
-        
-        // 方法2: 使用缓存的引用
-        if (!popup && this._logoutPopupRef) {
-          popup = this._logoutPopupRef
-        }
-        
-        // 方法3: 微信小程序环境下使用 $scope.selectComponent
-        if (!popup && this.$scope && typeof this.$scope.selectComponent === 'function') {
-          try {
-            popup = this.$scope.selectComponent('#logoutPopup')
-          } catch (e) {
-            if (debugEnabled) console.warn('closeLogoutPopup - $scope.selectComponent失败:', e)
-          }
-        }
-        
-        // 方法4: 从组件实例中查找 uni-popup 子组件
-        if (!popup && this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && child.$options.name === 'UniPopup') {
-              popup = child
-              break
-            }
-          }
-        }
-        
-        // 尝试关闭弹窗
-        if (popup && typeof popup.close === 'function') {
-          popup.close()
-          this.internalLogoutPopupOpened = false
-          
-          // 尝试应用样式
-          try {
-            if (this.logoutPopupPosition) {
-              this.$nextTick(() => {
-                // 样式应用逻辑
-              })
-            }
-          } catch (e) {
-            if (debugEnabled) console.warn('closeLogoutPopup - 应用样式失败:', e)
-          }
-          
-          if (debugEnabled) console.log('closeLogoutPopup - 成功关闭弹窗')
-          return
-        }
-        
-        // 重试机制
-        setTimeout(() => {
-          try {
-            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef
-            if (retryPopup && typeof retryPopup.close === 'function') {
-              retryPopup.close()
-              this.internalLogoutPopupOpened = false
-              if (debugEnabled) console.log('closeLogoutPopup - 重试成功关闭弹窗')
-              return
-            }
-          } catch (e) {
-            if (debugEnabled) console.warn('closeLogoutPopup - 重试失败:', e)
-          }
-        }, 100)
-        
-        // 备选方案：强制隐藏
-        if (debugEnabled) console.warn('closeLogoutPopup - 使用备选方案强制隐藏弹窗')
-        this.internalLogoutPopupOpened = true
-        this.$forceUpdate()
-        
-      } catch (error) {
-        if (debugEnabled) console.error('closeLogoutPopup - 关闭退出登录弹窗失败:', error)
-      }
+      })
     },
     
     // 确认退出登录
     async handleLogoutConfirm() {
       try {
+        if (this.isLoggingOut) return
+        this.isLoggingOut = true
         await this.userStore.logout()
-        
-        // 关闭弹窗并重置状态
-        this.handleLogoutCancel()
         
         uni.showToast({
           title: '已退出登录',
@@ -837,7 +600,7 @@ export default {
           uni.reLaunch({
             url: '/pages/user/login'
           })
-        }, 1000)
+        }, 500)
         
       } catch (error) {
         console.error('[Profile] 退出登录失败:', error)
@@ -846,8 +609,7 @@ export default {
           icon: 'error'
         })
       } finally {
-        // 确保重置弹窗状态
-        this.logoutPopupShown = false
+        this.isLoggingOut = false
       }
     }
   }

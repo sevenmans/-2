@@ -33,13 +33,7 @@ const _sfc_main = {
       // 整体缓存时间戳
       lastRefreshTime: 0,
       isRefreshing: false,
-      // 退出登录弹窗状态（已移除showLogoutPopup变量，改用ref方式）
-      logoutPopupShown: false,
-      // 弹窗状态控制变量
-      internalLogoutPopupOpened: false,
-      logoutPopupPosition: "",
-      // 弹窗实例缓存
-      _logoutPopupRef: null
+      isLoggingOut: false
     };
   },
   computed: {
@@ -57,48 +51,27 @@ const _sfc_main = {
     }
   },
   onLoad() {
-    this.logoutPopupShown = false;
-    this.internalLogoutPopupOpened = false;
     this.userStore = stores_user.useUserStore();
     this.bookingStore = stores_booking.useBookingStore();
     this.sharingStore = stores_sharing.useSharingStore();
-    this.$nextTick(() => {
-      try {
-        if (this.$refs.logoutPopup) {
-          this._logoutPopupRef = this.$refs.logoutPopup;
-        }
-      } catch (e) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:210", "[Profile] 缓存弹窗实例失败:", e);
-      }
-      setTimeout(() => {
-        try {
-          if (!this._logoutPopupRef && this.$refs.logoutPopup) {
-            this._logoutPopupRef = this.$refs.logoutPopup;
-          }
-        } catch (e) {
-          common_vendor.index.__f__("warn", "at pages/user/profile.vue:220", "[Profile] 延迟缓存弹窗实例失败:", e);
-        }
-      }, 500);
-    });
     this.loadUserData();
   },
   onShow() {
     this.loadUserDataWithCache();
   },
   onUnload() {
-    this._logoutPopupRef = null;
   },
   methods: {
     // 缓存优化的数据加载方法
     async loadUserDataWithCache() {
       if (this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:245", "[Profile] 正在刷新中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:199", "[Profile] 正在刷新中，跳过重复请求");
         return;
       }
       const now = Date.now();
       const hasData = this.userInfo && Object.keys(this.userInfo).length > 0;
       if (hasData && this.lastRefreshTime && now - this.lastRefreshTime < this.cacheTimeout) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:255", "[Profile] 使用缓存数据，跳过请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:209", "[Profile] 使用缓存数据，跳过请求");
         return;
       }
       await this.loadUserData();
@@ -111,9 +84,9 @@ const _sfc_main = {
     },
     // 加载用户数据
     async loadUserData() {
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:272", "[Profile] 开始加载用户数据");
+      common_vendor.index.__f__("log", "at pages/user/profile.vue:226", "[Profile] 开始加载用户数据");
       if (this.isLoading || this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:276", "[Profile] 正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:230", "[Profile] 正在加载中，跳过重复请求");
         return;
       }
       this.isLoading = true;
@@ -123,16 +96,16 @@ const _sfc_main = {
         await this.loadUserStats();
         setTimeout(async () => {
           try {
-            common_vendor.index.__f__("log", "at pages/user/profile.vue:293", "[Profile] 延迟加载待处理数量");
+            common_vendor.index.__f__("log", "at pages/user/profile.vue:247", "[Profile] 延迟加载待处理数量");
             await this.loadPendingCounts();
           } catch (error) {
-            common_vendor.index.__f__("warn", "at pages/user/profile.vue:296", "[Profile] 加载待处理数量失败:", error.message);
+            common_vendor.index.__f__("warn", "at pages/user/profile.vue:250", "[Profile] 加载待处理数量失败:", error.message);
           }
         }, 500);
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:300", "[Profile] 用户数据加载完成");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:254", "[Profile] 用户数据加载完成");
         this.lastRefreshTime = Date.now();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:306", "[Profile] 加载用户数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:260", "[Profile] 加载用户数据失败:", error);
         common_vendor.index.showToast({
           title: "加载用户信息失败",
           icon: "none",
@@ -146,21 +119,21 @@ const _sfc_main = {
     // 加载用户信息
     async loadUserInfo() {
       if (this.loadingFlags.userInfo) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:322", "[Profile] 用户信息正在加载中，跳过");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:276", "[Profile] 用户信息正在加载中，跳过");
         return;
       }
       if (this.isCacheValid("userInfo") && this.userInfo && Object.keys(this.userInfo).length > 0) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:327", "[Profile] 使用缓存的用户信息");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:281", "[Profile] 使用缓存的用户信息");
         return;
       }
       this.loadingFlags.userInfo = true;
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:334", "[Profile] 开始加载用户信息");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:288", "[Profile] 开始加载用户信息");
         await this.userStore.getUserInfo();
         this.lastLoadTime.userInfo = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:337", "[Profile] 用户信息加载成功");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:291", "[Profile] 用户信息加载成功");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:339", "[Profile] 用户信息加载失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:293", "[Profile] 用户信息加载失败:", error);
         throw error;
       } finally {
         this.loadingFlags.userInfo = false;
@@ -169,21 +142,21 @@ const _sfc_main = {
     // 加载用户统计
     async loadUserStats() {
       if (this.loadingFlags.userStats) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:350", "[Profile] 用户统计正在加载中，跳过");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:304", "[Profile] 用户统计正在加载中，跳过");
         return;
       }
       if (this.isCacheValid("userStats") && this.userStats && Object.keys(this.userStats).length > 0) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:355", "[Profile] 使用缓存的用户统计");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:309", "[Profile] 使用缓存的用户统计");
         return;
       }
       this.loadingFlags.userStats = true;
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:362", "[Profile] 开始加载用户统计");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:316", "[Profile] 开始加载用户统计");
         await this.userStore.getUserStats();
         this.lastLoadTime.userStats = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:365", "[Profile] 用户统计加载成功");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:319", "[Profile] 用户统计加载成功");
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:367", "[Profile] 用户统计加载失败，使用默认值:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:321", "[Profile] 用户统计加载失败，使用默认值:", error.message);
         this.userStats = {
           totalBookings: 0,
           pendingBookings: 0,
@@ -197,14 +170,14 @@ const _sfc_main = {
     // 加载待处理数量
     async loadPendingCounts() {
       if (this.loadingFlags.pendingCounts) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:384", "[Profile] 待处理数量正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:338", "[Profile] 待处理数量正在加载中，跳过重复请求");
         return;
       }
       if (this.isCacheValid("pendingCounts")) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:389", "[Profile] 使用缓存的待处理数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:343", "[Profile] 使用缓存的待处理数量");
         return;
       }
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:393", "[Profile] 开始加载待处理数量");
+      common_vendor.index.__f__("log", "at pages/user/profile.vue:347", "[Profile] 开始加载待处理数量");
       this.loadingFlags.pendingCounts = true;
       this.pendingBookings = 0;
       this.pendingSharings = 0;
@@ -219,14 +192,14 @@ const _sfc_main = {
         await this.delay(200);
         await this.loadReceivedRequests();
         this.lastLoadTime.pendingCounts = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:417", "[Profile] 所有待处理数量加载完成:", {
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:371", "[Profile] 所有待处理数量加载完成:", {
           pendingBookings: this.pendingBookings,
           pendingSharings: this.pendingSharings,
           pendingRequests: this.pendingRequests,
           receivedRequests: this.receivedRequests
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:425", "[Profile] 加载待处理数量失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:379", "[Profile] 加载待处理数量失败:", error);
       } finally {
         this.loadingFlags.pendingCounts = false;
       }
@@ -244,7 +217,7 @@ const _sfc_main = {
     // 加载待确认预约数量
     async loadPendingBookings() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:446", "[Profile] 加载待确认预约数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:400", "[Profile] 加载待确认预约数量");
         const result = await Promise.race([
           this.bookingStore.getUserBookings({
             status: "pending",
@@ -254,16 +227,16 @@ const _sfc_main = {
           this.createTimeoutPromise(5e3)
         ]);
         this.pendingBookings = result.total || 0;
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:457", "[Profile] 待确认预约数量:", this.pendingBookings);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:411", "[Profile] 待确认预约数量:", this.pendingBookings);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:459", "[Profile] 加载待确认预约数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:413", "[Profile] 加载待确认预约数量失败:", error.message);
         this.pendingBookings = 0;
       }
     },
     // 加载待处理拼场数量
     async loadPendingSharings() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:467", "[Profile] 加载待处理拼场数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:421", "[Profile] 加载待处理拼场数量");
         const result = await Promise.race([
           this.bookingStore.getUserSharingOrders({
             status: "pending",
@@ -277,16 +250,16 @@ const _sfc_main = {
         } else {
           this.pendingSharings = result.total || 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:483", "[Profile] 待处理拼场数量:", this.pendingSharings);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:437", "[Profile] 待处理拼场数量:", this.pendingSharings);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:485", "[Profile] 加载待处理拼场数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:439", "[Profile] 加载待处理拼场数量失败:", error.message);
         this.pendingSharings = 0;
       }
     },
     // 加载我发出的待处理申请数量
     async loadPendingRequests() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:493", "[Profile] 加载我发出的待处理申请数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:447", "[Profile] 加载我发出的待处理申请数量");
         const result = await Promise.race([
           this.sharingStore.getSentRequestsList(),
           this.createTimeoutPromise(5e3)
@@ -297,16 +270,16 @@ const _sfc_main = {
         } else {
           this.pendingRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:505", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:459", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:507", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:461", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
         this.pendingRequests = 0;
       }
     },
     // 加载收到的待处理申请数量
     async loadReceivedRequests() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:515", "[Profile] 加载收到的待处理申请数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:469", "[Profile] 加载收到的待处理申请数量");
         const result = await Promise.race([
           this.sharingStore.getReceivedRequestsList(),
           this.createTimeoutPromise(5e3)
@@ -317,9 +290,9 @@ const _sfc_main = {
         } else {
           this.receivedRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:527", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:481", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:529", "[Profile] 加载收到的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:483", "[Profile] 加载收到的待处理申请数量失败:", error.message);
         this.receivedRequests = 0;
       }
     },
@@ -353,7 +326,7 @@ const _sfc_main = {
         await this.userStore.getUserInfo();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:572", "上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:526", "上传头像失败:", error);
         common_vendor.index.showToast({
           title: "上传失败",
           icon: "error"
@@ -387,179 +360,28 @@ const _sfc_main = {
     },
     // 显示退出登录确认
     showLogoutConfirm() {
-      if (this.logoutPopupShown) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:618", "[Profile] 退出登录弹窗已显示，跳过重复操作");
+      if (this.isLoggingOut) {
         return;
       }
-      this.showLogoutPopup();
-      this.logoutPopupShown = true;
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:624", "[Profile] 显示退出登录确认弹窗");
-    },
-    // 取消退出登录
-    handleLogoutCancel() {
-      this.closeLogoutPopup();
-      this.logoutPopupShown = false;
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:631", "[Profile] 取消退出登录");
-    },
-    // 显示退出登录弹窗（兼容微信小程序）
-    showLogoutPopup() {
-      const debugEnabled = false;
-      try {
-        let windowInfo, deviceInfo, appInfo;
-        try {
-          windowInfo = common_vendor.index.getWindowInfo ? common_vendor.index.getWindowInfo() : {};
-          deviceInfo = common_vendor.index.getDeviceInfo ? common_vendor.index.getDeviceInfo() : {};
-          appInfo = common_vendor.index.getAppBaseInfo ? common_vendor.index.getAppBaseInfo() : {};
-        } catch (e) {
-          if (debugEnabled)
-            ;
-        }
-        let popup = null;
-        if (this.$refs.logoutPopup) {
-          popup = this.$refs.logoutPopup;
-          if (Array.isArray(popup)) {
-            popup = popup[0];
+      common_vendor.index.showModal({
+        title: "确认退出",
+        content: "确定要退出登录吗？",
+        confirmText: "退出",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            this.handleLogoutConfirm();
           }
         }
-        if (!popup && this._logoutPopupRef) {
-          popup = this._logoutPopupRef;
-        }
-        if (!popup && this.$scope && typeof this.$scope.selectComponent === "function") {
-          try {
-            popup = this.$scope.selectComponent("#logoutPopup");
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }
-        if (!popup && this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && child.$options.name === "UniPopup") {
-              popup = child;
-              break;
-            }
-          }
-        }
-        if (popup && typeof popup.open === "function") {
-          popup.open();
-          this.internalLogoutPopupOpened = true;
-          try {
-            if (this.logoutPopupPosition) {
-              this.$nextTick(() => {
-              });
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-          if (debugEnabled)
-            ;
-          return;
-        }
-        setTimeout(() => {
-          try {
-            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef;
-            if (retryPopup && typeof retryPopup.open === "function") {
-              retryPopup.open();
-              this.internalLogoutPopupOpened = true;
-              if (debugEnabled)
-                ;
-              return;
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }, 100);
-        if (debugEnabled)
-          ;
-        this.internalLogoutPopupOpened = false;
-        this.$forceUpdate();
-      } catch (error) {
-      }
-    },
-    // 关闭退出登录弹窗（兼容微信小程序）
-    closeLogoutPopup() {
-      const debugEnabled = false;
-      try {
-        let windowInfo, deviceInfo, appInfo;
-        try {
-          windowInfo = common_vendor.index.getWindowInfo ? common_vendor.index.getWindowInfo() : {};
-          deviceInfo = common_vendor.index.getDeviceInfo ? common_vendor.index.getDeviceInfo() : {};
-          appInfo = common_vendor.index.getAppBaseInfo ? common_vendor.index.getAppBaseInfo() : {};
-        } catch (e) {
-          if (debugEnabled)
-            ;
-        }
-        let popup = null;
-        if (this.$refs.logoutPopup) {
-          popup = this.$refs.logoutPopup;
-          if (Array.isArray(popup)) {
-            popup = popup[0];
-          }
-        }
-        if (!popup && this._logoutPopupRef) {
-          popup = this._logoutPopupRef;
-        }
-        if (!popup && this.$scope && typeof this.$scope.selectComponent === "function") {
-          try {
-            popup = this.$scope.selectComponent("#logoutPopup");
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }
-        if (!popup && this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && child.$options.name === "UniPopup") {
-              popup = child;
-              break;
-            }
-          }
-        }
-        if (popup && typeof popup.close === "function") {
-          popup.close();
-          this.internalLogoutPopupOpened = false;
-          try {
-            if (this.logoutPopupPosition) {
-              this.$nextTick(() => {
-              });
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-          if (debugEnabled)
-            ;
-          return;
-        }
-        setTimeout(() => {
-          try {
-            let retryPopup = this.$refs.logoutPopup || this._logoutPopupRef;
-            if (retryPopup && typeof retryPopup.close === "function") {
-              retryPopup.close();
-              this.internalLogoutPopupOpened = false;
-              if (debugEnabled)
-                ;
-              return;
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }, 100);
-        if (debugEnabled)
-          ;
-        this.internalLogoutPopupOpened = true;
-        this.$forceUpdate();
-      } catch (error) {
-      }
+      });
     },
     // 确认退出登录
     async handleLogoutConfirm() {
       try {
+        if (this.isLoggingOut)
+          return;
+        this.isLoggingOut = true;
         await this.userStore.logout();
-        this.handleLogoutCancel();
         common_vendor.index.showToast({
           title: "已退出登录",
           icon: "success"
@@ -568,24 +390,19 @@ const _sfc_main = {
           common_vendor.index.reLaunch({
             url: "/pages/user/login"
           });
-        }, 1e3);
+        }, 500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:843", "[Profile] 退出登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:606", "[Profile] 退出登录失败:", error);
         common_vendor.index.showToast({
           title: "退出失败",
           icon: "error"
         });
       } finally {
-        this.logoutPopupShown = false;
+        this.isLoggingOut = false;
       }
     }
   }
 };
-if (!Array) {
-  const _component_uni_popup_dialog = common_vendor.resolveComponent("uni-popup-dialog");
-  const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
-  (_component_uni_popup_dialog + _component_uni_popup)();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _a, _b, _c, _d, _e;
   return common_vendor.e({
@@ -619,21 +436,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     v: common_vendor.t($data.receivedRequests)
   } : {}, {
     w: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/received")),
-    x: common_vendor.o((...args) => $options.showLogoutConfirm && $options.showLogoutConfirm(...args)),
-    y: common_vendor.o($options.handleLogoutCancel),
-    z: common_vendor.o($options.handleLogoutConfirm),
-    A: common_vendor.p({
-      type: "warn",
-      title: "确认退出",
-      content: "确定要退出登录吗？",
-      ["before-close"]: true
-    }),
-    B: common_vendor.sr("logoutPopup", "f6b4f04d-0"),
-    C: $data.internalLogoutPopupOpened,
-    D: common_vendor.n($data.logoutPopupPosition),
-    E: common_vendor.p({
-      type: "dialog"
-    })
+    x: common_vendor.o((...args) => $options.showLogoutConfirm && $options.showLogoutConfirm(...args))
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f6b4f04d"]]);

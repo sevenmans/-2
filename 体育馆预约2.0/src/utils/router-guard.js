@@ -1,6 +1,8 @@
 import { showToast } from './ui.js'
 import { getToken, getUserInfo } from './auth.js'
 
+let isRedirectingToLogin = false
+
 // 游客页面（未登录可访问）
 export const guestPages = [
   '/pages/user/login',
@@ -78,6 +80,11 @@ function checkPermission(url) {
     if (!isFromLoginPage) {
       showToast('请先登录')
     }
+
+    if (isRedirectingToLogin) {
+      return false
+    }
+    isRedirectingToLogin = true
     
     // 保存当前页面路径作为重定向URL
     const redirectUrl = encodeURIComponent(url)
@@ -86,6 +93,9 @@ function checkPermission(url) {
     uni.reLaunch({
       url: `/pages/user/login?redirect=${redirectUrl}`
     })
+    setTimeout(() => {
+      isRedirectingToLogin = false
+    }, 800)
     return false
   }
   
