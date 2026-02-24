@@ -1,0 +1,84 @@
+server:
+  port: 8080
+  # 监听所有网络接口
+  address: 0.0.0.0
+  # 开发环境禁用 HTTPS
+  # ssl:
+  #   enabled: true
+  #   key-store: classpath:keystore.p12
+  #   key-store-password: 123456
+  #   key-store-type: PKCS12
+  #   key-alias: gymbooking
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/gym_booking?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: yanyu123..
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+    generate-ddl: true
+
+# 应用配置
+app:
+  # JWT 配置
+  jwt:
+    secret: gymBookingSuperSecretKey123!@#ThisIsAVeryLongAndSecureSecretKeyForJWT
+    expirationMs: 86400000 # 24小时
+  # 默认管理员账号配置
+  default-admin:
+    username: admin
+    password: admin123
+    email: admin@example.com
+    nickname: 系统管理员
+    phone: 13800138000
+
+# 日志配置
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.example.gymbooking.security: DEBUG
+    com.example.gymbooking.controller.AuthController: DEBUG
+    root: DEBUG
+    com.example.gymbooking: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.boot.actuate: INFO
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 7
+
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      simple:
+        enabled: true
