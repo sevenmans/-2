@@ -413,14 +413,13 @@ export default {
 // 快捷功能
 .quick-actions {
   display: flex;
-  flex-wrap: wrap;
   background-color: #ffffff;
   padding: 40rpx 30rpx;
   margin-bottom: 20rpx;
-  gap: 20rpx;
+  justify-content: space-between;
 
   .action-item {
-    width: calc(25% - 15rpx);
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
