@@ -1,7 +1,7 @@
 // 环境配置
 const config = {
   development: {
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'http://192.168.3.5:8080/api',
     timeout: 10000, // 减少到10秒超时，避免过长等待
     debug: true,
     cache: true, // 启用缓存

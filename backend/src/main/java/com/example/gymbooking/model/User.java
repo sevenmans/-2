@@ -16,7 +16,8 @@ import java.util.Set;
        uniqueConstraints = {
            @UniqueConstraint(columnNames = "username"),
            @UniqueConstraint(columnNames = "phone"),
-           @UniqueConstraint(columnNames = "email")
+           @UniqueConstraint(columnNames = "email"),
+           @UniqueConstraint(columnNames = "wechat_openid")
        })
 public class User {
     @Id
@@ -46,6 +47,10 @@ public class User {
     
     @Size(max = 255)
     private String avatar;
+
+    @Size(max = 64)
+    @Column(name = "wechat_openid")
+    private String wechatOpenid;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -130,6 +135,14 @@ public class User {
     
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getWechatOpenid() {
+        return wechatOpenid;
+    }
+
+    public void setWechatOpenid(String wechatOpenid) {
+        this.wechatOpenid = wechatOpenid;
     }
 
     public Set<Role> getRoles() {

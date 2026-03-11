@@ -12,6 +12,7 @@ const _sfc_main = {
       showPassword: false,
       smsCountdown: 0,
       smsTimer: null,
+      showAccountLogin: false,
       formData: {
         phone: "13402838501",
         // 默认手机号
@@ -61,6 +62,9 @@ const _sfc_main = {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
+    toggleAccountLogin() {
+      this.showAccountLogin = !this.showAccountLogin;
+    },
     // 发送短信验证码
     async sendSmsCode() {
       if (!this.canSendSms || this.smsCountdown > 0)
@@ -76,7 +80,7 @@ const _sfc_main = {
         });
         this.startCountdown();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/login.vue:226", "发送验证码失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/login.vue:219", "发送验证码失败:", error);
         common_vendor.index.showToast({
           title: error.message || "发送失败",
           icon: "error"
@@ -121,7 +125,7 @@ const _sfc_main = {
           this.handleLoginSuccess();
         }, 1500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/login.vue:282", "登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/login.vue:275", "登录失败:", error);
         let errorMessage = "登录失败";
         if (error.message) {
           if (error.message.includes("用户名或密码错误") || error.message.includes("账号或密码错误")) {
@@ -166,7 +170,7 @@ const _sfc_main = {
             common_vendor.index.switchTab({
               url: pagePath,
               fail: (err) => {
-                common_vendor.index.__f__("error", "at pages/user/login.vue:337", "[Login] switchTab失败:", err);
+                common_vendor.index.__f__("error", "at pages/user/login.vue:330", "[Login] switchTab失败:", err);
                 common_vendor.index.switchTab({ url: "/pages/index/index" });
               }
             });
@@ -174,20 +178,20 @@ const _sfc_main = {
             common_vendor.index.redirectTo({
               url: decodedUrl,
               fail: (err) => {
-                common_vendor.index.__f__("error", "at pages/user/login.vue:346", "[Login] redirectTo失败:", err);
+                common_vendor.index.__f__("error", "at pages/user/login.vue:339", "[Login] redirectTo失败:", err);
                 common_vendor.index.switchTab({ url: "/pages/index/index" });
               }
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/user/login.vue:353", "[Login] 处理重定向URL失败:", error);
+          common_vendor.index.__f__("error", "at pages/user/login.vue:346", "[Login] 处理重定向URL失败:", error);
           common_vendor.index.switchTab({ url: "/pages/index/index" });
         }
       } else {
         common_vendor.index.switchTab({
           url: "/pages/index/index",
           fail: (err) => {
-            common_vendor.index.__f__("error", "at pages/user/login.vue:362", "[Login] 跳转首页失败:", err);
+            common_vendor.index.__f__("error", "at pages/user/login.vue:355", "[Login] 跳转首页失败:", err);
           }
         });
       }
@@ -211,11 +215,22 @@ const _sfc_main = {
       return true;
     },
     // 微信登录
-    wechatLogin() {
-      common_vendor.index.showToast({
-        title: "功能开发中",
-        icon: "none"
-      });
+    async wechatLogin() {
+      try {
+        await this.userStore.loginByWechat();
+        common_vendor.index.showToast({
+          title: "登录成功",
+          icon: "success"
+        });
+        setTimeout(() => {
+          this.handleLoginSuccess();
+        }, 1200);
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: error.message || "微信登录失败",
+          icon: "none"
+        });
+      }
     },
     // Apple登录
     appleLogin() {
@@ -253,39 +268,45 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_assets._imports_0,
-    b: $data.loginType === "password" ? 1 : "",
-    c: common_vendor.o(($event) => $options.switchLoginType("password")),
-    d: $data.loginType === "sms" ? 1 : "",
-    e: common_vendor.o(($event) => $options.switchLoginType("sms")),
-    f: $data.formData.phone,
-    g: common_vendor.o(($event) => $data.formData.phone = $event.detail.value),
-    h: $data.loginType === "password"
+    b: common_vendor.o((...args) => $options.wechatLogin && $options.wechatLogin(...args)),
+    c: common_vendor.t($data.showAccountLogin ? "收起其他登录方式" : "使用手机号/账号登录"),
+    d: common_vendor.o((...args) => $options.toggleAccountLogin && $options.toggleAccountLogin(...args)),
+    e: $data.showAccountLogin
+  }, $data.showAccountLogin ? common_vendor.e({
+    f: $data.loginType === "password" ? 1 : "",
+    g: common_vendor.o(($event) => $options.switchLoginType("password")),
+    h: $data.loginType === "sms" ? 1 : "",
+    i: common_vendor.o(($event) => $options.switchLoginType("sms")),
+    j: $data.formData.phone,
+    k: common_vendor.o(($event) => $data.formData.phone = $event.detail.value),
+    l: $data.loginType === "password"
   }, $data.loginType === "password" ? {
-    i: !$data.showPassword,
-    j: $data.formData.password,
-    k: common_vendor.o(($event) => $data.formData.password = $event.detail.value),
-    l: common_vendor.t($data.showPassword ? "🙈" : "👁️"),
-    m: common_vendor.o((...args) => $options.togglePassword && $options.togglePassword(...args))
+    m: !$data.showPassword,
+    n: $data.formData.password,
+    o: common_vendor.o(($event) => $data.formData.password = $event.detail.value),
+    p: common_vendor.t($data.showPassword ? "🙈" : "👁️"),
+    q: common_vendor.o((...args) => $options.togglePassword && $options.togglePassword(...args))
   } : {}, {
-    n: $data.loginType === "sms"
+    r: $data.loginType === "sms"
   }, $data.loginType === "sms" ? {
-    o: $data.formData.smsCode,
-    p: common_vendor.o(($event) => $data.formData.smsCode = $event.detail.value),
-    q: common_vendor.t($data.smsCountdown > 0 ? `${$data.smsCountdown}s` : "获取验证码"),
-    r: !$options.canSendSms || $data.smsCountdown > 0,
-    s: common_vendor.o((...args) => $options.sendSmsCode && $options.sendSmsCode(...args))
+    s: $data.formData.smsCode,
+    t: common_vendor.o(($event) => $data.formData.smsCode = $event.detail.value),
+    v: common_vendor.t($data.smsCountdown > 0 ? `${$data.smsCountdown}s` : "获取验证码"),
+    w: !$options.canSendSms || $data.smsCountdown > 0,
+    x: common_vendor.o((...args) => $options.sendSmsCode && $options.sendSmsCode(...args))
   } : {}, {
-    t: !$options.canLogin,
-    v: common_vendor.o((...args) => $options.handleLogin && $options.handleLogin(...args)),
-    w: $data.loginType === "password"
+    y: !$options.canLogin,
+    z: common_vendor.o((...args) => $options.handleLogin && $options.handleLogin(...args)),
+    A: $data.loginType === "password"
   }, $data.loginType === "password" ? {
-    x: common_vendor.o((...args) => $options.navigateToReset && $options.navigateToReset(...args))
+    B: common_vendor.o((...args) => $options.navigateToReset && $options.navigateToReset(...args))
+  } : {}) : {}, {
+    C: $data.showAccountLogin
+  }, $data.showAccountLogin ? {
+    D: common_vendor.o((...args) => $options.navigateToRegister && $options.navigateToRegister(...args))
   } : {}, {
-    y: common_vendor.o((...args) => $options.wechatLogin && $options.wechatLogin(...args)),
-    z: common_vendor.o((...args) => $options.appleLogin && $options.appleLogin(...args)),
-    A: common_vendor.o((...args) => $options.navigateToRegister && $options.navigateToRegister(...args)),
-    B: common_vendor.o((...args) => $options.showUserAgreement && $options.showUserAgreement(...args)),
-    C: common_vendor.o((...args) => $options.showPrivacyPolicy && $options.showPrivacyPolicy(...args))
+    E: common_vendor.o((...args) => $options.showUserAgreement && $options.showUserAgreement(...args)),
+    F: common_vendor.o((...args) => $options.showPrivacyPolicy && $options.showPrivacyPolicy(...args))
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ebed24a8"]]);

@@ -5,6 +5,7 @@
 	import { useVenueStore } from '@/stores/venue.js'
 	import { useSharingStore } from '@/stores/sharing.js'
 	import { useBookingStore } from '@/stores/booking.js'
+	import { getToken, getUserInfo } from '@/utils/auth.js'
 	// WebSocket功能已被移除
 
 	export default {
@@ -81,8 +82,8 @@
 			checkAndRedirectToLogin() {
 				try {
 					console.log('[App] 检查登录状态')
-					const token = uni.getStorageSync('token')
-					const userInfo = uni.getStorageSync('userInfo')
+					const token = getToken()
+					const userInfo = getUserInfo()
 					
 					if (!token || !userInfo) {
 						console.log('[App] 未登录，跳转到登录页')

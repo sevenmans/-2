@@ -7,6 +7,7 @@ const stores_app = require("./stores/app.js");
 const stores_venue = require("./stores/venue.js");
 const stores_sharing = require("./stores/sharing.js");
 const stores_booking = require("./stores/booking.js");
+const utils_auth = require("./utils/auth.js");
 const stores_index = require("./stores/index.js");
 const utils_feedback = require("./utils/feedback.js");
 if (!Math) {
@@ -69,8 +70,8 @@ const _sfc_main = {
     };
   },
   onLaunch: function() {
-    common_vendor.index.__f__("log", "at App.vue:22", "[App] 应用启动");
-    common_vendor.index.__f__("log", "at App.vue:25", "🏪 初始化 Pinia stores");
+    common_vendor.index.__f__("log", "at App.vue:23", "[App] 应用启动");
+    common_vendor.index.__f__("log", "at App.vue:26", "🏪 初始化 Pinia stores");
     this.userStore = stores_user.useUserStore();
     this.appStore = stores_app.useAppStore();
     this.venueStore = stores_venue.useVenueStore();
@@ -78,7 +79,7 @@ const _sfc_main = {
     this.bookingStore = stores_booking.useBookingStore();
     utils_routerGuardNew.setupRouterGuard();
     this.userStore.initUserState();
-    common_vendor.index.__f__("log", "at App.vue:39", "🎧 设置所有Store的事件监听器");
+    common_vendor.index.__f__("log", "at App.vue:40", "🎧 设置所有Store的事件监听器");
     this.venueStore.setupOrderExpiredListener();
     if (this.venueStore.setupAdditionalEventListeners) {
       this.venueStore.setupAdditionalEventListeners();
@@ -89,36 +90,36 @@ const _sfc_main = {
     if (this.bookingStore.setupEventListeners) {
       this.bookingStore.setupEventListeners();
     }
-    common_vendor.index.__f__("log", "at App.vue:57", "✅ 所有Store事件监听器设置完成");
+    common_vendor.index.__f__("log", "at App.vue:58", "✅ 所有Store事件监听器设置完成");
     this.checkAndRedirectToLogin();
     this.$nextTick(() => {
       this.setupNetworkListener();
     });
   },
   onShow: function() {
-    common_vendor.index.__f__("log", "at App.vue:70", "App Show");
+    common_vendor.index.__f__("log", "at App.vue:71", "App Show");
   },
   onHide: function() {
-    common_vendor.index.__f__("log", "at App.vue:73", "App Hide");
+    common_vendor.index.__f__("log", "at App.vue:74", "App Hide");
   },
   methods: {
     // WebSocket功能已被移除，initWebSocket方法已删除
     // 检查登录状态并跳转到登录页
     checkAndRedirectToLogin() {
       try {
-        common_vendor.index.__f__("log", "at App.vue:83", "[App] 检查登录状态");
-        const token = common_vendor.index.getStorageSync("token");
-        const userInfo = common_vendor.index.getStorageSync("userInfo");
+        common_vendor.index.__f__("log", "at App.vue:84", "[App] 检查登录状态");
+        const token = utils_auth.getToken();
+        const userInfo = utils_auth.getUserInfo();
         if (!token || !userInfo) {
-          common_vendor.index.__f__("log", "at App.vue:88", "[App] 未登录，跳转到登录页");
+          common_vendor.index.__f__("log", "at App.vue:89", "[App] 未登录，跳转到登录页");
           common_vendor.index.reLaunch({
             url: "/pages/user/login"
           });
           return;
         }
-        common_vendor.index.__f__("log", "at App.vue:95", "[App] 已登录，继续正常流程");
+        common_vendor.index.__f__("log", "at App.vue:96", "[App] 已登录，继续正常流程");
       } catch (error) {
-        common_vendor.index.__f__("warn", "at App.vue:97", "[App] 登录状态检查失败:", error.message);
+        common_vendor.index.__f__("warn", "at App.vue:98", "[App] 登录状态检查失败:", error.message);
         common_vendor.index.reLaunch({
           url: "/pages/user/login"
         });

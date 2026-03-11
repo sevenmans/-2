@@ -9,7 +9,11 @@ function register(data) {
 function logout() {
   return utils_request.post("/auth/logout");
 }
+function wechatLogin(data) {
+  return utils_request.post("/auth/wechat/login", data);
+}
 exports.login = login;
 exports.logout = logout;
 exports.register = register;
+exports.wechatLogin = wechatLogin;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/auth.js.map

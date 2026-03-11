@@ -4,6 +4,7 @@ com/example/gymbooking/model/TimeSlot$SlotStatus.class
 com/example/gymbooking/controller/VerificationController.class
 com/example/gymbooking/controller/AnnouncementController$1.class
 com/example/gymbooking/model/Announcement$AnnouncementType.class
+com/example/gymbooking/service/WechatAuthService$1.class
 com/example/gymbooking/controller/AnnouncementController.class
 com/example/gymbooking/service/OrderStatusService.class
 com/example/gymbooking/controller/AuthController.class
@@ -16,6 +17,7 @@ com/example/gymbooking/model/Venue$VenueStatus.class
 com/example/gymbooking/service/TimeSlotService.class
 com/example/gymbooking/repository/SharingRequestRepository.class
 com/example/gymbooking/controller/OrderController.class
+com/example/gymbooking/service/WechatAuthService.class
 com/example/gymbooking/model/Venue.class
 com/example/gymbooking/config/SchedulingConfig.class
 com/example/gymbooking/security/jwt/JwtUtils.class

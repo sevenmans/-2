@@ -37,6 +37,10 @@ app:
   jwt:
     secret: gymBookingSuperSecretKey123!@#ThisIsAVeryLongAndSecureSecretKeyForJWT
     expirationMs: 86400000 # 24小时
+  wechat:
+    miniapp:
+      appid: ${WECHAT_MINIAPP_APPID:wx2e811ad126ad0e40}
+      secret: ${WECHAT_MINIAPP_SECRET:42aec928a4192779f79e3b6bb7750289}
   # 默认管理员账号配置
   default-admin:
     username: admin

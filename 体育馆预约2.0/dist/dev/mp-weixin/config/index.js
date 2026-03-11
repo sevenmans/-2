@@ -1,7 +1,7 @@
 "use strict";
 const config = {
   development: {
-    baseURL: "http://localhost:8080/api",
+    baseURL: "http://192.168.3.5:8080/api",
     timeout: 1e4,
     // 启用缓存
     retryTimes: 1,

@@ -11,6 +11,7 @@ import com.example.gymbooking.security.jwt.JwtUtils;
 import com.example.gymbooking.security.services.UserDetailsImpl;
 import com.example.gymbooking.security.services.UserDetailsServiceImpl;
 import com.example.gymbooking.service.SmsService;
+import com.example.gymbooking.service.WechatAuthService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -58,6 +60,9 @@ public class AuthController {
     
     @Autowired
     private SmsService smsService;
+
+    @Autowired
+    private WechatAuthService wechatAuthService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
@@ -279,6 +284,63 @@ public class AuthController {
             response.put("success", false);
             response.put("message", "验证码发送失败，请稍后重试");
             return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/wechat/login")
+    public ResponseEntity<?> wechatLogin(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        if (code == null || code.trim().isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "code不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            String openid = wechatAuthService.getOpenidByCode(code);
+            User user = userRepository.findByWechatOpenid(openid).orElseGet(() -> {
+                String suffix = openid.length() > 8 ? openid.substring(openid.length() - 8) : openid;
+                String username = "wx_" + suffix;
+                while (Boolean.TRUE.equals(userRepository.existsByUsername(username))) {
+                    username = "wx_" + suffix + "_" + System.currentTimeMillis() % 10000;
+                }
+
+                User newUser = new User();
+                newUser.setUsername(username);
+                newUser.setPassword(encoder.encode(UUID.randomUUID().toString()));
+                newUser.setNickname("微信用户" + suffix);
+                newUser.setPhone(null);
+                newUser.setEmail(null);
+                newUser.setWechatOpenid(openid);
+                Set<Role> roles = new HashSet<>();
+                roles.add(Role.ROLE_USER);
+                newUser.setRoles(roles);
+                return userRepository.save(newUser);
+            });
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+            String jwt = jwtUtils.generateJwtToken(authentication);
+            List<String> roleNames = user.getRoles().stream().map(Enum::name).collect(Collectors.toList());
+            JwtResponse jwtResponse = new JwtResponse(
+                    jwt,
+                    "Bearer",
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    roleNames
+            );
+            return ResponseEntity.ok(jwtResponse);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
     

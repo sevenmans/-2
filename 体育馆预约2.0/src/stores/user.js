@@ -139,6 +139,48 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    async loginByWechat() {
+      try {
+        const loginRes = await new Promise((resolve, reject) => {
+          uni.login({
+            provider: 'weixin',
+            success: resolve,
+            fail: reject
+          })
+        })
+
+        if (!loginRes || !loginRes.code) {
+          throw new Error('获取微信登录凭证失败')
+        }
+
+        const response = await authApi.wechatLogin({ code: loginRes.code })
+        const responseData = response.data || response
+        const token = responseData.accessToken || responseData.token
+
+        if (!token) {
+          throw new Error('未获取到登录令牌')
+        }
+
+        const user = {
+          id: responseData.id,
+          username: responseData.username,
+          email: responseData.email,
+          phone: responseData.phone,
+          nickname: responseData.nickname || responseData.username,
+          avatar: responseData.avatar,
+          roles: responseData.roles
+        }
+
+        this.setToken(token)
+        this.setUserInfo(user)
+        this.setLoginStatus(true)
+        return response
+      } catch (error) {
+        this.setLoginStatus(false)
+        throw error
+      }
+    },
+
     // 获取用户信息
     async getUserInfo() {
       try {

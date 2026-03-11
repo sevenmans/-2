@@ -6,9 +6,16 @@
       <text class="app-name">体育馆预约</text>
       <text class="app-slogan">让运动更简单</text>
     </view>
+
+    <view class="wechat-primary">
+      <button class="wechat-main-btn" @click="wechatLogin">微信一键登录</button>
+      <view class="account-entry" @click="toggleAccountLogin">
+        <text class="account-entry-text">{{ showAccountLogin ? '收起其他登录方式' : '使用手机号/账号登录' }}</text>
+      </view>
+    </view>
     
     <!-- 登录表单 -->
-    <view class="login-form">
+    <view v-if="showAccountLogin" class="login-form">
       <!-- 标签切换 -->
       <view class="tab-bar">
         <view 
@@ -96,27 +103,8 @@
       </view>
     </view>
     
-    <!-- 其他登录方式 -->
-    <view class="other-login">
-      <view class="divider">
-        <text class="divider-text">其他登录方式</text>
-      </view>
-      
-      <view class="social-login">
-        <view class="social-item" @click="wechatLogin">
-          <text class="social-icon">💬</text>
-          <text class="social-text">微信登录</text>
-        </view>
-        
-        <view class="social-item" @click="appleLogin">
-          <text class="social-icon">🍎</text>
-          <text class="social-text">Apple登录</text>
-        </view>
-      </view>
-    </view>
-    
     <!-- 底部链接 -->
-    <view class="footer">
+    <view v-if="showAccountLogin" class="footer">
       <text class="footer-text">还没有账号？</text>
       <text class="footer-link" @click="navigateToRegister">立即注册</text>
     </view>
@@ -144,6 +132,7 @@ export default {
       showPassword: false,
       smsCountdown: 0,
       smsTimer: null,
+      showAccountLogin: false,
 
       formData: {
         phone: '13402838501',  // 默认手机号
@@ -203,6 +192,10 @@ export default {
     // 切换密码显示
     togglePassword() {
       this.showPassword = !this.showPassword
+    },
+
+    toggleAccountLogin() {
+      this.showAccountLogin = !this.showAccountLogin
     },
     
     // 发送短信验证码
@@ -387,11 +380,22 @@ export default {
     },
     
     // 微信登录
-    wechatLogin() {
-      uni.showToast({
-        title: '功能开发中',
-        icon: 'none'
-      })
+    async wechatLogin() {
+      try {
+        await this.userStore.loginByWechat()
+        uni.showToast({
+          title: '登录成功',
+          icon: 'success'
+        })
+        setTimeout(() => {
+          this.handleLoginSuccess()
+        }, 1200)
+      } catch (error) {
+        uni.showToast({
+          title: error.message || '微信登录失败',
+          icon: 'none'
+        })
+      }
     },
     
     // Apple登录
@@ -464,6 +468,32 @@ export default {
   .app-slogan {
     font-size: 28rpx;
     color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.wechat-primary {
+  margin-bottom: 32rpx;
+
+  .wechat-main-btn {
+    width: 100%;
+    height: 92rpx;
+    background: #07c160;
+    color: #ffffff;
+    border-radius: 14rpx;
+    font-size: 32rpx;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 10rpx 24rpx rgba(7, 193, 96, 0.28);
+  }
+
+  .account-entry {
+    margin-top: 20rpx;
+    text-align: center;
+  }
+
+  .account-entry-text {
+    font-size: 26rpx;
+    color: rgba(255, 255, 255, 0.86);
   }
 }
 
