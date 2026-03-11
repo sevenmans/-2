@@ -108,6 +108,12 @@
 			}
 		},
 		{
+			"path": "pages/sharing/participants",
+			"style": {
+				"navigationBarTitleText": "参与者列表"
+			}
+		},
+		{
 			"path": "pages/sharing/my-orders",
 			"style": {
 				"navigationBarTitleText": "我的拼场"

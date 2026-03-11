@@ -27,6 +27,7 @@ if (!Math) {
   "./pages/sharing/create.js";
   "./pages/sharing/detail.js";
   "./pages/sharing/manage.js";
+  "./pages/sharing/participants.js";
   "./pages/sharing/my-orders.js";
   "./pages/user/login.js";
   "./pages/user/register.js";

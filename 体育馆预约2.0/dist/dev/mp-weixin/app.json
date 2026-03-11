@@ -17,6 +17,7 @@
     "pages/sharing/create",
     "pages/sharing/detail",
     "pages/sharing/manage",
+    "pages/sharing/participants",
     "pages/sharing/my-orders",
     "pages/user/login",
     "pages/user/register",

@@ -196,20 +196,24 @@ const userStore = useUserStore()
 
 // 响应式数据
 const selectedStatus = ref('all')
+
+// 优化后的 5 个筛选 Tab（从用户视角归类）
 const statusOptions = ref([
   { label: '全部', value: 'all' },
-  { label: '待支付', value: 'PENDING' },
-  { label: '已支付', value: 'PAID' },
-  { label: '已确认', value: 'CONFIRMED' },
-  { label: '已核销', value: 'VERIFIED' },
-  { label: '已完成', value: 'COMPLETED' },
-  { label: '已取消', value: 'CANCELLED' },
-  { label: '已过期', value: 'EXPIRED' },
-  // 拼场相关状态
-  { label: '开放中', value: 'OPEN' },
-  { label: '等待对方支付', value: 'APPROVED_PENDING_PAYMENT' },
-  { label: '拼场成功', value: 'SHARING_SUCCESS' }
+  { label: '待支付', value: 'pending' },
+  { label: '进行中', value: 'ongoing' },
+  { label: '已完成', value: 'done' },
+  { label: '已取消', value: 'closed' }
 ])
+
+// 每个 Tab 对应的后端状态集合
+const statusGroupMap = {
+  'all': null, // 全部，不过滤
+  'pending': ['PENDING'], // 待支付
+  'ongoing': ['PAID', 'CONFIRMED', 'OPEN', 'APPROVED_PENDING_PAYMENT', 'SHARING_SUCCESS', 'FULL', 'PENDING_FULL'], // 进行中
+  'done': ['VERIFIED', 'COMPLETED'], // 已完成
+  'closed': ['CANCELLED', 'EXPIRED'] // 已取消
+}
 const currentBookingId = ref(null)
 const cancelPopup = ref(null)
 const showCancelPopup = ref(false)
@@ -251,15 +255,20 @@ const hasMore = computed(() => {
 
 const filteredBookings = computed(() => {
   const bookings = bookingList.value || []
-  const currentStatus = selectedStatus.value
+  const currentTab = selectedStatus.value
 
-
-  if (currentStatus === 'all') {
+  // "全部"直接返回
+  if (currentTab === 'all') {
     return bookings
-  } else {
-    const result = bookings.filter(booking => booking.status === currentStatus)
-    return result
   }
+
+  // 根据 Tab 对应的状态集合进行筛选
+  const allowedStatuses = statusGroupMap[currentTab]
+  if (!allowedStatuses) {
+    return bookings
+  }
+
+  return bookings.filter(booking => allowedStatuses.includes(booking.status))
 })
 
 // 空状态文本
@@ -488,24 +497,24 @@ const emptyStateText = computed(() => {
       return statusMap[status] || 'status-pending';
     };
 
-    // 获取状态文本
+    // 获取状态文本（卡片上的标签文字，贴近用户语言）
     const getStatusText = (status) => {
       const statusMap = {
-        // 基础状态（所有订单通用）
+        // 基础状态
         'PENDING': '待支付',
-        'PAID': '已支付',
-        'CONFIRMED': '已确认',
+        'PAID': '已支付，待确认',
+        'CONFIRMED': '待使用',
         'VERIFIED': '已核销',
         'COMPLETED': '已完成',
         'CANCELLED': '已取消',
         'EXPIRED': '已过期',
 
-        // 拼场订单特有状态
-        'OPEN': '开放中(1/2)',
-        'APPROVED_PENDING_PAYMENT': '等待对方支付',
-        'SHARING_SUCCESS': '拼场成功(2人)',
+        // 拼场订单特有状态（在「进行中」Tab 内通过标签区分）
+        'OPEN': '拼场中',
+        'APPROVED_PENDING_PAYMENT': '等待对方付款',
+        'SHARING_SUCCESS': '拼场成功',
         'PENDING_FULL': '待满员',
-        'FULL': '已满员(2/2)'
+        'FULL': '已满员'
       };
       return statusMap[status] || '待支付';
     };
@@ -884,11 +893,11 @@ const emptyStateText = computed(() => {
   min-height: 100vh;
 }
 
-// 状态筛选
+// 状态筛选（优化为 5 个 Tab，均匀分布）
 .status-filter {
   display: flex;
   background-color: #ffffff;
-  padding: 20rpx 30rpx;
+  padding: 20rpx 16rpx;
   border-bottom: 1rpx solid #f0f0f0;
   
   .filter-item {
@@ -898,6 +907,7 @@ const emptyStateText = computed(() => {
     font-size: 28rpx;
     color: #666666;
     position: relative;
+    white-space: nowrap;
     
     &.active {
       color: #ff6b35;
@@ -909,7 +919,7 @@ const emptyStateText = computed(() => {
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 60rpx;
+        width: 48rpx;
         height: 4rpx;
         background-color: #ff6b35;
         border-radius: 2rpx;

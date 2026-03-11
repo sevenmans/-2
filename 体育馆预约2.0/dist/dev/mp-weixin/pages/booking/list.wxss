@@ -30,7 +30,7 @@
 .status-filter.data-v-afb09895 {
   display: flex;
   background-color: #ffffff;
-  padding: 20rpx 30rpx;
+  padding: 20rpx 16rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 .status-filter .filter-item.data-v-afb09895 {
@@ -40,6 +40,7 @@
   font-size: 28rpx;
   color: #666666;
   position: relative;
+  white-space: nowrap;
 }
 .status-filter .filter-item.active.data-v-afb09895 {
   color: #ff6b35;
@@ -52,7 +53,7 @@
   left: 50%;
   -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
-  width: 60rpx;
+  width: 48rpx;
   height: 4rpx;
   background-color: #ff6b35;
   border-radius: 2rpx;
