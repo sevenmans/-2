@@ -117,14 +117,11 @@ const _sfc_main = {
   },
   async onShow() {
     common_vendor.index.__f__("log", "at pages/sharing/list.vue:374", "🔍 [DEBUG] sharing/list.vue onShow被调用");
-    if (this.lastRefreshTime === 0) {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:379", "拼场列表页面：首次加载，强制刷新数据");
-      await this.refreshData();
-    } else {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:382", "拼场列表页面：非首次加载，使用缓存优化");
-      await this.refreshDataWithCache();
-    }
-    await this.loadUserApplications();
+    const refreshPromise = this.lastRefreshTime === 0 ? this.refreshData() : this.refreshDataWithCache();
+    await Promise.all([
+      refreshPromise,
+      this.loadUserApplications().catch((err) => common_vendor.index.__f__("warn", "at pages/sharing/list.vue:384", "加载申请记录失败:", err.message))
+    ]);
     this.startAutoRefresh();
   },
   onHide() {
@@ -142,15 +139,15 @@ const _sfc_main = {
     // 初始化数据
     async initData() {
       try {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:412", "拼场列表页面：开始初始化数据");
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:413", "拼场列表页面：Store状态:", this.sharingStore);
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:414", "拼场列表页面：当前显示模式:", this.showMode);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:411", "拼场列表页面：开始初始化数据");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:412", "拼场列表页面：Store状态:", this.sharingStore);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:413", "拼场列表页面：当前显示模式:", this.showMode);
         const apiMethod = this.showMode === "all" ? this.sharingStore.getAllSharingOrders : this.sharingStore.getJoinableSharingOrders;
         const result = await apiMethod({ page: 1, pageSize: 10 });
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:419", "拼场列表页面：API返回结果:", result);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:418", "拼场列表页面：API返回结果:", result);
         this.$forceUpdate();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:423", "拼场列表页面：初始化数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:422", "拼场列表页面：初始化数据失败:", error);
         common_vendor.index.showToast({
           title: "获取拼场数据失败",
           icon: "none"
@@ -161,63 +158,45 @@ const _sfc_main = {
     async refreshDataWithCache() {
       var _a, _b;
       const now = Date.now();
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:435", "拼场列表页面：refreshDataWithCache 被调用", {
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:434", "拼场列表页面：refreshDataWithCache 被调用", {
         isRefreshing: this.isRefreshing,
         hasOrders: ((_a = this.sharingOrders) == null ? void 0 : _a.length) > 0,
         timeSinceLastRefresh: now - this.lastRefreshTime,
         cacheTimeout: this.cacheTimeout
       });
       if (this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:444", "拼场列表页面：正在刷新中，跳过本次请求");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:443", "拼场列表页面：正在刷新中，跳过本次请求");
         return;
       }
       if (((_b = this.sharingOrders) == null ? void 0 : _b.length) > 0 && now - this.lastRefreshTime < this.cacheTimeout) {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:450", "拼场列表页面：使用缓存数据，跳过刷新");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:449", "拼场列表页面：使用缓存数据，跳过刷新");
         return;
       }
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:455", "拼场列表页面：缓存已过期或无数据，执行刷新");
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:454", "拼场列表页面：缓存已过期或无数据，执行刷新");
       await this.refreshData();
     },
     // 刷新数据
     async refreshData() {
-      var _a, _b, _c, _d, _e;
+      var _a;
       if (this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:463", "拼场列表页面：正在加载中，跳过重复调用");
         return;
       }
       this.isRefreshing = true;
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:468", "拼场列表页面：🔒 设置 isRefreshing = true，当前时间:", (/* @__PURE__ */ new Date()).toLocaleTimeString());
       try {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:471", "拼场列表页面：开始刷新数据，当前显示模式:", this.showMode);
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:472", "拼场列表页面：Store状态:", {
-          loading: (_a = this.sharingStore) == null ? void 0 : _a.loading,
-          ordersCount: (_c = (_b = this.sharingStore) == null ? void 0 : _b.sharingOrders) == null ? void 0 : _c.length
-        });
         const apiMethod = this.showMode === "all" ? this.sharingStore.getAllSharingOrders.bind(this.sharingStore) : this.sharingStore.getJoinableSharingOrders.bind(this.sharingStore);
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:482", "拼场列表页面：准备调用API方法:", this.showMode === "all" ? "getAllSharingOrders" : "getJoinableSharingOrders");
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:483", "拼场列表页面：⏳ 等待API响应，开始时间:", (/* @__PURE__ */ new Date()).toLocaleTimeString());
         const result = await apiMethod({
           page: 1,
           pageSize: 10,
           refresh: true,
           _t: Date.now()
-          // 添加时间戳，防止缓存
         });
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:494", "拼场列表页面：✅ API调用成功，结束时间:", (/* @__PURE__ */ new Date()).toLocaleTimeString());
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:495", "拼场列表页面：API返回结果:", result);
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:496", "拼场列表页面：刷新数据完成，订单数量:", ((_d = this.sharingOrders) == null ? void 0 : _d.length) || 0);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:479", "[SharingList] 刷新完成，订单数量:", ((_a = this.sharingOrders) == null ? void 0 : _a.length) || 0);
         this.lastRefreshTime = Date.now();
         this.$forceUpdate();
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
         common_vendor.index.stopPullDownRefresh();
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:506", "拼场列表页面：❌ 刷新数据失败，时间:", (/* @__PURE__ */ new Date()).toLocaleTimeString());
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:507", "拼场列表页面：错误详情:", {
-          message: error.message,
-          stack: error.stack,
-          showMode: this.showMode,
-          storeLoading: (_e = this.sharingStore) == null ? void 0 : _e.loading
-        });
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:489", "[SharingList] 刷新失败:", error.message);
         common_vendor.index.showToast({
           title: "刷新数据失败",
           icon: "none",
@@ -225,7 +204,6 @@ const _sfc_main = {
         });
       } finally {
         this.isRefreshing = false;
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:523", "拼场列表页面：🔓 已重置 isRefreshing = false，时间:", (/* @__PURE__ */ new Date()).toLocaleTimeString());
       }
     },
     // 加载更多
@@ -234,7 +212,7 @@ const _sfc_main = {
       if (this.loading || !this.hasMore)
         return;
       try {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:532", "拼场列表页面：开始加载更多，当前页码:", this.pagination.current, "显示模式:", this.showMode);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:506", "拼场列表页面：开始加载更多，当前页码:", this.pagination.current, "显示模式:", this.showMode);
         const nextPage = this.pagination.current + 1;
         const apiMethod = this.showMode === "all" ? this.sharingStore.getAllSharingOrders : this.sharingStore.getJoinableSharingOrders;
         await apiMethod({
@@ -242,9 +220,9 @@ const _sfc_main = {
           pageSize: 10,
           status: this.selectedStatus
         });
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:541", "拼场列表页面：加载更多完成，订单数量:", ((_a = this.sharingOrders) == null ? void 0 : _a.length) || 0);
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:515", "拼场列表页面：加载更多完成，订单数量:", ((_a = this.sharingOrders) == null ? void 0 : _a.length) || 0);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:543", "拼场列表页面：加载更多失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:517", "拼场列表页面：加载更多失败:", error);
         common_vendor.index.showToast({
           title: "加载更多失败",
           icon: "none"
@@ -263,18 +241,18 @@ const _sfc_main = {
           refresh: true
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:564", "筛选失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:538", "筛选失败:", error);
       }
     },
     // 切换显示模式
     async switchMode(mode) {
       var _a, _b;
       if (this.showMode === mode) {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:571", "拼场列表页面：模式未改变，跳过切换");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:545", "拼场列表页面：模式未改变，跳过切换");
         return;
       }
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:575", "拼场列表页面：🔄 切换显示模式从", this.showMode, "到", mode);
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:576", "拼场列表页面：当前状态:", {
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:549", "拼场列表页面：🔄 切换显示模式从", this.showMode, "到", mode);
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:550", "拼场列表页面：当前状态:", {
         isRefreshing: this.isRefreshing,
         storeLoading: (_a = this.sharingStore) == null ? void 0 : _a.loading,
         ordersCount: (_b = this.sharingOrders) == null ? void 0 : _b.length
@@ -283,12 +261,12 @@ const _sfc_main = {
       this.showMode = mode;
       this.selectedStatus = "";
       try {
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:588", "拼场列表页面：准备刷新数据...");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:562", "拼场列表页面：准备刷新数据...");
         this.lastRefreshTime = 0;
         await this.refreshData();
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:595", "拼场列表页面：✅ 模式切换成功");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:569", "拼场列表页面：✅ 模式切换成功");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:597", "拼场列表页面：❌ 切换模式失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:571", "拼场列表页面：❌ 切换模式失败:", error);
         common_vendor.index.showToast({
           title: "切换模式失败，请重试",
           icon: "none"
@@ -296,7 +274,7 @@ const _sfc_main = {
         this.showMode = mode === "all" ? "joinable" : "all";
       } finally {
         this.isRefreshing = false;
-        common_vendor.index.__f__("log", "at pages/sharing/list.vue:607", "拼场列表页面：🔓 switchMode finally: isRefreshing = false");
+        common_vendor.index.__f__("log", "at pages/sharing/list.vue:581", "拼场列表页面：🔓 switchMode finally: isRefreshing = false");
       }
     },
     // 跳转到详情页
@@ -332,13 +310,13 @@ const _sfc_main = {
         const applications = (response == null ? void 0 : response.data) || (response == null ? void 0 : response.list) || response || [];
         this.userApplications = Array.isArray(applications) ? applications : [];
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:654", "加载用户申请记录失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:628", "加载用户申请记录失败:", error);
         this.userApplications = [];
       }
     },
     // 加入拼场
     joinSharing(sharingId) {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:661", "🔍 [DEBUG] joinSharing被调用，sharingId:", sharingId, "调用栈:", new Error().stack);
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:635", "🔍 [DEBUG] joinSharing被调用，sharingId:", sharingId, "调用栈:", new Error().stack);
       const sharing = this.sharingOrders.find((s) => s.id === sharingId);
       if (this.isMySharing(sharing)) {
         common_vendor.index.showToast({
@@ -404,7 +382,7 @@ const _sfc_main = {
                 ;
               return;
             } catch (e) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:764", "joinSharing - open调用异常", e);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:738", "joinSharing - open调用异常", e);
               if (attempt === 0) {
                 const self = this;
                 setTimeout(() => {
@@ -421,7 +399,7 @@ const _sfc_main = {
               if (debugEnabled)
                 ;
             } catch (fallbackError) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:783", "joinSharing - 备选方案失败:", fallbackError);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:757", "joinSharing - 备选方案失败:", fallbackError);
               common_vendor.index.showToast({ title: "弹窗打开失败", icon: "none" });
             }
             return;
@@ -434,7 +412,7 @@ const _sfc_main = {
         };
         tryOpen(0);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:799", "joinSharing - 执行失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:773", "joinSharing - 执行失败:", error);
         common_vendor.index.showToast({
           title: "操作失败，请重试",
           icon: "none"
@@ -454,7 +432,7 @@ const _sfc_main = {
     },
     // 关闭加入弹窗
     closeJoinModal() {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:818", "🔍 [DEBUG] closeJoinModal被调用");
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:792", "🔍 [DEBUG] closeJoinModal被调用");
       const debugEnabled = false;
       try {
         const windowInfo = common_vendor.index.getWindowInfo();
@@ -509,7 +487,7 @@ const _sfc_main = {
                 ;
               return;
             } catch (e) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:906", "closeJoinModal - close调用异常", e);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:880", "closeJoinModal - close调用异常", e);
               if (attempt === 0) {
                 setTimeout(() => tryClose(1), 100);
                 return;
@@ -523,7 +501,7 @@ const _sfc_main = {
               if (debugEnabled)
                 ;
             } catch (fallbackError) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:924", "closeJoinModal - 备选方案失败:", fallbackError);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:898", "closeJoinModal - 备选方案失败:", fallbackError);
               common_vendor.index.showToast({ title: "弹窗关闭失败", icon: "none" });
             }
             return;
@@ -534,7 +512,7 @@ const _sfc_main = {
         };
         tryClose(0);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:940", "closeJoinModal - 执行失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:914", "closeJoinModal - 执行失败:", error);
         this.internalJoinPopupOpened = false;
       } finally {
         this.currentSharing = null;
@@ -598,7 +576,7 @@ const _sfc_main = {
         await this.loadUserApplications();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:1021", "加入拼场失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:995", "加入拼场失败:", error);
         common_vendor.index.showToast({
           title: error.message || "加入失败",
           icon: "error"
@@ -607,7 +585,7 @@ const _sfc_main = {
     },
     // 显示筛选弹窗
     showFilterModal() {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1031", "🔍 [DEBUG] showFilterModal被调用");
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1005", "🔍 [DEBUG] showFilterModal被调用");
       const debugEnabled = false;
       try {
         const windowInfo = common_vendor.index.getWindowInfo();
@@ -673,7 +651,7 @@ const _sfc_main = {
                 ;
               return;
             } catch (e) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:1129", "showFilterModal - open调用异常", e);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:1103", "showFilterModal - open调用异常", e);
               if (attempt === 0) {
                 setTimeout(() => tryOpen(1), 100);
                 return;
@@ -687,7 +665,7 @@ const _sfc_main = {
               if (debugEnabled)
                 ;
             } catch (fallbackError) {
-              common_vendor.index.__f__("error", "at pages/sharing/list.vue:1147", "showFilterModal - 备选方案失败:", fallbackError);
+              common_vendor.index.__f__("error", "at pages/sharing/list.vue:1121", "showFilterModal - 备选方案失败:", fallbackError);
               common_vendor.index.showToast({ title: "弹窗打开失败", icon: "none" });
             }
             return;
@@ -698,7 +676,7 @@ const _sfc_main = {
         };
         tryOpen(0);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:1163", "showFilterModal - 执行失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:1137", "showFilterModal - 执行失败:", error);
         this.internalFilterPopupOpened = true;
       }
     },
@@ -770,7 +748,7 @@ const _sfc_main = {
         const minute = String(date.getMinutes()).padStart(2, "0");
         return `${year}-${month}-${day} ${hour}:${minute}`;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/list.vue:1250", "时间格式化错误:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/list.vue:1224", "时间格式化错误:", error);
         return "--";
       }
     },
@@ -801,7 +779,7 @@ const _sfc_main = {
     },
     // 倒计时过期处理
     onCountdownExpired(order) {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1283", "拼场订单倒计时过期:", order.orderNo);
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1257", "拼场订单倒计时过期:", order.orderNo);
       this.refreshData();
     },
     // 获取状态样式类
@@ -831,7 +809,7 @@ const _sfc_main = {
     },
     // 处理拼场数据变化
     onSharingDataChanged(data) {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1317", "拼场列表页面：收到数据变化通知:", data);
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1291", "拼场列表页面：收到数据变化通知:", data);
       if (this.sharingOrders && data.orderId) {
         const order = this.sharingOrders.find((o) => o.id == data.orderId);
         if (order) {
@@ -841,7 +819,7 @@ const _sfc_main = {
           if (data.action === "APPROVED" && order.currentParticipants >= 2) {
             order.status = "SHARING_SUCCESS";
           }
-          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1333", "拼场列表页面：已更新订单数据:", order);
+          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1307", "拼场列表页面：已更新订单数据:", order);
         }
       }
       setTimeout(() => {
@@ -850,18 +828,18 @@ const _sfc_main = {
     },
     // 处理订单取消事件
     onOrderCancelled(data) {
-      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1345", "拼场列表页面：收到订单取消通知:", data);
+      common_vendor.index.__f__("log", "at pages/sharing/list.vue:1319", "拼场列表页面：收到订单取消通知:", data);
       if (data.orderId) {
         if (data.type === "sharing") {
-          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1350", "检测到拼场订单取消，刷新拼场大厅数据");
+          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1324", "检测到拼场订单取消，刷新拼场大厅数据");
           setTimeout(() => {
-            common_vendor.index.__f__("log", "at pages/sharing/list.vue:1353", "开始刷新拼场大厅数据...");
+            common_vendor.index.__f__("log", "at pages/sharing/list.vue:1327", "开始刷新拼场大厅数据...");
             this.refreshData();
           }, 500);
         } else if (data.type === "booking") {
-          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1357", "检测到预约订单取消，刷新拼场大厅数据");
+          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1331", "检测到预约订单取消，刷新拼场大厅数据");
           setTimeout(() => {
-            common_vendor.index.__f__("log", "at pages/sharing/list.vue:1360", "开始刷新拼场大厅数据...");
+            common_vendor.index.__f__("log", "at pages/sharing/list.vue:1334", "开始刷新拼场大厅数据...");
             this.refreshData();
           }, 1500);
         }
@@ -902,10 +880,10 @@ const _sfc_main = {
       }
       this.refreshTimer = setInterval(async () => {
         try {
-          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1409", "定时刷新拼场数据...");
+          common_vendor.index.__f__("log", "at pages/sharing/list.vue:1383", "定时刷新拼场数据...");
           await this.refreshData();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/sharing/list.vue:1412", "定时刷新失败:", error);
+          common_vendor.index.__f__("error", "at pages/sharing/list.vue:1386", "定时刷新失败:", error);
         }
       }, 6e4);
     },

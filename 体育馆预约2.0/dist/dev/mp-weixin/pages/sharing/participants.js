@@ -18,7 +18,7 @@ const _sfc_main = {
     };
   },
   onLoad(options) {
-    common_vendor.index.__f__("log", "at pages/sharing/participants.vue:64", "SharingParticipants onLoad:", options);
+    common_vendor.index.__f__("log", "at pages/sharing/participants.vue:113", "SharingParticipants onLoad:", options);
     this.orderId = (options == null ? void 0 : options.orderId) || "";
     if (!this.orderId) {
       common_vendor.index.showToast({ title: "订单ID缺失", icon: "none" });
@@ -31,6 +31,17 @@ const _sfc_main = {
     this.load().finally(() => common_vendor.index.stopPullDownRefresh());
   },
   methods: {
+    getInitial(name) {
+      if (!name)
+        return "友";
+      return name.substring(0, 1).toUpperCase();
+    },
+    getAvatarClass(index, badgeText) {
+      if (badgeText === "发起方")
+        return "avatar-creator";
+      const colors = ["bg-c1", "bg-c2", "bg-c3", "bg-c4", "bg-c5"];
+      return colors[index % colors.length];
+    },
     normalizeStatus(status) {
       return (status || "").toString().toUpperCase();
     },
@@ -112,35 +123,38 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.sharingOrder
   }, $data.sharingOrder ? {
-    b: common_vendor.t($data.sharingOrder.venueName || ""),
+    b: common_vendor.t($data.sharingOrder.venueName || "拼场活动"),
     c: common_vendor.t($data.sharingOrder.startTime || ""),
-    d: common_vendor.t($data.sharingOrder.endTime || "")
+    d: common_vendor.t($data.sharingOrder.endTime || ""),
+    e: common_vendor.t($data.sharingOrder.teamName || "-"),
+    f: common_vendor.t($data.sharingOrder.currentParticipants || 0),
+    g: common_vendor.t($data.sharingOrder.maxParticipants || 0)
   } : {}, {
-    e: $data.sharingOrder
-  }, $data.sharingOrder ? {
-    f: common_vendor.t($data.sharingOrder.teamName || "-"),
-    g: common_vendor.t($data.sharingOrder.currentParticipants || 0),
-    h: common_vendor.t($data.sharingOrder.maxParticipants || 0)
-  } : {}, {
-    i: $data.loading
+    h: $data.loading
   }, $data.loading ? {} : $data.error ? {
-    k: common_vendor.t($data.error),
-    l: common_vendor.o((...args) => $options.load && $options.load(...args))
+    j: common_vendor.t($data.error),
+    k: common_vendor.o((...args) => $options.load && $options.load(...args))
   } : common_vendor.e({
+    l: common_vendor.t($data.participants.length),
     m: $data.participants.length === 0
   }, $data.participants.length === 0 ? {} : {
-    n: common_vendor.f($data.participants, (p, k0, i0) => {
-      return {
-        a: common_vendor.t(p.teamName || p.username || "-"),
-        b: common_vendor.t(p.badgeText),
-        c: common_vendor.n(p.badgeClass),
-        d: common_vendor.t(p.participantsCount || 0),
-        e: common_vendor.t(p.contact || "-"),
-        f: p.key
-      };
+    n: common_vendor.f($data.participants, (p, index, i0) => {
+      return common_vendor.e({
+        a: common_vendor.t($options.getInitial(p.teamName || p.username)),
+        b: common_vendor.n($options.getAvatarClass(index, p.badgeText)),
+        c: p.badgeText === "发起方"
+      }, p.badgeText === "发起方" ? {} : {}, {
+        d: common_vendor.t(p.teamName || p.username || "神秘球友"),
+        e: common_vendor.t(p.badgeText),
+        f: common_vendor.n(p.badgeClass),
+        g: common_vendor.t(p.participantsCount || 0),
+        h: common_vendor.t(p.contact || "暂无"),
+        i: p.key,
+        j: p.badgeText === "发起方" ? 1 : ""
+      });
     })
   }), {
-    j: $data.error
+    i: $data.error
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-bb53d9bf"]]);

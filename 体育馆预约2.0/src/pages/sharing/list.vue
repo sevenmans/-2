@@ -374,17 +374,16 @@ export default {
     console.log('🔍 [DEBUG] sharing/list.vue onShow被调用')
     // 已移除popup-protection相关调用
 
-    // 🔥 修复: 首次加载时强制刷新，后续使用缓存优化
-    if (this.lastRefreshTime === 0) {
-      console.log('拼场列表页面：首次加载，强制刷新数据')
-      await this.refreshData()
-    } else {
-      console.log('拼场列表页面：非首次加载，使用缓存优化')
-      await this.refreshDataWithCache()
-    }
-
-    // 加载用户申请记录
-    await this.loadUserApplications()
+    // 🔥 性能优化：拼场列表和用户申请记录并行加载
+    const refreshPromise = this.lastRefreshTime === 0
+      ? this.refreshData()
+      : this.refreshDataWithCache()
+    
+    await Promise.all([
+      refreshPromise,
+      this.loadUserApplications().catch(err => console.warn('加载申请记录失败:', err.message))
+    ])
+    
     // 启动定时刷新
     this.startAutoRefresh()
   },
@@ -458,42 +457,26 @@ export default {
     
     // 刷新数据
     async refreshData() {
-      // 🔥 修复问题3: 改进防重复调用逻辑 - 只检查页面级别的标志
       if (this.isRefreshing) {
-        console.log('拼场列表页面：正在加载中，跳过重复调用')
         return
       }
 
       this.isRefreshing = true
-      console.log('拼场列表页面：🔒 设置 isRefreshing = true，当前时间:', new Date().toLocaleTimeString())
 
       try {
-        console.log('拼场列表页面：开始刷新数据，当前显示模式:', this.showMode)
-        console.log('拼场列表页面：Store状态:', {
-          loading: this.sharingStore?.loading,
-          ordersCount: this.sharingStore?.sharingOrders?.length
-        })
-
         // 根据显示模式选择不同的API
         const apiMethod = this.showMode === 'all'
           ? this.sharingStore.getAllSharingOrders.bind(this.sharingStore)
           : this.sharingStore.getJoinableSharingOrders.bind(this.sharingStore)
 
-        console.log('拼场列表页面：准备调用API方法:', this.showMode === 'all' ? 'getAllSharingOrders' : 'getJoinableSharingOrders')
-        console.log('拼场列表页面：⏳ 等待API响应，开始时间:', new Date().toLocaleTimeString())
-
-        // 🔥 修复问题1: 移除页面层面的超时逻辑，完全依赖API层面的超时处理
-        // 这样可以确保store的loading状态总是正确的
         const result = await apiMethod({
           page: 1,
           pageSize: 10,
           refresh: true,
-          _t: Date.now() // 添加时间戳，防止缓存
+          _t: Date.now()
         })
 
-        console.log('拼场列表页面：✅ API调用成功，结束时间:', new Date().toLocaleTimeString())
-        console.log('拼场列表页面：API返回结果:', result)
-        console.log('拼场列表页面：刷新数据完成，订单数量:', this.sharingOrders?.length || 0)
+        console.log('[SharingList] 刷新完成，订单数量:', this.sharingOrders?.length || 0)
 
         // 更新缓存时间
         this.lastRefreshTime = Date.now()
@@ -503,24 +486,15 @@ export default {
         uni.stopPullDownRefresh()
       } catch (error) {
         uni.stopPullDownRefresh()
-        console.error('拼场列表页面：❌ 刷新数据失败，时间:', new Date().toLocaleTimeString())
-        console.error('拼场列表页面：错误详情:', {
-          message: error.message,
-          stack: error.stack,
-          showMode: this.showMode,
-          storeLoading: this.sharingStore?.loading
-        })
+        console.error('[SharingList] 刷新失败:', error.message)
 
-        // 🔥 修复问题3: 显示更友好的错误提示
         uni.showToast({
           title: '刷新数据失败',
           icon: 'none',
           duration: 2000
         })
       } finally {
-        // 🔥 修复问题3: 确保无论如何都重置标志,防止死锁
         this.isRefreshing = false
-        console.log('拼场列表页面：🔓 已重置 isRefreshing = false，时间:', new Date().toLocaleTimeString())
       }
     },
     

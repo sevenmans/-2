@@ -235,21 +235,18 @@ export default {
       this.isRefreshing = true
       
       try {
-        // 加载用户信息
-        await this.loadUserInfo()
-        
-        // 加载用户统计（可选）
-        await this.loadUserStats()
-        
-        // 延迟加载待处理数量，避免与基础数据请求冲突
-        setTimeout(async () => {
-          try {
-            console.log('[Profile] 延迟加载待处理数量')
-            await this.loadPendingCounts()
-          } catch (error) {
+        // 🔥 性能优化：用户信息 + 统计 + 角标数量三组请求并行执行
+        await Promise.all([
+          // 第一组：核心数据（用户信息 + 统计），失败会抛异常
+          Promise.all([
+            this.loadUserInfo(),
+            this.loadUserStats()
+          ]),
+          // 第二组：角标数量，失败只静默降级，不影响页面渲染
+          this.loadPendingCounts().catch(error => {
             console.warn('[Profile] 加载待处理数量失败:', error.message)
-          }
-        }, 500)
+          })
+        ])
         
         console.log('[Profile] 用户数据加载完成')
         
@@ -354,17 +351,13 @@ export default {
       this.receivedRequests = 0
       
       try {
-        // 串行执行，避免并发请求导致超时
-        await this.loadPendingBookings()
-        await this.delay(200) // 请求间隔
-        
-        await this.loadPendingSharings()
-        await this.delay(200)
-        
-        await this.loadPendingRequests()
-        await this.delay(200)
-        
-        await this.loadReceivedRequests()
+        // 🔥 性能优化：4 个角标请求并行执行，每个独立容错
+        await Promise.allSettled([
+          this.loadPendingBookings(),
+          this.loadPendingSharings(),
+          this.loadPendingRequests(),
+          this.loadReceivedRequests()
+        ])
         
         this.lastLoadTime.pendingCounts = Date.now()
         
@@ -402,7 +395,7 @@ export default {
           this.bookingStore.getUserBookings({
             status: 'pending',
             page: 1,
-            pageSize: 100
+            pageSize: 1 // 🔥 只需要 total 数字，不需要完整数据
           }),
           this.createTimeoutPromise(5000)
         ])
@@ -423,7 +416,7 @@ export default {
           this.bookingStore.getUserSharingOrders({
             status: 'PENDING',
             page: 1,
-            pageSize: 100
+            pageSize: 1 // 🔥 只需要 total 数字，不需要完整数据
           }),
           this.createTimeoutPromise(5000)
         ])
@@ -449,7 +442,7 @@ export default {
           this.sharingStore.getSentRequestsList({
             status: 'PENDING',
             page: 1,
-            pageSize: 100
+            pageSize: 1 // 🔥 只需要 total 数字，不需要完整数据
           }),
           this.createTimeoutPromise(5000)
         ])
@@ -476,7 +469,7 @@ export default {
           this.sharingStore.getReceivedRequestsList({
             status: 'PENDING',
             page: 1,
-            pageSize: 100
+            pageSize: 1 // 🔥 只需要 total 数字，不需要完整数据
           }),
           this.createTimeoutPromise(5000)
         ])

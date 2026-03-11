@@ -522,17 +522,24 @@ export default {
         
         this.loading = true;
         
-        // 获取场馆详情
-        await this.venueStore.getVenueDetail(this.venueId);
-        console.log('[VenueDetail] 获取场馆详情成功');
+        this.loading = true;
         
-        // 初始化日期
+        // 🔥 性能优化：先初始化日期获取 selectedDate，让详情和时间段接口并行请求
         this.initDates();
         
-        // 加载时间段
+        const requests = [
+          this.venueStore.getVenueDetail(this.venueId)
+            .then(() => console.log('[VenueDetail] 获取场馆详情成功'))
+            .catch(e => console.error('[VenueDetail] 获取详情失败:', e))
+        ];
+
         if (this.selectedDate) {
-          await this.loadTimeSlots();
+          requests.push(
+            this.loadTimeSlots().catch(e => console.error('[VenueDetail] 获取时间段失败:', e))
+          );
         }
+
+        await Promise.all(requests);
         
         console.log('[VenueDetail] 数据初始化完成');
         
@@ -725,11 +732,8 @@ export default {
           false
         );
 
-        console.log('[VenueDetail] 🔥 getVenueTimeSlots返回结果:', result);
-        console.log('[VenueDetail] 时间段获取结果:', result);
-
         let timeSlots = this.timeSlots || [];
-        console.log('[VenueDetail] 原始时间段数量:', timeSlots.length);
+        console.log(`[VenueDetail] 🎉 获取到 ${timeSlots.length} 个时间段`);
 
         // 🎯 关键修复：强制修正时间段状态
         if (timeSlots.length > 0) {

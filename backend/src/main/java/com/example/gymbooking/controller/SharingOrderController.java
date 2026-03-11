@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.Objects;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -247,10 +249,28 @@ return ResponseEntity.ok(result);
     @GetMapping("/by-order/{orderId}")
     public ResponseEntity<?> getSharingOrderByMainOrderId(@PathVariable Long orderId) {
         try {
-            logger.info("=== 通过主订单ID获取拼场订单详情 ===");
-            logger.info("主订单ID: {}", orderId);
+            logger.info("=== 通过主/虚拟订单ID获取拼场订单详情 ===");
+            logger.info("请求的订单ID: {}", orderId);
 
-            SharingOrder sharingOrder = sharingOrderRepository.findByOrderId(orderId);
+            SharingOrder sharingOrder = null;
+
+            if (orderId < 0) {
+                // 是虚拟订单（负数ID，对应为 -RequestId）
+                Long requestId = -orderId;
+                logger.info("检测到虚拟订单ID {}，其对应的拼场申请ID为: {}", orderId, requestId);
+                Optional<SharingRequest> requestOpt = sharingRequestRepository.findById(requestId);
+                if (requestOpt.isPresent()) {
+                    Long realSharingOrderId = requestOpt.get().getSharingOrderId();
+                    if (realSharingOrderId != null) {
+                        sharingOrder = sharingOrderService.getSharingOrderById(realSharingOrderId).orElse(null);
+                        logger.info("通过虚拟订单找到拼场申请，关联的拼场订单ID: {}", realSharingOrderId);
+                    }
+                }
+            } else {
+                // 正常通过主订单ID查找
+                sharingOrder = sharingOrderRepository.findByOrderId(orderId);
+            }
+
             logger.info("查询结果: {}", sharingOrder != null ? "找到拼场订单ID: " + sharingOrder.getId() : "未找到拼场订单");
 
             if (sharingOrder != null) {
@@ -337,9 +357,20 @@ return ResponseEntity.ok(result);
             }
             List<SharingOrder> allOrders = sharingOrderService.getAllSharingOrders();
             
-            // 为每个拼场订单添加场馆位置信息
+            // 🔥 性能优化：批量查询场馆信息，避免 N+1 查询
+            Set<Long> venueIds = allOrders.stream()
+                .map(SharingOrder::getVenueId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+            Map<Long, Venue> venueMap = new HashMap<>();
+            if (!venueIds.isEmpty()) {
+                venueRepository.findAllById(venueIds).forEach(v -> venueMap.put(v.getId(), v));
+            }
             List<SharingOrder> enrichedOrders = allOrders.stream()
-                .map(this::enrichSharingOrderWithVenueInfo)
+                .peek(order -> {
+                    Venue venue = venueMap.get(order.getVenueId());
+                    order.setVenueLocation(venue != null ? venue.getLocation() : "位置未知");
+                })
                 .collect(Collectors.toList());
             
             // 如果请求全部数据，则不分页
@@ -393,9 +424,20 @@ return ResponseEntity.ok(result);
             logger.info("获取可加入的拼场订单列表，页码: {}, 页大小: {}", page, pageSize);
             List<SharingOrder> allJoinableOrders = sharingOrderService.getJoinableSharingOrders();
             
-            // 为每个拼场订单添加场馆位置信息
+            // 🔥 性能优化：批量查询场馆信息，避免 N+1 查询
+            Set<Long> venueIds = allJoinableOrders.stream()
+                .map(SharingOrder::getVenueId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+            Map<Long, Venue> venueMap = new HashMap<>();
+            if (!venueIds.isEmpty()) {
+                venueRepository.findAllById(venueIds).forEach(v -> venueMap.put(v.getId(), v));
+            }
             List<SharingOrder> enrichedOrders = allJoinableOrders.stream()
-                .map(this::enrichSharingOrderWithVenueInfo)
+                .peek(order -> {
+                    Venue venue = venueMap.get(order.getVenueId());
+                    order.setVenueLocation(venue != null ? venue.getLocation() : "位置未知");
+                })
                 .collect(Collectors.toList());
             
             // 手动分页

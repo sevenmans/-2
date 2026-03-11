@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -270,128 +271,105 @@ public class UserController {
             logger.info("获取用户预约记录，用户名: {}", currentUsername);
 
             List<Order> orders = orderRepository.findByUsername(currentUsername);
-            logger.info("找到 {} 个发起的订单，用户名: {}", orders.size(), currentUsername);
+            logger.info("找到 {} 个发起的订单", orders.size());
 
-            // 同时获取用户作为申请者的拼场申请
-            logger.info("=== 开始查询用户拼场申请 ===");
-            logger.info("查询用户名: {}", currentUsername);
-
+            // 获取用户作为申请者的拼场申请
             List<SharingRequest> sharingRequests = sharingRequestRepository.findByApplicantUsername(currentUsername);
-            logger.info("找到 {} 个拼场申请，用户名: {}", sharingRequests.size(), currentUsername);
+            logger.debug("找到 {} 个拼场申请", sharingRequests.size());
 
-            // 详细打印每个拼场申请的信息
+            // 将拼场申请转换为虚拟订单，混入预约列表
+            int addedVirtualOrders = 0;
             for (SharingRequest request : sharingRequests) {
-                logger.info("拼场申请详情 - ID: {}, 申请者: {}, 订单ID: {}, 拼场订单ID: {}, 状态: {}, 支付金额: {}, 创建时间: {}",
-                           request.getId(), request.getApplicantUsername(), request.getOrderId(),
-                           request.getSharingOrderId(), request.getStatus(), request.getPaymentAmount(), request.getCreatedAt());
-            }
-
-            // 将拼场申请转换为订单格式，添加到结果中
-            for (SharingRequest request : sharingRequests) {
-                logger.info("=== 处理拼场申请 ===");
-                logger.info("申请ID: {}, 申请者: {}, orderId: {}, sharingOrderId: {}, 状态: {}, 支付金额: {}",
-                           request.getId(), request.getApplicantUsername(), request.getOrderId(),
-                           request.getSharingOrderId(), request.getStatus(), request.getPaymentAmount());
-
-                // 仅在“已同意后需要支付/已支付/已完成”时才把拼场申请混入“我的预约”列表
-                // 待处理/拒绝/取消/超时 等状态应在“我的申请”页面查看，不应出现在预约列表并触发支付/取消预约逻辑
+                // 仅纳入已同意/已支付等有效状态的申请
                 if (request.getStatus() == SharingRequest.RequestStatus.PENDING ||
                     request.getStatus() == SharingRequest.RequestStatus.REJECTED ||
                     request.getStatus() == SharingRequest.RequestStatus.CANCELLED ||
                     request.getStatus() == SharingRequest.RequestStatus.TIMEOUT_CANCELLED) {
-                    logger.info("跳过拼场申请（不纳入预约列表）- 申请ID: {}, 状态: {}", request.getId(), request.getStatus());
                     continue;
                 }
 
                 Order originalOrder = null;
-
-                // 优先从orderId获取，如果没有则从sharingOrderId获取
                 if (request.getOrderId() != null) {
                     originalOrder = orderRepository.findById(request.getOrderId()).orElse(null);
-                    if (originalOrder != null) {
-                        logger.info("✅ 从orderId获取原始订单成功: ID={}, 场馆={}, 时间={}, 价格={}",
-                                   originalOrder.getId(), originalOrder.getVenueName(),
-                                   originalOrder.getBookingTime(), originalOrder.getTotalPrice());
-                    } else {
-                        logger.error("❌ 从orderId获取原始订单失败: {}", request.getOrderId());
-                    }
                 } else if (request.getSharingOrderId() != null) {
-                    // 如果没有orderId，尝试从SharingOrder获取对应的Order
                     originalOrder = findOrderBySharingOrderId(request.getSharingOrderId());
-                    if (originalOrder != null) {
-                        logger.info("✅ 从sharingOrderId获取原始订单成功: ID={}, 场馆={}, 时间={}, 价格={}",
-                                   originalOrder.getId(), originalOrder.getVenueName(),
-                                   originalOrder.getBookingTime(), originalOrder.getTotalPrice());
-                    } else {
-                        logger.error("❌ 从sharingOrderId获取原始订单失败: {}", request.getSharingOrderId());
-                    }
-                } else {
-                    logger.error("❌ 申请ID {} 既没有orderId也没有sharingOrderId", request.getId());
                 }
 
                 if (originalOrder != null) {
-                    // 创建一个虚拟订单对象，表示申请者的"订单"
                     Order applicantOrder = createVirtualOrderFromRequest(request, originalOrder);
                     orders.add(applicantOrder);
-                    logger.info("✅ 添加申请者虚拟订单 - 申请ID: {}, 虚拟订单ID: {}, 状态: {}, 支付状态: {}",
-                               request.getId(), applicantOrder.getId(), request.getStatus(), request.getIsPaid());
+                    addedVirtualOrders++;
                 } else {
-                    logger.error("❌ 无法找到申请ID {} 对应的原始订单，orderId: {}, sharingOrderId: {}",
-                               request.getId(), request.getOrderId(), request.getSharingOrderId());
+                    logger.warn("无法找到申请ID {} 对应的原始订单", request.getId());
                 }
-                logger.info("=== 拼场申请处理完成 ===");
             }
-
-            logger.info("总共返回 {} 个订单（包括发起的订单和申请的拼场）", orders.size());
+            logger.info("混入 {} 个虚拟订单，总计 {} 个订单", addedVirtualOrders, orders.size());
 
             // 根据状态过滤
             if (status != null && !status.trim().isEmpty()) {
                 Order.OrderStatus orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
                 orders = orders.stream()
                         .filter(order -> order.getStatus() == orderStatus)
-                        .collect(java.util.stream.Collectors.toList());
+                        .collect(Collectors.toList());
             }
 
-            // 按创建时间倒序排序，确保最新的订单（包括虚拟订单）在前面
+            // 按创建时间倒序排序
             orders.sort((o1, o2) -> {
                 if (o1.getCreatedAt() == null && o2.getCreatedAt() == null) return 0;
                 if (o1.getCreatedAt() == null) return 1;
                 if (o2.getCreatedAt() == null) return -1;
-                return o2.getCreatedAt().compareTo(o1.getCreatedAt()); // 倒序
+                return o2.getCreatedAt().compareTo(o1.getCreatedAt());
             });
 
-            logger.info("排序后的订单列表，前3个订单的创建时间:");
-            for (int i = 0; i < Math.min(3, orders.size()); i++) {
-                Order order = orders.get(i);
-                logger.info("  订单{}: ID={}, 订单号={}, 创建时间={}",
-                           i+1, order.getId(), order.getOrderNo(), order.getCreatedAt());
+            // ===== 🔥 性能优化：批量预加载场馆信息和时间段信息 =====
+            // 1. 收集所有需要查询的场馆ID
+            Set<Long> venueIds = orders.stream()
+                    .map(Order::getVenueId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            // 一次性查出所有场馆，放入 Map
+            Map<Long, Venue> venueMap = new HashMap<>();
+            if (!venueIds.isEmpty()) {
+                List<Venue> venues = venueRepository.findAllById(venueIds);
+                for (Venue v : venues) {
+                    venueMap.put(v.getId(), v);
+                }
             }
-            
-            // 转换为前端需要的格式
+            logger.debug("批量加载了 {} 个场馆信息", venueMap.size());
+
+            // 2. 收集所有需要查时间段的真实订单ID（非虚拟、非已取消有原始时间的）
+            List<Long> realOrderIds = orders.stream()
+                    .filter(o -> o.getId() > 0) // 排除虚拟订单
+                    .filter(o -> !(o.getStatus() == Order.OrderStatus.CANCELLED
+                                   && o.getOriginalStartTime() != null
+                                   && o.getOriginalEndTime() != null)) // 排除已有原始时间的已取消订单
+                    .map(Order::getId)
+                    .collect(Collectors.toList());
+            // 一次性查出所有时间段，按 orderId 分组
+            Map<Long, List<TimeSlot>> timeSlotsMap = new HashMap<>();
+            if (!realOrderIds.isEmpty()) {
+                List<TimeSlot> allTimeSlots = timeSlotRepository.findByOrderIdIn(realOrderIds);
+                for (TimeSlot ts : allTimeSlots) {
+                    timeSlotsMap.computeIfAbsent(ts.getOrderId(), k -> new ArrayList<>()).add(ts);
+                }
+            }
+            logger.debug("批量加载了 {} 个订单的时间段信息", timeSlotsMap.size());
+            // ===== 批量预加载完成 =====
+
+            // 转换为前端需要的格式（使用预加载的 Map，无循环内数据库查询）
             List<Map<String, Object>> bookingList = orders.stream().map(order -> {
                 Map<String, Object> booking = new HashMap<>();
                 booking.put("id", order.getId());
                 booking.put("venueName", order.getVenueName());
                 booking.put("venueId", order.getVenueId());
                 
-                // 从场馆信息获取位置
+                // 🔥 优化：从预加载的 Map 中获取场馆地址，不再查数据库
                 String venueLocation = "位置未知";
                 if (order.getVenueId() != null) {
-                    try {
-                        Optional<Venue> venue = venueRepository.findById(order.getVenueId());
-                        if (venue.isPresent()) {
-                            venueLocation = venue.get().getLocation();
-                            logger.info("✅ 获取场馆地址成功: 订单ID={}, 场馆ID={}, 地址={}",
-                                       order.getId(), order.getVenueId(), venueLocation);
-                        } else {
-                            logger.warn("⚠️ 场馆不存在: 订单ID={}, 场馆ID={}", order.getId(), order.getVenueId());
-                        }
-                    } catch (Exception e) {
-                        logger.error("❌ 获取场馆地址失败: 订单ID={}, 场馆ID={}, 错误: {}",
-                                    order.getId(), order.getVenueId(), e.getMessage());
+                    Venue venue = venueMap.get(order.getVenueId());
+                    if (venue != null) {
+                        venueLocation = venue.getLocation();
                     }
-                } else {
-                    logger.warn("⚠️ 订单场馆ID为空: 订单ID={}", order.getId());
                 }
                 booking.put("venueLocation", venueLocation);
                 
@@ -399,108 +377,62 @@ public class UserController {
                 if (order.getBookingTime() != null) {
                     booking.put("bookingDate", order.getBookingTime().toLocalDate().toString());
 
-                    // 对于已取消的订单，优先使用保存的原始时间信息
                     if (order.getStatus() == Order.OrderStatus.CANCELLED &&
                         order.getOriginalStartTime() != null && order.getOriginalEndTime() != null) {
-
+                        // 已取消订单：使用保存的原始时间
                         booking.put("startTime", order.getOriginalStartTime().toString());
                         booking.put("endTime", order.getOriginalEndTime().toString());
-
-                        // 🔥 修复：计算实际的时间段数量，而不是硬编码为1
-                        // 每个时间段是1小时，所以时间段数量 = (结束时间 - 开始时间) / 60分钟
                         long minutesDiff = java.time.temporal.ChronoUnit.MINUTES.between(
-                            order.getOriginalStartTime(),
-                            order.getOriginalEndTime()
-                        );
-                        int calculatedTimeSlotCount = (int) (minutesDiff / 60);
-                        if (calculatedTimeSlotCount <= 0) {
-                            calculatedTimeSlotCount = 1; // 最少1个时段
-                        }
+                            order.getOriginalStartTime(), order.getOriginalEndTime());
+                        int calculatedTimeSlotCount = Math.max((int) (minutesDiff / 60), 1);
                         booking.put("timeSlotCount", calculatedTimeSlotCount);
-
-                        logger.info("🔴 已取消订单{}的时间信息: startTime={}, endTime={}, 时间段数: {}",
-                                   order.getId(), order.getOriginalStartTime(), order.getOriginalEndTime(), calculatedTimeSlotCount);
-
+                    } else if (order.getId() < 0) {
+                        // 虚拟订单：直接使用订单对象中的时间
+                        LocalTime startTime = order.getBookingTime().toLocalTime();
+                        LocalTime endTime = (order.getEndDateTime() != null)
+                                ? order.getEndDateTime().toLocalTime()
+                                : startTime.plusHours(2);
+                        booking.put("startTime", startTime.toString());
+                        booking.put("endTime", endTime.toString());
+                        booking.put("timeSlotCount", 1);
                     } else {
-                        // 检查是否为虚拟订单（ID为负数）
-                        if (order.getId() < 0) {
-                            // 虚拟订单：直接使用订单对象中的时间信息
-                            logger.info("✅ 处理虚拟订单时间信息: ID={}, bookingTime={}, endTime={}",
-                                       order.getId(), order.getBookingTime(), order.getEndTime());
-
-                            LocalTime startTime = order.getBookingTime().toLocalTime();
-                            LocalTime endTime;
-
-                            if (order.getEndDateTime() != null) {
-                                endTime = order.getEndDateTime().toLocalTime();
-                            } else {
-                                // 如果没有结束时间，默认+2小时
-                                endTime = startTime.plusHours(2);
-                            }
-
-                            booking.put("startTime", startTime.toString());
-                            booking.put("endTime", endTime.toString());
-                            booking.put("timeSlotCount", 1);
-
-                            logger.info("✅ 虚拟订单时间设置完成: startTime={}, endTime={}", startTime, endTime);
+                        // 🔥 优化：从预加载的 Map 中获取时间段，不再查数据库
+                        List<TimeSlot> orderTimeSlots = timeSlotsMap.getOrDefault(order.getId(), Collections.emptyList());
+                        if (!orderTimeSlots.isEmpty()) {
+                            LocalTime earliestStart = orderTimeSlots.stream()
+                                .map(TimeSlot::getStartTime)
+                                .min(LocalTime::compareTo)
+                                .orElse(order.getBookingTime().toLocalTime());
+                            LocalTime latestEnd = orderTimeSlots.stream()
+                                .map(TimeSlot::getEndTime)
+                                .max(LocalTime::compareTo)
+                                .orElse(order.getBookingTime().toLocalTime().plusHours(1));
+                            booking.put("startTime", earliestStart.toString());
+                            booking.put("endTime", latestEnd.toString());
+                            booking.put("timeSlotCount", orderTimeSlots.size());
                         } else {
-                            // 真实订单：获取该订单的所有时间段，计算完整的时间范围
-                            try {
-                                List<TimeSlot> orderTimeSlots = timeSlotRepository.findByOrderId(order.getId());
-
-                                if (!orderTimeSlots.isEmpty()) {
-                                    // 找到最早的开始时间和最晚的结束时间
-                                    LocalTime earliestStart = orderTimeSlots.stream()
-                                        .map(TimeSlot::getStartTime)
-                                        .min(LocalTime::compareTo)
-                                        .orElse(order.getBookingTime().toLocalTime());
-
-                                    LocalTime latestEnd = orderTimeSlots.stream()
-                                        .map(TimeSlot::getEndTime)
-                                        .max(LocalTime::compareTo)
-                                        .orElse(order.getBookingTime().toLocalTime().plusHours(1));
-
-                                    booking.put("startTime", earliestStart.toString());
-                                    booking.put("endTime", latestEnd.toString());
-
-                                    // 添加时间段数量信息
-                                    booking.put("timeSlotCount", orderTimeSlots.size());
-                                } else {
-                                    // 如果没有找到时间段，使用订单的预约时间
-                                    LocalTime startTime = order.getBookingTime().toLocalTime();
-                                    booking.put("startTime", startTime.toString());
-                                    booking.put("endTime", startTime.plusHours(1).toString());
-                                    booking.put("timeSlotCount", 1);
-                                }
-                            } catch (Exception e) {
-                                // 如果查询失败，使用默认值
-                                logger.error("查询订单时间段失败: {}", e.getMessage());
-                                LocalTime startTime = order.getBookingTime().toLocalTime();
-                                booking.put("startTime", startTime.toString());
-                                booking.put("endTime", startTime.plusHours(1).toString());
-                                booking.put("timeSlotCount", 1);
-                            }
+                            LocalTime startTime = order.getBookingTime().toLocalTime();
+                            booking.put("startTime", startTime.toString());
+                            booking.put("endTime", startTime.plusHours(1).toString());
+                            booking.put("timeSlotCount", 1);
                         }
                     }
                 }
                 
                 booking.put("totalPrice", order.getTotalPrice());
                 booking.put("status", order.getStatus().name());
-                booking.put("bookingType", order.getBookingType().name()); // 添加订单类型字段
+                booking.put("bookingType", order.getBookingType().name());
                 booking.put("createdAt", order.getCreatedAt() != null ? order.getCreatedAt().toString() : null);
                 booking.put("createTime", order.getCreatedAt() != null ? order.getCreatedAt().toString() : null);
-
                 booking.put("orderNo", order.getOrderNo());
 
-                // 为虚拟订单添加paymentAmount字段（前端需要）
+                // 为虚拟订单添加paymentAmount字段
                 if (order.getId() < 0) {
                     booking.put("paymentAmount", order.getTotalPrice());
-                    logger.info("✅ 为虚拟订单添加paymentAmount字段: ID={}, paymentAmount={}",
-                               order.getId(), order.getTotalPrice());
                 }
                 
                 return booking;
-            }).collect(java.util.stream.Collectors.toList());
+            }).collect(Collectors.toList());
             
             // 手动分页
             int start = (page - 1) * pageSize;

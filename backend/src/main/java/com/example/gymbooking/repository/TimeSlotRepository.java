@@ -26,6 +26,9 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     // 根据订单ID查询时间段
     List<TimeSlot> findByOrderId(Long orderId);
     
+    // 根据多个订单ID批量查询时间段（性能优化，避免 N+1 查询）
+    List<TimeSlot> findByOrderIdIn(List<Long> orderIds);
+    
     // 根据场馆ID、日期和开始时间查询时间段
     List<TimeSlot> findByVenueIdAndDateAndStartTime(Long venueId, LocalDate date, LocalTime startTime);
 

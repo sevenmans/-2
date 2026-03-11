@@ -293,16 +293,12 @@ const emptyStateText = computed(() => {
       }
 
       try {
-        // 优先使用缓存，先秒开，再在后台静默刷新
-        const resp = await bookingStore.getUserBookings({
+        // 🔥 性能优化：只发一次请求，不再静默刷新（下拉刷新和 onShow 已覆盖刷新场景）
+        await bookingStore.getUserBookings({
           page: 1,
           pageSize: 10,
           refresh: false // 允许使用缓存，提升首屏速度
         });
-        // 后台静默刷新最新数据（不阻塞首屏）
-        setTimeout(() => {
-          bookingStore.getUserBookings({ page: 1, pageSize: 10, refresh: true, _t: Date.now() }).catch(() => {})
-        }, 0)
       } catch (error) {
         console.error('[BookingList] 数据初始化失败:', error)
         uni.showToast({
