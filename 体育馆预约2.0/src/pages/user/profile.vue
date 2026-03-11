@@ -511,8 +511,8 @@ export default {
       try {
         uni.showLoading({ title: '上传中...' })
         
-        // 这里应该调用上传头像的API
-        // const result = await this.uploadUserAvatar(filePath)
+        // 调用 store 的 uploadAvatar 方法
+        await this.userStore.uploadAvatar(filePath)
         
         uni.hideLoading()
         uni.showToast({
@@ -520,14 +520,11 @@ export default {
           icon: 'success'
         })
         
-        // 重新获取用户信息
-        await this.userStore.getUserInfo()
-        
       } catch (error) {
         uni.hideLoading()
-        console.error('上传头像失败:', error)
+        console.error('[Profile] 上传头像失败:', error)
         uni.showToast({
-          title: '上传失败',
+          title: error.message || '上传失败',
           icon: 'error'
         })
       }

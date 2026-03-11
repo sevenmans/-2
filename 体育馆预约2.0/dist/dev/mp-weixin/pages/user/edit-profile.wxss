@@ -70,6 +70,24 @@
   background-color: #ffffff;
   margin-bottom: 20rpx;
 }
+.form-section .section-header.data-v-c6066cac {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 30rpx 10rpx;
+}
+.form-section .section-header .section-title.data-v-c6066cac {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.form-section .section-header .section-hint.data-v-c6066cac {
+  font-size: 22rpx;
+  color: #999999;
+  background-color: #f5f5f5;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
 .form-section .form-item.data-v-c6066cac {
   display: flex;
   align-items: center;
@@ -91,13 +109,6 @@
   color: #333333;
   text-align: right;
 }
-.form-section .form-item .item-textarea.data-v-c6066cac {
-  flex: 1;
-  min-height: 120rpx;
-  font-size: 28rpx;
-  color: #333333;
-  text-align: right;
-}
 .form-section .form-item .picker-text.data-v-c6066cac {
   flex: 1;
   font-size: 28rpx;
@@ -108,19 +119,15 @@
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 .form-section .form-item .phone-wrapper .phone-text.data-v-c6066cac {
   font-size: 28rpx;
   color: #333333;
 }
-.form-section .form-item .phone-wrapper .change-phone-btn.data-v-c6066cac {
-  padding: 8rpx 16rpx;
-  background-color: #ff6b35;
-  color: #ffffff;
-  font-size: 24rpx;
-  border-radius: 8rpx;
-  border: none;
+.form-section .form-item .phone-wrapper .phone-text.unbound.data-v-c6066cac {
+  color: #999999;
+  font-style: italic;
 }
 .form-section .form-item .change-password-btn.data-v-c6066cac {
   flex: 1;
@@ -153,31 +160,11 @@
   color: #ffffff;
   border-color: #ff6b35;
 }
-.privacy-section.data-v-c6066cac {
-  background-color: #ffffff;
-  margin-bottom: 20rpx;
+.form-section .sports-item.data-v-c6066cac {
+  flex-wrap: wrap;
 }
-.privacy-section .section-title.data-v-c6066cac {
-  display: block;
-  padding: 30rpx 30rpx 20rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #333333;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-.privacy-section .privacy-item.data-v-c6066cac {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 30rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-.privacy-section .privacy-item.data-v-c6066cac:last-child {
-  border-bottom: none;
-}
-.privacy-section .privacy-item .privacy-label.data-v-c6066cac {
-  font-size: 28rpx;
-  color: #333333;
+.form-section .sports-item .item-label.data-v-c6066cac {
+  margin-bottom: 16rpx;
 }
 .bottom-actions.data-v-c6066cac {
   position: fixed;
@@ -282,4 +269,34 @@
 .password-dialog .dialog-actions .confirm-btn.data-v-c6066cac {
   color: #ff6b35;
   font-weight: 600;
+}
+.custom-modal-mask.data-v-c6066cac {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  -webkit-animation: fadeIn-c6066cac 0.2s ease-out;
+          animation: fadeIn-c6066cac 0.2s ease-out;
+}
+@-webkit-keyframes fadeIn-c6066cac {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+@keyframes fadeIn-c6066cac {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
 }

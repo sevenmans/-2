@@ -330,17 +330,17 @@ const _sfc_main = {
     async uploadAvatar(filePath) {
       try {
         common_vendor.index.showLoading({ title: "上传中..." });
+        await this.userStore.uploadAvatar(filePath);
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({
           title: "头像更新成功",
           icon: "success"
         });
-        await this.userStore.getUserInfo();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:528", "上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:525", "[Profile] 上传头像失败:", error);
         common_vendor.index.showToast({
-          title: "上传失败",
+          title: error.message || "上传失败",
           icon: "error"
         });
       }
@@ -404,7 +404,7 @@ const _sfc_main = {
           });
         }, 500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:608", "[Profile] 退出登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:605", "[Profile] 退出登录失败:", error);
         common_vendor.index.showToast({
           title: "退出失败",
           icon: "error"

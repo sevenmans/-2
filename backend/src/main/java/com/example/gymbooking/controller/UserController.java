@@ -83,7 +83,10 @@ public class UserController {
             response.put("nickname", user.getNickname());
             response.put("phone", user.getPhone());
             response.put("email", user.getEmail());
+            response.put("avatar", user.getAvatar());
             response.put("roles", user.getRoles());
+            // 根据是否有微信openid判断登录方式
+            response.put("loginType", user.getWechatOpenid() != null ? "wechat" : "account");
             
             return ResponseEntity.ok(response);
             
@@ -174,8 +177,9 @@ public class UserController {
                 "id", savedUser.getId(),
                 "username", savedUser.getUsername(),
                 "nickname", savedUser.getNickname(),
-                "phone", savedUser.getPhone(),
-                "email", savedUser.getEmail()
+                "phone", savedUser.getPhone() != null ? savedUser.getPhone() : "",
+                "email", savedUser.getEmail() != null ? savedUser.getEmail() : "",
+                "avatar", savedUser.getAvatar() != null ? savedUser.getAvatar() : ""
             ));
             
             return ResponseEntity.ok(response);

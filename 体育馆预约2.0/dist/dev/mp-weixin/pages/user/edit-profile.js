@@ -9,21 +9,15 @@ const _sfc_main = {
       userStore: null,
       formData: {
         avatar: "",
-        username: "",
         nickname: "",
+        email: "",
+        // 趣味字段（后端暂不存储，仅本地保留）
         gender: "",
         birthday: "",
-        email: "",
-        bio: "",
-        sportsPreferences: [],
-        city: "",
-        showBookingHistory: true,
-        allowSharingInvite: true,
-        receiveNotifications: true
+        sportsPreferences: []
       },
       genderOptions: ["男", "女", "保密"],
       sportsOptions: ["篮球", "足球", "羽毛球", "乒乓球", "网球", "游泳", "健身", "瑜伽"],
-      regionValue: [],
       // 密码修改表单
       passwordForm: {
         oldPassword: "",
@@ -32,8 +26,6 @@ const _sfc_main = {
       },
       // 弹窗状态控制变量
       internalPasswordPopupOpened: false,
-      passwordPopupPosition: "",
-      _passwordPopupRef: null,
       // 缓存相关
       lastInitTime: 0,
       cacheTimeout: 60 * 1e3,
@@ -48,35 +40,28 @@ const _sfc_main = {
     },
     genderIndex() {
       return this.genderOptions.indexOf(this.formData.gender);
+    },
+    // 登录方式：'wechat' 或 'account'
+    loginType() {
+      var _a;
+      return ((_a = this.userInfo) == null ? void 0 : _a.loginType) || "account";
     }
   },
   onLoad() {
     this.userStore = stores_user.useUserStore();
     this.internalPasswordPopupOpened = false;
-    this.$nextTick(() => {
-      try {
-        this._passwordPopupRef = this.$refs.passwordPopup;
-        if (!this._passwordPopupRef) {
-          setTimeout(() => {
-            this._passwordPopupRef = this.$refs.passwordPopup;
-          }, 100);
-        }
-      } catch (e) {
-      }
-    });
     this.initFormData();
   },
   onShow() {
     this.initFormDataWithCache();
   },
   onUnload() {
-    this._passwordPopupRef = null;
   },
   methods: {
     // 🚀 缓存优化的表单数据初始化
     async initFormDataWithCache() {
       const now = Date.now();
-      if (this.lastInitTime && now - this.lastInitTime < this.cacheTimeout && this.formData.username) {
+      if (this.lastInitTime && now - this.lastInitTime < this.cacheTimeout && this.formData.nickname) {
         return;
       }
       if (this.isInitializing) {
@@ -96,7 +81,7 @@ const _sfc_main = {
         try {
           const result = await this.userStore.getUserInfo();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:357", "[EditProfile] 获取用户信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:284", "[EditProfile] 获取用户信息失败:", error);
           common_vendor.index.showToast({
             title: "获取用户信息失败",
             icon: "error"
@@ -107,36 +92,21 @@ const _sfc_main = {
       if (this.userInfo) {
         this.formData = {
           avatar: this.userInfo.avatar || "",
-          username: this.userInfo.username || "",
           nickname: this.userInfo.nickname || this.userInfo.username || "未设置昵称",
-          gender: this.userInfo.gender || "",
-          birthday: this.userInfo.birthday || "",
           email: this.userInfo.email || "",
-          bio: this.userInfo.bio || "",
-          sportsPreferences: this.userInfo.sportsPreferences || [],
-          city: this.userInfo.city || "",
-          showBookingHistory: this.userInfo.showBookingHistory !== false,
-          allowSharingInvite: this.userInfo.allowSharingInvite !== false,
-          receiveNotifications: this.userInfo.receiveNotifications !== false
+          // 趣味字段（从本地存储恢复）
+          gender: this.userInfo.gender || common_vendor.index.getStorageSync("user_gender_" + this.userInfo.id) || "",
+          birthday: this.userInfo.birthday || common_vendor.index.getStorageSync("user_birthday_" + this.userInfo.id) || "",
+          sportsPreferences: this.userInfo.sportsPreferences || JSON.parse(common_vendor.index.getStorageSync("user_sports_" + this.userInfo.id) || "[]")
         };
-        if (this.userInfo.city) {
-          this.regionValue = this.userInfo.city.split(" ");
-        }
       } else {
         this.formData = {
           avatar: "",
-          username: "用户" + Date.now().toString().slice(-6),
-          // 生成默认用户名
           nickname: "未设置昵称",
+          email: "",
           gender: "",
           birthday: "",
-          email: "",
-          bio: "",
-          sportsPreferences: [],
-          city: "",
-          showBookingHistory: true,
-          allowSharingInvite: true,
-          receiveNotifications: true
+          sportsPreferences: []
         };
       }
     },
@@ -163,7 +133,9 @@ const _sfc_main = {
       try {
         common_vendor.index.showLoading({ title: "上传中..." });
         const result = await this.userStore.uploadAvatar(filePath);
-        this.formData.avatar = result.url;
+        if (result && result.avatarUrl) {
+          this.formData.avatar = result.avatarUrl;
+        }
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({
           title: "头像更新成功",
@@ -171,9 +143,9 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:441", "上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:355", "[EditProfile] 上传头像失败:", error);
         common_vendor.index.showToast({
-          title: "上传失败",
+          title: error.message || "上传失败",
           icon: "error"
         });
       }
@@ -186,11 +158,6 @@ const _sfc_main = {
     onBirthdayChange(e) {
       this.formData.birthday = e.detail.value;
     },
-    // 地区变化
-    onRegionChange(e) {
-      this.regionValue = e.detail.value;
-      this.formData.city = e.detail.value.join(" ");
-    },
     // 切换运动偏好
     toggleSport(sport) {
       const index = this.formData.sportsPreferences.indexOf(sport);
@@ -200,13 +167,9 @@ const _sfc_main = {
         this.formData.sportsPreferences.push(sport);
       }
     },
-    // 隐私设置变化
-    onPrivacyChange(key, e) {
-      this.formData[key] = e.detail.value;
-    },
     // 保存个人资料
     async saveProfile() {
-      var _a, _b, _c, _d, _e;
+      var _a, _b, _c;
       if (!this.validateForm())
         return;
       let loadingShown = false;
@@ -214,24 +177,19 @@ const _sfc_main = {
         common_vendor.index.showLoading({ title: "保存中..." });
         loadingShown = true;
         const cleanData = {
-          username: ((_a = this.formData.username) == null ? void 0 : _a.trim()) || "",
-          nickname: ((_b = this.formData.nickname) == null ? void 0 : _b.trim()) || "",
-          gender: this.formData.gender || "",
-          birthday: this.formData.birthday || "",
-          email: ((_c = this.formData.email) == null ? void 0 : _c.trim()) || "",
-          bio: ((_d = this.formData.bio) == null ? void 0 : _d.trim()) || "",
-          city: ((_e = this.formData.city) == null ? void 0 : _e.trim()) || "",
-          sportsPreferences: this.formData.sportsPreferences || [],
-          showBookingHistory: Boolean(this.formData.showBookingHistory),
-          allowSharingInvite: Boolean(this.formData.allowSharingInvite),
-          receiveNotifications: Boolean(this.formData.receiveNotifications)
+          nickname: ((_a = this.formData.nickname) == null ? void 0 : _a.trim()) || "",
+          email: ((_b = this.formData.email) == null ? void 0 : _b.trim()) || ""
         };
-        Object.keys(cleanData).forEach((key) => {
-          if (cleanData[key] === "" && key !== "bio") {
-            delete cleanData[key];
-          }
-        });
+        if (!cleanData.nickname) {
+          delete cleanData.nickname;
+        }
         await this.userStore.updateUserInfo(cleanData);
+        if ((_c = this.userInfo) == null ? void 0 : _c.id) {
+          const userId = this.userInfo.id;
+          common_vendor.index.setStorageSync("user_gender_" + userId, this.formData.gender || "");
+          common_vendor.index.setStorageSync("user_birthday_" + userId, this.formData.birthday || "");
+          common_vendor.index.setStorageSync("user_sports_" + userId, JSON.stringify(this.formData.sportsPreferences || []));
+        }
         if (loadingShown) {
           common_vendor.index.hideLoading();
           loadingShown = false;
@@ -248,7 +206,7 @@ const _sfc_main = {
           common_vendor.index.hideLoading();
           loadingShown = false;
         }
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:539", "保存失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:435", "[EditProfile] 保存失败:", error);
         common_vendor.index.showToast({
           title: error.message || "保存失败",
           icon: "error"
@@ -257,13 +215,6 @@ const _sfc_main = {
     },
     // 验证表单
     validateForm() {
-      if (!this.formData.username.trim()) {
-        common_vendor.index.showToast({
-          title: "请输入用户名",
-          icon: "error"
-        });
-        return false;
-      }
       if (!this.formData.nickname.trim()) {
         common_vendor.index.showToast({
           title: "请输入昵称",
@@ -287,163 +238,11 @@ const _sfc_main = {
         newPassword: "",
         confirmPassword: ""
       };
-      this.showPasswordPopup();
+      this.internalPasswordPopupOpened = true;
     },
     // 关闭密码修改弹窗
     closePasswordDialog() {
-      this.closePasswordPopup();
-    },
-    // 显示密码修改弹窗（兼容微信小程序）
-    showPasswordPopup() {
-      const debugEnabled = false;
-      try {
-        let windowInfo, deviceInfo, appBaseInfo;
-        try {
-          windowInfo = common_vendor.index.getWindowInfo();
-          deviceInfo = common_vendor.index.getDeviceInfo();
-          appBaseInfo = common_vendor.index.getAppBaseInfo();
-        } catch (e) {
-        }
-        const platform = (deviceInfo == null ? void 0 : deviceInfo.platform) || (appBaseInfo == null ? void 0 : appBaseInfo.platform) || "unknown";
-        const uniPlatform = (appBaseInfo == null ? void 0 : appBaseInfo.uniPlatform) || "unknown";
-        if (debugEnabled)
-          ;
-        if (this.$refs.passwordPopup) {
-          if (Array.isArray(this.$refs.passwordPopup)) {
-            const popup = this.$refs.passwordPopup[0];
-            if (popup && typeof popup.open === "function") {
-              popup.open();
-              this.internalPasswordPopupOpened = true;
-              return;
-            }
-          } else if (typeof this.$refs.passwordPopup.open === "function") {
-            this.$refs.passwordPopup.open();
-            this.internalPasswordPopupOpened = true;
-            return;
-          }
-        }
-        if (this._passwordPopupRef && typeof this._passwordPopupRef.open === "function") {
-          this._passwordPopupRef.open();
-          this.internalPasswordPopupOpened = true;
-          return;
-        }
-        if ((platform === "devtools" || uniPlatform === "mp-weixin") && this.$scope && typeof this.$scope.selectComponent === "function") {
-          try {
-            const popup = this.$scope.selectComponent("#passwordPopup") || this.$scope.selectComponent(".password-popup");
-            if (popup && typeof popup.open === "function") {
-              popup.open();
-              this.internalPasswordPopupOpened = true;
-              return;
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }
-        if (this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && (child.$options.name === "UniPopup" || child.$options._componentTag === "uni-popup")) {
-              if (typeof child.open === "function") {
-                child.open();
-                this.internalPasswordPopupOpened = true;
-                return;
-              }
-            }
-          }
-        }
-        setTimeout(() => {
-          if (this.$refs.passwordPopup && typeof this.$refs.passwordPopup.open === "function") {
-            this.$refs.passwordPopup.open();
-            this.internalPasswordPopupOpened = true;
-            return;
-          }
-          try {
-            this.passwordPopupPosition = "force-show";
-            this.internalPasswordPopupOpened = true;
-            this.$forceUpdate();
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }, 100);
-      } catch (error) {
-      }
-    },
-    // 关闭密码修改弹窗（兼容微信小程序）
-    closePasswordPopup() {
-      const debugEnabled = false;
-      try {
-        let windowInfo, deviceInfo, appBaseInfo;
-        try {
-          windowInfo = common_vendor.index.getWindowInfo();
-          deviceInfo = common_vendor.index.getDeviceInfo();
-          appBaseInfo = common_vendor.index.getAppBaseInfo();
-        } catch (e) {
-        }
-        const platform = (deviceInfo == null ? void 0 : deviceInfo.platform) || (appBaseInfo == null ? void 0 : appBaseInfo.platform) || "unknown";
-        const uniPlatform = (appBaseInfo == null ? void 0 : appBaseInfo.uniPlatform) || "unknown";
-        if (debugEnabled)
-          ;
-        if (this.$refs.passwordPopup) {
-          if (Array.isArray(this.$refs.passwordPopup)) {
-            const popup = this.$refs.passwordPopup[0];
-            if (popup && typeof popup.close === "function") {
-              popup.close();
-              this.internalPasswordPopupOpened = false;
-              return;
-            }
-          } else if (typeof this.$refs.passwordPopup.close === "function") {
-            this.$refs.passwordPopup.close();
-            this.internalPasswordPopupOpened = false;
-            return;
-          }
-        }
-        if (this._passwordPopupRef && typeof this._passwordPopupRef.close === "function") {
-          this._passwordPopupRef.close();
-          this.internalPasswordPopupOpened = false;
-          return;
-        }
-        if ((platform === "devtools" || uniPlatform === "mp-weixin") && this.$scope && typeof this.$scope.selectComponent === "function") {
-          try {
-            const popup = this.$scope.selectComponent("#passwordPopup") || this.$scope.selectComponent(".password-popup");
-            if (popup && typeof popup.close === "function") {
-              popup.close();
-              this.internalPasswordPopupOpened = false;
-              return;
-            }
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }
-        if (this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && (child.$options.name === "UniPopup" || child.$options._componentTag === "uni-popup")) {
-              if (typeof child.close === "function") {
-                child.close();
-                this.internalPasswordPopupOpened = false;
-                return;
-              }
-            }
-          }
-        }
-        setTimeout(() => {
-          if (this.$refs.passwordPopup && typeof this.$refs.passwordPopup.close === "function") {
-            this.$refs.passwordPopup.close();
-            this.internalPasswordPopupOpened = false;
-            return;
-          }
-          try {
-            this.passwordPopupPosition = "force-hide";
-            this.internalPasswordPopupOpened = false;
-            this.$forceUpdate();
-          } catch (e) {
-            if (debugEnabled)
-              ;
-          }
-        }, 100);
-      } catch (error) {
-      }
+      this.internalPasswordPopupOpened = false;
     },
     // 修改密码
     async changePassword() {
@@ -477,7 +276,7 @@ const _sfc_main = {
       }
       try {
         common_vendor.index.showLoading({ title: "修改中..." });
-        await this.userStore.changeUserPassword({
+        await this.userStore.changePassword({
           oldPassword: this.passwordForm.oldPassword,
           newPassword: this.passwordForm.newPassword
         });
@@ -489,7 +288,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:834", "修改密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:532", "[EditProfile] 修改密码失败:", error);
         common_vendor.index.showToast({
           title: error.message || "修改失败",
           icon: "error"
@@ -502,33 +301,27 @@ const _sfc_main = {
     }
   }
 };
-if (!Array) {
-  const _component_uni_popup = common_vendor.resolveComponent("uni-popup");
-  _component_uni_popup();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _a;
-  return {
+  var _a, _b;
+  return common_vendor.e({
     a: $data.formData.avatar || "/static/images/default-avatar.svg",
     b: common_vendor.o((...args) => $options.changeAvatar && $options.changeAvatar(...args)),
-    c: $data.formData.username,
-    d: common_vendor.o(($event) => $data.formData.username = $event.detail.value),
-    e: $data.formData.nickname,
-    f: common_vendor.o(($event) => $data.formData.nickname = $event.detail.value),
-    g: common_vendor.t($data.formData.gender || "请选择性别"),
-    h: $data.genderOptions,
-    i: $options.genderIndex,
-    j: common_vendor.o((...args) => $options.onGenderChange && $options.onGenderChange(...args)),
-    k: common_vendor.t($data.formData.birthday || "请选择生日"),
-    l: $data.formData.birthday,
-    m: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args)),
-    n: common_vendor.t($options.formatPhone(((_a = $options.userInfo) == null ? void 0 : _a.phone) || "")),
-    o: $data.formData.email,
-    p: common_vendor.o(($event) => $data.formData.email = $event.detail.value),
-    q: common_vendor.o((...args) => $options.showPasswordDialog && $options.showPasswordDialog(...args)),
-    r: $data.formData.bio,
-    s: common_vendor.o(($event) => $data.formData.bio = $event.detail.value),
-    t: common_vendor.f($data.sportsOptions, (sport, k0, i0) => {
+    c: $data.formData.nickname,
+    d: common_vendor.o(($event) => $data.formData.nickname = $event.detail.value),
+    e: (_a = $options.userInfo) == null ? void 0 : _a.phone
+  }, ((_b = $options.userInfo) == null ? void 0 : _b.phone) ? {
+    f: common_vendor.t($options.formatPhone($options.userInfo.phone))
+  } : {}, {
+    g: $data.formData.email,
+    h: common_vendor.o(($event) => $data.formData.email = $event.detail.value),
+    i: common_vendor.t($data.formData.gender || "请选择性别"),
+    j: $data.genderOptions,
+    k: $options.genderIndex,
+    l: common_vendor.o((...args) => $options.onGenderChange && $options.onGenderChange(...args)),
+    m: common_vendor.t($data.formData.birthday || "请选择生日"),
+    n: $data.formData.birthday,
+    o: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args)),
+    p: common_vendor.f($data.sportsOptions, (sport, k0, i0) => {
       return {
         a: common_vendor.t(sport),
         b: $data.formData.sportsPreferences.includes(sport) ? 1 : "",
@@ -536,34 +329,27 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.toggleSport(sport), sport)
       };
     }),
-    v: common_vendor.t($data.formData.city || "请选择城市"),
-    w: $data.regionValue,
-    x: common_vendor.o((...args) => $options.onRegionChange && $options.onRegionChange(...args)),
-    y: $data.formData.showBookingHistory,
-    z: common_vendor.o(($event) => $options.onPrivacyChange("showBookingHistory", $event)),
-    A: $data.formData.allowSharingInvite,
-    B: common_vendor.o(($event) => $options.onPrivacyChange("allowSharingInvite", $event)),
-    C: $data.formData.receiveNotifications,
-    D: common_vendor.o(($event) => $options.onPrivacyChange("receiveNotifications", $event)),
-    E: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
-    F: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args)),
-    G: common_vendor.o((...args) => $options.closePasswordDialog && $options.closePasswordDialog(...args)),
-    H: $data.passwordForm.oldPassword,
-    I: common_vendor.o(($event) => $data.passwordForm.oldPassword = $event.detail.value),
-    J: $data.passwordForm.newPassword,
-    K: common_vendor.o(($event) => $data.passwordForm.newPassword = $event.detail.value),
-    L: $data.passwordForm.confirmPassword,
-    M: common_vendor.o(($event) => $data.passwordForm.confirmPassword = $event.detail.value),
-    N: common_vendor.o((...args) => $options.closePasswordDialog && $options.closePasswordDialog(...args)),
-    O: common_vendor.o((...args) => $options.changePassword && $options.changePassword(...args)),
-    P: common_vendor.sr("passwordPopup", "c6066cac-0"),
-    Q: $data.internalPasswordPopupOpened,
-    R: common_vendor.n($data.passwordPopupPosition),
-    S: common_vendor.p({
-      type: "center",
-      ["mask-click"]: false
-    })
-  };
+    q: $options.loginType === "account"
+  }, $options.loginType === "account" ? {
+    r: common_vendor.o((...args) => $options.showPasswordDialog && $options.showPasswordDialog(...args))
+  } : {}, {
+    s: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
+    t: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args)),
+    v: $data.internalPasswordPopupOpened
+  }, $data.internalPasswordPopupOpened ? {
+    w: common_vendor.o((...args) => $options.closePasswordDialog && $options.closePasswordDialog(...args)),
+    x: $data.passwordForm.oldPassword,
+    y: common_vendor.o(($event) => $data.passwordForm.oldPassword = $event.detail.value),
+    z: $data.passwordForm.newPassword,
+    A: common_vendor.o(($event) => $data.passwordForm.newPassword = $event.detail.value),
+    B: $data.passwordForm.confirmPassword,
+    C: common_vendor.o(($event) => $data.passwordForm.confirmPassword = $event.detail.value),
+    D: common_vendor.o((...args) => $options.closePasswordDialog && $options.closePasswordDialog(...args)),
+    E: common_vendor.o((...args) => $options.changePassword && $options.changePassword(...args)),
+    F: common_vendor.o(() => {
+    }),
+    G: common_vendor.o((...args) => $options.closePasswordDialog && $options.closePasswordDialog(...args))
+  } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c6066cac"]]);
 wx.createPage(MiniProgramPage);

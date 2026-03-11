@@ -143,7 +143,10 @@ public class AuthController {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                roleNames
+                roleNames,
+                user.getNickname(),
+                user.getPhone(),
+                user.getAvatar()
             );
             return ResponseEntity.<JwtResponse>ok(jwtResponse);
             
@@ -238,7 +241,10 @@ public class AuthController {
                 userDetailsImpl.getId(),
                 userDetailsImpl.getUsername(),
                 userDetailsImpl.getEmail(),
-                roleList
+                roleList,
+                savedUser.getNickname(),
+                savedUser.getPhone(),
+                savedUser.getAvatar()
         );
         logger.info("=== 注册请求处理成功 ===");
         return ResponseEntity.<JwtResponse>ok(jwtResponse);
@@ -333,7 +339,10 @@ public class AuthController {
                     user.getId(),
                     user.getUsername(),
                     user.getEmail(),
-                    roleNames
+                    roleNames,
+                    user.getNickname(),
+                    user.getPhone(),
+                    user.getAvatar()
             );
             return ResponseEntity.ok(jwtResponse);
         } catch (Exception e) {

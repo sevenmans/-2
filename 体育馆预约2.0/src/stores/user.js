@@ -349,6 +349,24 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    // 上传头像
+    async uploadAvatar(filePath) {
+      try {
+        const result = await userApi.uploadAvatar(filePath)
+        // 上传成功后更新本地用户信息中的 avatar
+        if (result && result.avatarUrl) {
+          this.setUserInfo({
+            ...this.userInfo,
+            avatar: result.avatarUrl
+          })
+        }
+        return result
+      } catch (error) {
+        console.error('[UserStore] 上传头像失败:', error)
+        throw error
+      }
+    },
+
     // 修改密码
     async changePassword(passwordData) {
       try {

@@ -298,6 +298,22 @@ const useUserStore = common_vendor.defineStore("user", {
         throw error;
       }
     },
+    // 上传头像
+    async uploadAvatar(filePath) {
+      try {
+        const result = await api_user.userApi.uploadAvatar(filePath);
+        if (result && result.avatarUrl) {
+          this.setUserInfo({
+            ...this.userInfo,
+            avatar: result.avatarUrl
+          });
+        }
+        return result;
+      } catch (error) {
+        common_vendor.index.__f__("error", "at stores/user.js:365", "[UserStore] 上传头像失败:", error);
+        throw error;
+      }
+    },
     // 修改密码
     async changePassword(passwordData) {
       try {
@@ -305,7 +321,7 @@ const useUserStore = common_vendor.defineStore("user", {
         utils_ui.showSuccess("密码修改成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:361", "[UserStore] 修改密码失败:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:379", "[UserStore] 修改密码失败:", error);
         utils_ui.showError(error.message || "密码修改失败");
         throw error;
       }

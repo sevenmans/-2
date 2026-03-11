@@ -15,17 +15,10 @@
       <text class="avatar-tip">点击更换头像</text>
     </view>
     
-    <!-- 个人信息表单 -->
+    <!-- 基本信息表单 -->
     <view class="form-section">
-      <!-- 用户名 -->
-      <view class="form-item">
-        <text class="item-label">用户名</text>
-        <input 
-          v-model="formData.username" 
-          class="item-input" 
-          placeholder="请输入用户名"
-          maxlength="20"
-        />
+      <view class="section-header">
+        <text class="section-title">基本信息</text>
       </view>
       
       <!-- 昵称 -->
@@ -37,6 +30,34 @@
           placeholder="请输入昵称"
           maxlength="20"
         />
+      </view>
+      
+      <!-- 手机号（只读） -->
+      <view class="form-item">
+        <text class="item-label">手机号</text>
+        <view class="phone-wrapper">
+          <text class="phone-text" v-if="userInfo?.phone">{{ formatPhone(userInfo.phone) }}</text>
+          <text class="phone-text unbound" v-else>未绑定手机号</text>
+        </view>
+      </view>
+      
+      <!-- 邮箱 -->
+      <view class="form-item">
+        <text class="item-label">邮箱</text>
+        <input 
+          v-model="formData.email" 
+          class="item-input" 
+          placeholder="请输入邮箱"
+          type="email"
+        />
+      </view>
+    </view>
+    
+    <!-- 个人偏好（趣味字段，后端暂不存储） -->
+    <view class="form-section">
+      <view class="section-header">
+        <text class="section-title">个人偏好</text>
+        <text class="section-hint">仅本地保存</text>
       </view>
       
       <!-- 性别 -->
@@ -68,44 +89,8 @@
         </picker>
       </view>
       
-      <!-- 手机号 -->
-      <view class="form-item">
-        <text class="item-label">手机号</text>
-        <view class="phone-wrapper">
-          <text class="phone-text">{{ formatPhone(userInfo?.phone || '') }}</text>
-        </view>
-      </view>
-      
-      <!-- 邮箱 -->
-      <view class="form-item">
-        <text class="item-label">邮箱</text>
-        <input 
-          v-model="formData.email" 
-          class="item-input" 
-          placeholder="请输入邮箱"
-          type="email"
-        />
-      </view>
-      
-      <!-- 修改密码 -->
-      <view class="form-item">
-        <text class="item-label">修改密码</text>
-        <button class="change-password-btn" @click="showPasswordDialog">修改密码</button>
-      </view>
-      
-      <!-- 个人简介 -->
-      <view class="form-item">
-        <text class="item-label">个人简介</text>
-        <textarea 
-          v-model="formData.bio" 
-          class="item-textarea" 
-          placeholder="请输入个人简介"
-          maxlength="200"
-        />
-      </view>
-      
       <!-- 运动偏好 -->
-      <view class="form-item">
+      <view class="form-item sports-item">
         <text class="item-label">运动偏好</text>
         <view class="sports-tags">
           <view 
@@ -119,48 +104,13 @@
           </view>
         </view>
       </view>
-      
-      <!-- 所在城市 -->
-      <view class="form-item">
-        <text class="item-label">所在城市</text>
-        <picker 
-          mode="region" 
-          :value="regionValue"
-          @change="onRegionChange"
-        >
-          <view class="picker-text">
-            {{ formData.city || '请选择城市' }}
-          </view>
-        </picker>
-      </view>
     </view>
     
-    <!-- 隐私设置 -->
-    <view class="privacy-section">
-      <text class="section-title">隐私设置</text>
-      
-      <view class="privacy-item">
-        <text class="privacy-label">允许他人查看我的预约记录</text>
-        <switch 
-          :checked="formData.showBookingHistory"
-          @change="onPrivacyChange('showBookingHistory', $event)"
-        />
-      </view>
-      
-      <view class="privacy-item">
-        <text class="privacy-label">允许他人邀请我参与拼场</text>
-        <switch 
-          :checked="formData.allowSharingInvite"
-          @change="onPrivacyChange('allowSharingInvite', $event)"
-        />
-      </view>
-      
-      <view class="privacy-item">
-        <text class="privacy-label">接收系统通知</text>
-        <switch 
-          :checked="formData.receiveNotifications"
-          @change="onPrivacyChange('receiveNotifications', $event)"
-        />
+    <!-- 修改密码（仅账号密码登录用户显示） -->
+    <view class="form-section" v-if="loginType === 'account'">
+      <view class="form-item">
+        <text class="item-label">修改密码</text>
+        <button class="change-password-btn" @click="showPasswordDialog">修改密码</button>
       </view>
     </view>
     
@@ -171,15 +121,9 @@
     </view>
     
 
-    <!-- 修改密码弹窗 -->
-    <uni-popup 
-      ref="passwordPopup" 
-      type="center" 
-      :mask-click="false"
-      v-show="internalPasswordPopupOpened"
-      :class="passwordPopupPosition"
-    >
-      <view class="password-dialog">
+    <!-- 修改密码弹窗（原生实现，彻底解决 uni-popup 引起的文档流穿透问题） -->
+    <view class="custom-modal-mask" v-if="internalPasswordPopupOpened" @click.stop="closePasswordDialog">
+      <view class="password-dialog" @click.stop="">
         <view class="dialog-header">
           <text class="dialog-title">修改密码</text>
           <text class="dialog-close" @click="closePasswordDialog">×</text>
@@ -222,7 +166,7 @@
           <button class="confirm-btn" @click="changePassword">确认</button>
         </view>
       </view>
-    </uni-popup>
+    </view>
   </view>
 </template>
 
@@ -242,22 +186,16 @@ export default {
       userStore: null,
       formData: {
         avatar: '',
-        username: '',
         nickname: '',
+        email: '',
+        // 趣味字段（后端暂不存储，仅本地保留）
         gender: '',
         birthday: '',
-        email: '',
-        bio: '',
-        sportsPreferences: [],
-        city: '',
-        showBookingHistory: true,
-        allowSharingInvite: true,
-        receiveNotifications: true
+        sportsPreferences: []
       },
       
       genderOptions: ['男', '女', '保密'],
       sportsOptions: ['篮球', '足球', '羽毛球', '乒乓球', '网球', '游泳', '健身', '瑜伽'],
-      regionValue: [],
       
       // 密码修改表单
       passwordForm: {
@@ -268,8 +206,6 @@ export default {
       
       // 弹窗状态控制变量
       internalPasswordPopupOpened: false,
-      passwordPopupPosition: '',
-      _passwordPopupRef: null,
       
       // 缓存相关
       lastInitTime: 0,
@@ -285,6 +221,11 @@ export default {
     
     genderIndex() {
       return this.genderOptions.indexOf(this.formData.gender)
+    },
+    
+    // 登录方式：'wechat' 或 'account'
+    loginType() {
+      return this.userInfo?.loginType || 'account'
     }
   },
   
@@ -294,20 +235,6 @@ export default {
     
     // 初始化弹窗状态
     this.internalPasswordPopupOpened = false
-    
-    // 缓存弹窗实例
-    this.$nextTick(() => {
-      try {
-        this._passwordPopupRef = this.$refs.passwordPopup
-        if (!this._passwordPopupRef) {
-          // 延迟重试
-          setTimeout(() => {
-            this._passwordPopupRef = this.$refs.passwordPopup
-          }, 100)
-        }
-      } catch (e) {
-      }
-    })
 
     this.initFormData()
   },
@@ -318,8 +245,8 @@ export default {
   },
   
   onUnload() {
-    // 清理弹窗缓存引用
-    this._passwordPopupRef = null
+    // 无需清理组件引用
+
   },
 
   methods: {
@@ -328,7 +255,7 @@ export default {
     async initFormDataWithCache() {
       // 检查缓存有效性
       const now = Date.now()
-      if (this.lastInitTime && (now - this.lastInitTime) < this.cacheTimeout && this.formData.username) {
+      if (this.lastInitTime && (now - this.lastInitTime) < this.cacheTimeout && this.formData.nickname) {
         return
       }
 
@@ -366,39 +293,22 @@ export default {
       if (this.userInfo) {
         this.formData = {
           avatar: this.userInfo.avatar || '',
-          username: this.userInfo.username || '',
           nickname: this.userInfo.nickname || this.userInfo.username || '未设置昵称',
-          gender: this.userInfo.gender || '',
-          birthday: this.userInfo.birthday || '',
           email: this.userInfo.email || '',
-          bio: this.userInfo.bio || '',
-          sportsPreferences: this.userInfo.sportsPreferences || [],
-          city: this.userInfo.city || '',
-          showBookingHistory: this.userInfo.showBookingHistory !== false,
-          allowSharingInvite: this.userInfo.allowSharingInvite !== false,
-          receiveNotifications: this.userInfo.receiveNotifications !== false
-        }
-        
-        // 设置城市选择器的值
-        if (this.userInfo.city) {
-          // 这里需要根据实际的城市数据结构来设置
-          this.regionValue = this.userInfo.city.split(' ')
+          // 趣味字段（从本地存储恢复）
+          gender: this.userInfo.gender || uni.getStorageSync('user_gender_' + this.userInfo.id) || '',
+          birthday: this.userInfo.birthday || uni.getStorageSync('user_birthday_' + this.userInfo.id) || '',
+          sportsPreferences: this.userInfo.sportsPreferences || JSON.parse(uni.getStorageSync('user_sports_' + this.userInfo.id) || '[]')
         }
       } else {
         // 即使用户信息为空，也要初始化表单数据
         this.formData = {
           avatar: '',
-          username: '用户' + Date.now().toString().slice(-6), // 生成默认用户名
           nickname: '未设置昵称',
+          email: '',
           gender: '',
           birthday: '',
-          email: '',
-          bio: '',
-          sportsPreferences: [],
-          city: '',
-          showBookingHistory: true,
-          allowSharingInvite: true,
-          receiveNotifications: true
+          sportsPreferences: []
         }
       }
     },
@@ -428,7 +338,11 @@ export default {
         uni.showLoading({ title: '上传中...' })
         
         const result = await this.userStore.uploadAvatar(filePath)
-        this.formData.avatar = result.url
+        
+        // 后端返回 { success: true, avatarUrl: "/uploads/avatars/xxx.jpg" }
+        if (result && result.avatarUrl) {
+          this.formData.avatar = result.avatarUrl
+        }
         
         uni.hideLoading()
         uni.showToast({
@@ -438,9 +352,9 @@ export default {
         
       } catch (error) {
         uni.hideLoading()
-        console.error('上传头像失败:', error)
+        console.error('[EditProfile] 上传头像失败:', error)
         uni.showToast({
-          title: '上传失败',
+          title: error.message || '上传失败',
           icon: 'error'
         })
       }
@@ -456,12 +370,6 @@ export default {
       this.formData.birthday = e.detail.value
     },
     
-    // 地区变化
-    onRegionChange(e) {
-      this.regionValue = e.detail.value
-      this.formData.city = e.detail.value.join(' ')
-    },
-    
     // 切换运动偏好
     toggleSport(sport) {
       const index = this.formData.sportsPreferences.indexOf(sport)
@@ -471,13 +379,6 @@ export default {
         this.formData.sportsPreferences.push(sport)
       }
     },
-    
-    // 隐私设置变化
-    onPrivacyChange(key, e) {
-      this.formData[key] = e.detail.value
-    },
-    
-
     
     // 保存个人资料
     async saveProfile() {
@@ -490,31 +391,26 @@ export default {
         uni.showLoading({ title: '保存中...' })
         loadingShown = true
         
-        
-        // 过滤和清理数据，只发送必要的字段
+        // 只发送后端支持的字段
         const cleanData = {
-          username: this.formData.username?.trim() || '',
           nickname: this.formData.nickname?.trim() || '',
-          gender: this.formData.gender || '',
-          birthday: this.formData.birthday || '',
-          email: this.formData.email?.trim() || '',
-          bio: this.formData.bio?.trim() || '',
-          city: this.formData.city?.trim() || '',
-          sportsPreferences: this.formData.sportsPreferences || [],
-          showBookingHistory: Boolean(this.formData.showBookingHistory),
-          allowSharingInvite: Boolean(this.formData.allowSharingInvite),
-          receiveNotifications: Boolean(this.formData.receiveNotifications)
+          email: this.formData.email?.trim() || ''
         }
         
-        // 移除空字符串字段
-        Object.keys(cleanData).forEach(key => {
-          if (cleanData[key] === '' && key !== 'bio') {
-            delete cleanData[key]
-          }
-        })
-        
+        // 移除空字符串字段（email允许为空）
+        if (!cleanData.nickname) {
+          delete cleanData.nickname
+        }
         
         await this.userStore.updateUserInfo(cleanData)
+        
+        // 保存趣味字段到本地存储
+        if (this.userInfo?.id) {
+          const userId = this.userInfo.id
+          uni.setStorageSync('user_gender_' + userId, this.formData.gender || '')
+          uni.setStorageSync('user_birthday_' + userId, this.formData.birthday || '')
+          uni.setStorageSync('user_sports_' + userId, JSON.stringify(this.formData.sportsPreferences || []))
+        }
         
         if (loadingShown) {
           uni.hideLoading()
@@ -536,7 +432,7 @@ export default {
           uni.hideLoading()
           loadingShown = false
         }
-        console.error('保存失败:', error)
+        console.error('[EditProfile] 保存失败:', error)
         uni.showToast({
           title: error.message || '保存失败',
           icon: 'error'
@@ -546,14 +442,6 @@ export default {
     
     // 验证表单
     validateForm() {
-      if (!this.formData.username.trim()) {
-        uni.showToast({
-          title: '请输入用户名',
-          icon: 'error'
-        })
-        return false
-      }
-      
       if (!this.formData.nickname.trim()) {
         uni.showToast({
           title: '请输入昵称',
@@ -580,202 +468,12 @@ export default {
         newPassword: '',
         confirmPassword: ''
       }
-      this.showPasswordPopup()
+      this.internalPasswordPopupOpened = true
     },
     
     // 关闭密码修改弹窗
     closePasswordDialog() {
-      this.closePasswordPopup()
-    },
-    
-    // 显示密码修改弹窗（兼容微信小程序）
-    showPasswordPopup() {
-      const debugEnabled = false // 调试开关
-      
-      try {
-        // 获取环境信息
-        let windowInfo, deviceInfo, appBaseInfo
-        try {
-          windowInfo = uni.getWindowInfo()
-          deviceInfo = uni.getDeviceInfo()
-          appBaseInfo = uni.getAppBaseInfo()
-        } catch (e) {
-        }
-        
-        const platform = deviceInfo?.platform || appBaseInfo?.platform || 'unknown'
-        const uniPlatform = appBaseInfo?.uniPlatform || 'unknown'
-        
-        if (debugEnabled) {
-        }
-        
-        // 方法1: 优先使用 $refs
-        if (this.$refs.passwordPopup) {
-          if (Array.isArray(this.$refs.passwordPopup)) {
-            const popup = this.$refs.passwordPopup[0]
-            if (popup && typeof popup.open === 'function') {
-              popup.open()
-              this.internalPasswordPopupOpened = true
-              return
-            }
-          } else if (typeof this.$refs.passwordPopup.open === 'function') {
-            this.$refs.passwordPopup.open()
-            this.internalPasswordPopupOpened = true
-            return
-          }
-        }
-        
-        // 方法2: 使用缓存的引用
-        if (this._passwordPopupRef && typeof this._passwordPopupRef.open === 'function') {
-          this._passwordPopupRef.open()
-          this.internalPasswordPopupOpened = true
-          return
-        }
-        
-        // 方法3: 微信小程序环境下使用 $scope.selectComponent
-        if ((platform === 'devtools' || uniPlatform === 'mp-weixin') && this.$scope && typeof this.$scope.selectComponent === 'function') {
-          try {
-            const popup = this.$scope.selectComponent('#passwordPopup') || this.$scope.selectComponent('.password-popup')
-            if (popup && typeof popup.open === 'function') {
-              popup.open()
-              this.internalPasswordPopupOpened = true
-              return
-            }
-          } catch (e) {
-            if (debugEnabled) console.error('showPasswordPopup - $scope.selectComponent异常:', e)
-          }
-        }
-        
-        // 方法4: 从组件实例中查找 uni-popup 子组件
-        if (this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && (child.$options.name === 'UniPopup' || child.$options._componentTag === 'uni-popup')) {
-              if (typeof child.open === 'function') {
-                child.open()
-                this.internalPasswordPopupOpened = true
-                return
-              }
-            }
-          }
-        }
-        
-        // 重试机制：延迟100ms后重试一次
-        setTimeout(() => {
-          
-          // 重新尝试获取弹窗实例
-          if (this.$refs.passwordPopup && typeof this.$refs.passwordPopup.open === 'function') {
-            this.$refs.passwordPopup.open()
-            this.internalPasswordPopupOpened = true
-            return
-          }
-          
-          // 备选方案：使用DOM操作强制显示
-          try {
-            this.passwordPopupPosition = 'force-show'
-            this.internalPasswordPopupOpened = true
-            this.$forceUpdate()
-          } catch (e) {
-            if (debugEnabled) console.error('showPasswordPopup - 备选方案失败:', e)
-          }
-        }, 100)
-        
-      } catch (error) {
-        if (debugEnabled) console.error('showPasswordPopup - 显示密码修改弹窗失败:', error)
-      }
-    },
-    
-    // 关闭密码修改弹窗（兼容微信小程序）
-    closePasswordPopup() {
-      const debugEnabled = false // 调试开关
-      
-      try {
-        // 获取环境信息
-        let windowInfo, deviceInfo, appBaseInfo
-        try {
-          windowInfo = uni.getWindowInfo()
-          deviceInfo = uni.getDeviceInfo()
-          appBaseInfo = uni.getAppBaseInfo()
-        } catch (e) {
-        }
-        
-        const platform = deviceInfo?.platform || appBaseInfo?.platform || 'unknown'
-        const uniPlatform = appBaseInfo?.uniPlatform || 'unknown'
-        
-        if (debugEnabled) {
-        }
-        
-        // 方法1: 优先使用 $refs
-        if (this.$refs.passwordPopup) {
-          if (Array.isArray(this.$refs.passwordPopup)) {
-            const popup = this.$refs.passwordPopup[0]
-            if (popup && typeof popup.close === 'function') {
-              popup.close()
-              this.internalPasswordPopupOpened = false
-              return
-            }
-          } else if (typeof this.$refs.passwordPopup.close === 'function') {
-            this.$refs.passwordPopup.close()
-            this.internalPasswordPopupOpened = false
-            return
-          }
-        }
-        
-        // 方法2: 使用缓存的引用
-        if (this._passwordPopupRef && typeof this._passwordPopupRef.close === 'function') {
-          this._passwordPopupRef.close()
-          this.internalPasswordPopupOpened = false
-          return
-        }
-        
-        // 方法3: 微信小程序环境下使用 $scope.selectComponent
-        if ((platform === 'devtools' || uniPlatform === 'mp-weixin') && this.$scope && typeof this.$scope.selectComponent === 'function') {
-          try {
-            const popup = this.$scope.selectComponent('#passwordPopup') || this.$scope.selectComponent('.password-popup')
-            if (popup && typeof popup.close === 'function') {
-              popup.close()
-              this.internalPasswordPopupOpened = false
-              return
-            }
-          } catch (e) {
-            if (debugEnabled) console.error('closePasswordPopup - $scope.selectComponent异常:', e)
-          }
-        }
-        
-        // 方法4: 从组件实例中查找 uni-popup 子组件
-        if (this.$children && this.$children.length > 0) {
-          for (let child of this.$children) {
-            if (child.$options && (child.$options.name === 'UniPopup' || child.$options._componentTag === 'uni-popup')) {
-              if (typeof child.close === 'function') {
-                child.close()
-                this.internalPasswordPopupOpened = false
-                return
-              }
-            }
-          }
-        }
-        
-        // 重试机制：延迟100ms后重试一次
-        setTimeout(() => {
-          
-          // 重新尝试获取弹窗实例
-          if (this.$refs.passwordPopup && typeof this.$refs.passwordPopup.close === 'function') {
-            this.$refs.passwordPopup.close()
-            this.internalPasswordPopupOpened = false
-            return
-          }
-          
-          // 备选方案：使用DOM操作强制隐藏
-          try {
-            this.passwordPopupPosition = 'force-hide'
-            this.internalPasswordPopupOpened = false
-            this.$forceUpdate()
-          } catch (e) {
-            if (debugEnabled) console.error('closePasswordPopup - 备选方案失败:', e)
-          }
-        }, 100)
-        
-      } catch (error) {
-        if (debugEnabled) console.error('closePasswordPopup - 关闭密码修改弹窗失败:', error)
-      }
+      this.internalPasswordPopupOpened = false
     },
     
     // 修改密码
@@ -816,7 +514,7 @@ export default {
       try {
         uni.showLoading({ title: '修改中...' })
         
-        await this.userStore.changeUserPassword({
+        await this.userStore.changePassword({
           oldPassword: this.passwordForm.oldPassword,
           newPassword: this.passwordForm.newPassword
         })
@@ -831,7 +529,7 @@ export default {
         
       } catch (error) {
         uni.hideLoading()
-        console.error('修改密码失败:', error)
+        console.error('[EditProfile] 修改密码失败:', error)
         uni.showToast({
           title: error.message || '修改失败',
           icon: 'error'
@@ -904,6 +602,27 @@ export default {
   background-color: #ffffff;
   margin-bottom: 20rpx;
   
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30rpx 30rpx 10rpx;
+    
+    .section-title {
+      font-size: 28rpx;
+      font-weight: 600;
+      color: #333333;
+    }
+    
+    .section-hint {
+      font-size: 22rpx;
+      color: #999999;
+      background-color: #f5f5f5;
+      padding: 4rpx 12rpx;
+      border-radius: 8rpx;
+    }
+  }
+  
   .form-item {
     display: flex;
     align-items: center;
@@ -928,14 +647,6 @@ export default {
       text-align: right;
     }
     
-    .item-textarea {
-      flex: 1;
-      min-height: 120rpx;
-      font-size: 28rpx;
-      color: #333333;
-      text-align: right;
-    }
-    
     .picker-text {
       flex: 1;
       font-size: 28rpx;
@@ -947,20 +658,16 @@ export default {
       flex: 1;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       
       .phone-text {
         font-size: 28rpx;
         color: #333333;
-      }
-      
-      .change-phone-btn {
-        padding: 8rpx 16rpx;
-        background-color: #ff6b35;
-        color: #ffffff;
-        font-size: 24rpx;
-        border-radius: 8rpx;
-        border: none;
+        
+        &.unbound {
+          color: #999999;
+          font-style: italic;
+        }
       }
     }
     
@@ -1000,36 +707,13 @@ export default {
       }
     }
   }
-}
-
-// 隐私设置
-.privacy-section {
-  background-color: #ffffff;
-  margin-bottom: 20rpx;
   
-  .section-title {
-    display: block;
-    padding: 30rpx 30rpx 20rpx;
-    font-size: 28rpx;
-    font-weight: 600;
-    color: #333333;
-    border-bottom: 1rpx solid #f0f0f0;
-  }
-  
-  .privacy-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30rpx;
-    border-bottom: 1rpx solid #f0f0f0;
+  // 运动偏好项特殊布局
+  .sports-item {
+    flex-wrap: wrap;
     
-    &:last-child {
-      border-bottom: none;
-    }
-    
-    .privacy-label {
-      font-size: 28rpx;
-      color: #333333;
+    .item-label {
+      margin-bottom: 16rpx;
     }
   }
 }
@@ -1155,5 +839,25 @@ export default {
       font-weight: 600;
     }
   }
+}
+
+// 原生手搓弹窗遮罩层
+.custom-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
