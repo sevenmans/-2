@@ -2,7 +2,6 @@
 require("../common/vendor.js");
 const guestPages = [
   "/pages/user/login",
-  "/pages/user/register",
   "/pages/index/index"
   // 允许未登录访问首页
 ];

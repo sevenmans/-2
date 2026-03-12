@@ -209,18 +209,6 @@ const useUserStore = common_vendor.defineStore("user", {
         throw error;
       }
     },
-    // 用户注册
-    async register(registerData) {
-      try {
-        const response = await api_auth.register(registerData);
-        utils_ui.showSuccess("注册成功");
-        return response;
-      } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:239", "[UserStore] 注册错误:", error);
-        utils_ui.showError(error.message || "注册失败");
-        throw error;
-      }
-    },
     // 用户退出
     async logout() {
       try {
@@ -234,7 +222,7 @@ const useUserStore = common_vendor.defineStore("user", {
           url: "/pages/user/login"
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:267", "[UserStore] 退出登录错误:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:253", "[UserStore] 退出登录错误:", error);
         this.clearUserData();
         throw error;
       }
@@ -260,12 +248,12 @@ const useUserStore = common_vendor.defineStore("user", {
           this.setLoginStatus(true);
           return true;
         } catch (error) {
-          common_vendor.index.__f__("error", "at stores/user.js:304", "[UserStore] Token验证失败:", error);
+          common_vendor.index.__f__("error", "at stores/user.js:290", "[UserStore] Token验证失败:", error);
           this.clearUserData();
           return false;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:311", "[UserStore] 检查登录状态错误:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:297", "[UserStore] 检查登录状态错误:", error);
         this.setLoginStatus(false);
         return false;
       } finally {
@@ -281,7 +269,7 @@ const useUserStore = common_vendor.defineStore("user", {
         }
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:330", "[UserStore] 获取用户统计信息失败:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:316", "[UserStore] 获取用户统计信息失败:", error);
         throw error;
       }
     },
@@ -298,7 +286,7 @@ const useUserStore = common_vendor.defineStore("user", {
         }
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:351", "[UserStore] 更新用户信息失败:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:337", "[UserStore] 更新用户信息失败:", error);
         utils_ui.showError(error.message || "更新失败");
         throw error;
       }
@@ -315,7 +303,7 @@ const useUserStore = common_vendor.defineStore("user", {
         }
         return result;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:370", "[UserStore] 上传头像失败:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:356", "[UserStore] 上传头像失败:", error);
         throw error;
       }
     },
@@ -326,7 +314,7 @@ const useUserStore = common_vendor.defineStore("user", {
         utils_ui.showSuccess("密码修改成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/user.js:384", "[UserStore] 修改密码失败:", error);
+        common_vendor.index.__f__("error", "at stores/user.js:370", "[UserStore] 修改密码失败:", error);
         utils_ui.showError(error.message || "密码修改失败");
         throw error;
       }

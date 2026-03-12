@@ -16,24 +16,6 @@
     
     <!-- 登录表单 -->
     <view v-if="showAccountLogin" class="login-form">
-      <!-- 标签切换 -->
-      <view class="tab-bar">
-        <view 
-          class="tab-item" 
-          :class="{ active: loginType === 'password' }"
-          @click="switchLoginType('password')"
-        >
-          密码登录
-        </view>
-        <view 
-          class="tab-item" 
-          :class="{ active: loginType === 'sms' }"
-          @click="switchLoginType('sms')"
-        >
-          验证码登录
-        </view>
-      </view>
-      
       <!-- 手机号输入 -->
       <view class="form-item">
         <view class="input-wrapper">
@@ -49,7 +31,7 @@
       </view>
       
       <!-- 密码登录 -->
-      <view v-if="loginType === 'password'" class="form-item">
+      <view class="form-item">
         <view class="input-wrapper">
           <text class="input-icon">🔒</text>
           <input 
@@ -67,27 +49,6 @@
         </view>
       </view>
       
-      <!-- 验证码登录 -->
-      <view v-if="loginType === 'sms'" class="form-item">
-        <view class="input-wrapper">
-          <text class="input-icon">💬</text>
-          <input 
-            v-model="formData.smsCode" 
-            class="input-field" 
-            type="number"
-            placeholder="请输入验证码"
-            maxlength="6"
-          />
-          <button 
-            class="sms-btn" 
-            :disabled="!canSendSms || smsCountdown > 0"
-            @click="sendSmsCode"
-          >
-            {{ smsCountdown > 0 ? `${smsCountdown}s` : '获取验证码' }}
-          </button>
-        </view>
-      </view>
-      
       <!-- 登录按钮 -->
       <button 
         class="login-btn" 
@@ -98,15 +59,9 @@
       </button>
       
       <!-- 忘记密码 -->
-      <view v-if="loginType === 'password'" class="forgot-password">
+      <view class="forgot-password">
         <text @click="navigateToReset">忘记密码？</text>
       </view>
-    </view>
-    
-    <!-- 底部链接 -->
-    <view v-if="showAccountLogin" class="footer">
-      <text class="footer-text">还没有账号？</text>
-      <text class="footer-link" @click="navigateToRegister">立即注册</text>
     </view>
     
     <!-- 协议提示 -->
@@ -128,16 +83,12 @@ export default {
   data() {
     return {
       userStore: null,
-      loginType: 'password', // 'password' | 'sms'
       showPassword: false,
-      smsCountdown: 0,
-      smsTimer: null,
       showAccountLogin: false,
 
       formData: {
         phone: '13402838501',  // 默认手机号
-        password: 'yangyu123..',  // 默认密码
-        smsCode: ''
+        password: 'yangyu123..'  // 默认密码
       }
     }
   },
@@ -154,11 +105,7 @@ export default {
     
     // 是否可以登录
     canLogin() {
-      if (this.loginType === 'password') {
-        return this.canSendSms && this.formData.password.length >= 6
-      } else {
-        return this.canSendSms && this.formData.smsCode.length === 6
-      }
+      return this.canSendSms && this.formData.password.length >= 6
     }
   },
   
@@ -173,22 +120,9 @@ export default {
   },
   
   onUnload() {
-    // 清除定时器
-    if (this.smsTimer) {
-      clearInterval(this.smsTimer)
-    }
   },
   
   methods: {
-    
-    // 切换登录方式
-    switchLoginType(type) {
-      this.loginType = type
-      // 清空表单
-      this.formData.password = ''
-      this.formData.smsCode = ''
-    },
-    
     // 切换密码显示
     togglePassword() {
       this.showPassword = !this.showPassword
@@ -196,44 +130,6 @@ export default {
 
     toggleAccountLogin() {
       this.showAccountLogin = !this.showAccountLogin
-    },
-    
-    // 发送短信验证码
-    async sendSmsCode() {
-      if (!this.canSendSms || this.smsCountdown > 0) return
-      
-      try {
-        await this.userStore.getSmsCode({
-          phone: this.formData.phone,
-          type: 'login'
-        })
-        uni.showToast({
-          title: '验证码已发送',
-          icon: 'success'
-        })
-        
-        // 开始倒计时
-        this.startCountdown()
-        
-      } catch (error) {
-        console.error('发送验证码失败:', error)
-        uni.showToast({
-          title: error.message || '发送失败',
-          icon: 'error'
-        })
-      }
-    },
-    
-    // 开始倒计时
-    startCountdown() {
-      this.smsCountdown = 60
-      this.smsTimer = setInterval(() => {
-        this.smsCountdown--
-        if (this.smsCountdown <= 0) {
-          clearInterval(this.smsTimer)
-          this.smsTimer = null
-        }
-      }, 1000)
     },
     
     // 处理登录
@@ -244,20 +140,10 @@ export default {
       if (!this.validatePhone()) return
       
       try {
-        let result
-        if (this.loginType === 'password') {
-          // 密码登录
-          result = await this.userStore.login({
-            username: this.formData.phone,
-            password: this.formData.password
-          })
-        } else {
-          // 验证码登录
-          result = await this.userStore.smsLogin({
-            phone: this.formData.phone,
-            smsCode: this.formData.smsCode
-          })
-        }
+        await this.userStore.login({
+          username: this.formData.phone,
+          password: this.formData.password
+        })
 
         // 登录成功，用户信息已在登录API中返回并设置
         
@@ -279,13 +165,9 @@ export default {
           if (error.message.includes('用户名或密码错误') || error.message.includes('账号或密码错误')) {
             errorMessage = '账号或密码错误，请重新输入'
           } else if (error.message.includes('用户不存在')) {
-            errorMessage = '账号不存在，请先注册'
+            errorMessage = '账号不存在，请使用微信登录'
           } else if (error.message.includes('密码错误')) {
             errorMessage = '密码错误，请重新输入'
-          } else if (error.message.includes('验证码错误') || error.message.includes('验证码不正确')) {
-            errorMessage = '验证码错误，请重新输入'
-          } else if (error.message.includes('验证码已过期')) {
-            errorMessage = '验证码已过期，请重新获取'
           } else if (error.message.includes('网络')) {
             errorMessage = '网络连接失败，请检查网络'
           } else {
@@ -403,13 +285,6 @@ export default {
       uni.showToast({
         title: '功能开发中',
         icon: 'none'
-      })
-    },
-    
-    // 跳转到注册页
-    navigateToRegister() {
-      uni.navigateTo({
-        url: '/pages/user/register'
       })
     },
     

@@ -20,7 +20,6 @@
     "pages/sharing/participants",
     "pages/sharing/my-orders",
     "pages/user/login",
-    "pages/user/register",
     "pages/user/edit-profile",
     "pages/test/auth-test",
     "pages/sharing/requests",

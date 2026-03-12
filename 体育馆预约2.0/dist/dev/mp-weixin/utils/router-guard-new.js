@@ -3,8 +3,7 @@ const common_vendor = require("../common/vendor.js");
 const utils_auth = require("./auth.js");
 const stores_user = require("../stores/user.js");
 const PUBLIC_PAGES = [
-  "/pages/user/login",
-  "/pages/user/register"
+  "/pages/user/login"
 ];
 const PAYMENT_PAGES = [
   "/pages/payment/index",
@@ -83,7 +82,7 @@ function handleLoginRequired(originalUrl) {
     common_vendor.index.reLaunch({
       url: `/pages/user/login?redirect=${redirectUrl}`,
       fail: (err) => {
-        common_vendor.index.__f__("error", "at utils/router-guard-new.js:167", "[RouterGuard] 跳转登录页失败:", err);
+        common_vendor.index.__f__("error", "at utils/router-guard-new.js:166", "[RouterGuard] 跳转登录页失败:", err);
       }
     });
   }, 100);

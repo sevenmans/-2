@@ -6,11 +6,10 @@ let isRedirectingToLogin = false
 // 游客页面（未登录可访问）
 export const guestPages = [
   '/pages/user/login',
-  '/pages/user/register',
   '/pages/index/index' // 允许未登录访问首页
 ]
 
-// 所有页面都需要登录，除了登录和注册页面
+// 所有页面都需要登录，除了登录页面
 const authPages = [
   '/pages/index/index',
   '/pages/venue/list',
@@ -57,7 +56,7 @@ function checkPermission(url) {
   // 提取页面路径
   const pagePath = url.split('?')[0]
   
-  // 检查是否是游客页面（登录、注册页面和首页）
+  // 检查是否是游客页面（登录页面和首页）
   const isGuestPage = guestPages.some(page => pagePath.includes(page))
   
   // 如果是游客页面，直接允许访问
@@ -110,7 +109,7 @@ export function checkCurrentPageAuth() {
   const currentPage = pages[pages.length - 1]
   const pagePath = `/${currentPage.route}`
   
-  // 检查是否是游客页面（登录和注册页面）
+  // 检查是否是游客页面（登录页面）
   const isGuestPage = guestPages.some(page => pagePath.includes(page))
   
   // 如果是游客页面，则不需要登录；否则需要登录

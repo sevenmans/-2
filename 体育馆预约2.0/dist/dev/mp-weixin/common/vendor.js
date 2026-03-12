@@ -7058,7 +7058,7 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.3.5";
+  const hosts = "127.0.0.1,192.168.3.5,198.18.0.1";
   const port = "8090";
   const id = "mp-weixin_2--c2M";
   const lazy = typeof swan !== "undefined";
@@ -8695,12 +8695,6 @@ const pages = [
     }
   },
   {
-    path: "pages/user/register",
-    style: {
-      navigationBarTitleText: "注册"
-    }
-  },
-  {
     path: "pages/user/edit-profile",
     style: {
       navigationBarTitleText: "编辑资料"
@@ -9229,7 +9223,7 @@ class S {
 function T(e2) {
   return e2 && "string" == typeof e2 ? JSON.parse(e2) : e2;
 }
-const b = true, E = "mp-weixin", A = T(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), P = E, C = T('{"address":["127.0.0.1","192.168.3.5"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), O = T('[{"provider":"aliyun","spaceName":"gym","spaceId":"mp-4178189d-6513-4fe8-8982-ab82fdace5e7","clientSecret":"0EULOWDDNs3nq+Whc4bhzg==","endpoint":"https://api.next.bspapp.com"}]') || [];
+const b = true, E = "mp-weixin", A = T(define_process_env_UNI_SECURE_NETWORK_CONFIG_default), P = E, C = T('{"address":["127.0.0.1","192.168.3.5","198.18.0.1"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/unicloud/**/*.js"]}'), O = T('[{"provider":"aliyun","spaceName":"gym","spaceId":"mp-4178189d-6513-4fe8-8982-ab82fdace5e7","clientSecret":"0EULOWDDNs3nq+Whc4bhzg==","endpoint":"https://api.next.bspapp.com"}]') || [];
 let N = "";
 try {
   N = "__UNI__C7319B0";

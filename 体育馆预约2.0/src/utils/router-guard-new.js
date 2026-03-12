@@ -3,8 +3,7 @@ import { useUserStore } from '@/stores/user.js'
 
 // 无需登录即可访问的页面
 const PUBLIC_PAGES = [
-  '/pages/user/login',
-  '/pages/user/register'
+  '/pages/user/login'
 ]
 
 // 需要登录但不强制检查的页面（支付相关页面）
@@ -14,7 +13,7 @@ const PAYMENT_PAGES = [
   '/pages/payment/failed'
 ]
 
-// 除了登录注册页面，所有页面都需要登录
+// 除了登录页面，所有页面都需要登录
 
 // 当前是否正在检查登录状态
 let isCheckingAuth = false
@@ -49,7 +48,7 @@ export function setupRouterGuard() {
 function checkPagePermission(url, method) {
   const pagePath = extractPagePath(url)
 
-  // 1. 公开页面（登录注册页面），无需检查
+  // 1. 公开页面（登录页面），无需检查
   if (isPublicPage(pagePath)) {
     return true
   }

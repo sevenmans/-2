@@ -228,20 +228,6 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    // 用户注册
-    async register(registerData) {
-      try {
-        const response = await authApi.register(registerData)
-        
-        showSuccess('注册成功')
-        return response
-      } catch (error) {
-        console.error('[UserStore] 注册错误:', error)
-        showError(error.message || '注册失败')
-        throw error
-      }
-    },
-
     // 用户退出
     async logout() {
       try {

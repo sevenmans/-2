@@ -31,7 +31,6 @@ if (!Math) {
   "./pages/sharing/participants.js";
   "./pages/sharing/my-orders.js";
   "./pages/user/login.js";
-  "./pages/user/register.js";
   "./pages/user/edit-profile.js";
   "./pages/test/auth-test.js";
   "./pages/sharing/requests.js";
