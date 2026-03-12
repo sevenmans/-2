@@ -108,8 +108,7 @@
     
     <!-- 修改密码（仅账号密码登录用户显示） -->
     <view class="form-section" v-if="loginType === 'account'">
-      <view class="form-item">
-        <text class="item-label">修改密码</text>
+      <view class="form-item center-item">
         <button class="change-password-btn" @click="showPasswordDialog">修改密码</button>
       </view>
     </view>
@@ -225,7 +224,10 @@ export default {
     
     // 登录方式：'wechat' 或 'account'
     loginType() {
-      return this.userInfo?.loginType || 'account'
+      if (this.userInfo?.loginType) {
+        return this.userInfo.loginType
+      }
+      return this.userInfo?.wechatOpenid ? 'wechat' : 'account'
     }
   },
   
@@ -680,6 +682,10 @@ export default {
       border-radius: 8rpx;
       border: none;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
     }
     
     // 运动标签
@@ -705,6 +711,27 @@ export default {
           border-color: #ff6b35;
         }
       }
+    }
+  }
+
+  // 修改密码按钮居中显示（无 label）
+  .center-item {
+    justify-content: center;
+    
+    .change-password-btn {
+      flex: initial;
+      width: 100%;
+      height: 80rpx;
+      line-height: 80rpx;
+      padding: 0;
+      background-color: #ff6b35;
+      color: #ffffff;
+      font-size: 28rpx;
+      border-radius: 8rpx;
+      border: none;
+      text-align: center;
+      display: block;
+      margin: 0;
     }
   }
   

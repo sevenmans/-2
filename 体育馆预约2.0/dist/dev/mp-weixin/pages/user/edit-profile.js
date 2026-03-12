@@ -43,8 +43,11 @@ const _sfc_main = {
     },
     // 登录方式：'wechat' 或 'account'
     loginType() {
-      var _a;
-      return ((_a = this.userInfo) == null ? void 0 : _a.loginType) || "account";
+      var _a, _b;
+      if ((_a = this.userInfo) == null ? void 0 : _a.loginType) {
+        return this.userInfo.loginType;
+      }
+      return ((_b = this.userInfo) == null ? void 0 : _b.wechatOpenid) ? "wechat" : "account";
     }
   },
   onLoad() {
@@ -81,7 +84,7 @@ const _sfc_main = {
         try {
           const result = await this.userStore.getUserInfo();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:284", "[EditProfile] 获取用户信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:286", "[EditProfile] 获取用户信息失败:", error);
           common_vendor.index.showToast({
             title: "获取用户信息失败",
             icon: "error"
@@ -143,7 +146,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:355", "[EditProfile] 上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:357", "[EditProfile] 上传头像失败:", error);
         common_vendor.index.showToast({
           title: error.message || "上传失败",
           icon: "error"
@@ -206,7 +209,7 @@ const _sfc_main = {
           common_vendor.index.hideLoading();
           loadingShown = false;
         }
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:435", "[EditProfile] 保存失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:437", "[EditProfile] 保存失败:", error);
         common_vendor.index.showToast({
           title: error.message || "保存失败",
           icon: "error"
@@ -288,7 +291,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:532", "[EditProfile] 修改密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:534", "[EditProfile] 修改密码失败:", error);
         common_vendor.index.showToast({
           title: error.message || "修改失败",
           icon: "error"

@@ -123,7 +123,8 @@ export const useUserStore = defineStore('user', {
           phone: responseData.phone,
           nickname: responseData.nickname,
           avatar: responseData.avatar,
-          roles: responseData.roles
+          roles: responseData.roles,
+          loginType: responseData.loginType || 'account'
         }
         
         // 更新状态
@@ -168,7 +169,8 @@ export const useUserStore = defineStore('user', {
           phone: responseData.phone,
           nickname: responseData.nickname || responseData.username,
           avatar: responseData.avatar,
-          roles: responseData.roles
+          roles: responseData.roles,
+          loginType: responseData.loginType || 'wechat'
         }
 
         this.setToken(token)
@@ -212,7 +214,10 @@ export const useUserStore = defineStore('user', {
         const response = await userApi.updateUserInfo(updateData)
 
         const updatedUserInfo = response.data || response
-        this.setUserInfo(updatedUserInfo)
+        this.setUserInfo({
+          ...this.userInfo,
+          ...updatedUserInfo
+        })
 
         showSuccess('用户信息更新成功')
         return updatedUserInfo
