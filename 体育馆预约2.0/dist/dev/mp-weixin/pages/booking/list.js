@@ -41,6 +41,8 @@ const _sfc_main = {
     const currentBookingId = common_vendor.ref(null);
     const cancelPopup = common_vendor.ref(null);
     const showCancelPopup = common_vendor.ref(false);
+    const showVerifyCodePopup = common_vendor.ref(false);
+    const activeVerifyCode = common_vendor.ref("");
     const loadingMore = common_vendor.computed(() => bookingStore.loadingMore);
     const showCancelModal = (bookingId) => {
       currentBookingId.value = bookingId;
@@ -58,6 +60,13 @@ const _sfc_main = {
           }
         }
       });
+    };
+    const showVerifyCodeModal = (booking) => {
+      activeVerifyCode.value = getVerifyCode(booking);
+      showVerifyCodePopup.value = true;
+    };
+    const closeVerifyCodeModal = () => {
+      showVerifyCodePopup.value = false;
     };
     const bookingList = common_vendor.computed(() => bookingStore.bookingListGetter);
     const loading = common_vendor.computed(() => bookingStore.isLoading);
@@ -99,7 +108,7 @@ const _sfc_main = {
           // 允许使用缓存，提升首屏速度
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:303", "[BookingList] 数据初始化失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:329", "[BookingList] 数据初始化失败:", error);
         common_vendor.index.showToast({
           title: "加载失败，请重试",
           icon: "none"
@@ -115,7 +124,7 @@ const _sfc_main = {
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
         common_vendor.index.stopPullDownRefresh();
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:347", "刷新数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:373", "刷新数据失败:", error);
         common_vendor.index.showToast({
           title: error.message || "刷新数据失败",
           icon: "none"
@@ -130,7 +139,7 @@ const _sfc_main = {
         const nextPage = pagination.value.current + 1;
         await bookingStore.getUserBookings({ page: nextPage, pageSize: 10 });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:365", "[BookingList] ❌ 加载更多失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:391", "[BookingList] ❌ 加载更多失败:", error);
         common_vendor.index.showToast({
           title: "加载失败，请重试",
           icon: "none"
@@ -154,7 +163,7 @@ const _sfc_main = {
     };
     const confirmCancel = async () => {
       if (!currentBookingId.value) {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:413", "No booking ID selected for cancellation");
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:439", "No booking ID selected for cancellation");
         return;
       }
       try {
@@ -169,7 +178,7 @@ const _sfc_main = {
         await initData();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:434", "取消预约失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:460", "取消预约失败:", error);
         common_vendor.index.showToast({
           title: error.message || "取消失败",
           icon: "error"
@@ -217,7 +226,7 @@ const _sfc_main = {
       const statusMap = {
         // 基础状态
         "PENDING": "待支付",
-        "PAID": "已支付，待确认",
+        "PAID": "待使用",
         "CONFIRMED": "待使用",
         "VERIFIED": "已核销",
         "COMPLETED": "已完成",
@@ -249,7 +258,7 @@ const _sfc_main = {
             return startTimeStr;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/list.vue:543", "虚拟订单时间格式化错误:", error);
+          common_vendor.index.__f__("error", "at pages/booking/list.vue:569", "虚拟订单时间格式化错误:", error);
           return "时间待定";
         }
       } else {
@@ -330,7 +339,7 @@ const _sfc_main = {
             dateTime = new Date(bookingTime);
           }
           if (isNaN(dateTime.getTime())) {
-            common_vendor.index.__f__("error", "at pages/booking/list.vue:650", "虚拟订单日期格式化错误 - 无效的时间:", bookingTime);
+            common_vendor.index.__f__("error", "at pages/booking/list.vue:676", "虚拟订单日期格式化错误 - 无效的时间:", bookingTime);
             return "";
           }
           return dateTime.toLocaleDateString("zh-CN", {
@@ -339,7 +348,7 @@ const _sfc_main = {
             day: "2-digit"
           }).replace(/\//g, "-");
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/list.vue:660", "虚拟订单日期格式化错误:", error);
+          common_vendor.index.__f__("error", "at pages/booking/list.vue:686", "虚拟订单日期格式化错误:", error);
           return "";
         }
       } else {
@@ -363,8 +372,8 @@ const _sfc_main = {
         // 🔥 添加时间戳，确保每次请求都有唯一的key，避免被去重机制阻塞
       }).then((result) => {
       }).catch((error) => {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:698", "[BookingList] ❌ 处理预约创建事件失败:", error);
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:699", "[BookingList] 错误堆栈:", error.stack);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:724", "[BookingList] ❌ 处理预约创建事件失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:725", "[BookingList] 错误堆栈:", error.stack);
       });
     };
     const handleOrderCancelled = (eventData) => {
@@ -393,7 +402,7 @@ const _sfc_main = {
           }
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:743", "处理订单过期事件失败:", e);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:769", "处理订单过期事件失败:", e);
       }
     };
     common_vendor.onMounted(() => {
@@ -418,7 +427,7 @@ const _sfc_main = {
         try {
           await bookingStore.refreshBookingList();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/list.vue:787", "[BookingList] ❌ 强制刷新失败:", error);
+          common_vendor.index.__f__("error", "at pages/booking/list.vue:813", "[BookingList] ❌ 强制刷新失败:", error);
         }
         return;
       }
@@ -430,7 +439,7 @@ const _sfc_main = {
         await bookingStore.refreshBookingList();
         lastShowTime = now;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/list.vue:803", "[BookingList] ❌ 刷新预约列表失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/list.vue:829", "[BookingList] ❌ 刷新预约列表失败:", error);
       }
     });
     common_vendor.onPullDownRefresh(async () => {
@@ -457,20 +466,20 @@ const _sfc_main = {
         url: `/pages/sharing/participants?orderId=${booking.id}`
       });
     };
-    const checkinOrder = (_booking) => {
-      common_vendor.index.showModal({
-        title: "确认签到",
-        content: "确认已到达场馆并开始使用？",
-        success: (res) => {
-          if (res.confirm) {
-            common_vendor.index.showToast({
-              title: "签到成功",
-              icon: "success"
-            });
-            initData();
-          }
-        }
-      });
+    const getVerifyCode = (booking) => {
+      if (!booking)
+        return "";
+      if (booking.orderNo)
+        return String(booking.orderNo);
+      if (booking.id !== void 0 && booking.id !== null)
+        return String(booking.id);
+      return "";
+    };
+    const formatVerifyCodeDisplay = (code) => {
+      if (!code)
+        return "--";
+      const compact = String(code).replace(/\s+/g, "");
+      return compact.replace(/(.{4})/g, "$1 ").trim();
     };
     const completeOrder = (_booking) => {
       common_vendor.index.showModal({
@@ -536,17 +545,17 @@ const _sfc_main = {
           } : booking.status === "EXPIRED" || booking.isExpired ? {
             w: common_vendor.o(($event) => rebookVenue(booking), `booking-${booking.id}`)
           } : booking.status === "PAID" ? {
-            y: common_vendor.o(($event) => viewOrderDetail(booking), `booking-${booking.id}`),
+            y: common_vendor.o(($event) => showVerifyCodeModal(booking), `booking-${booking.id}`),
             z: common_vendor.o(($event) => showCancelModal(booking.id), `booking-${booking.id}`)
           } : booking.status === "OPEN" || booking.status === "SHARING" || booking.status === "PENDING_FULL" ? {
             B: common_vendor.o(($event) => viewOrderDetail(booking), `booking-${booking.id}`),
             C: common_vendor.o(($event) => viewParticipants(booking), `booking-${booking.id}`),
             D: common_vendor.o(($event) => showCancelModal(booking.id), `booking-${booking.id}`)
           } : booking.status === "SHARING_SUCCESS" || booking.status === "FULL" ? {
-            F: common_vendor.o(($event) => viewOrderDetail(booking), `booking-${booking.id}`),
+            F: common_vendor.o(($event) => showVerifyCodeModal(booking), `booking-${booking.id}`),
             G: common_vendor.o(($event) => viewParticipants(booking), `booking-${booking.id}`)
           } : booking.status === "CONFIRMED" ? {
-            I: common_vendor.o(($event) => checkinOrder(), `booking-${booking.id}`),
+            I: common_vendor.o(($event) => showVerifyCodeModal(booking), `booking-${booking.id}`),
             J: common_vendor.o(($event) => showCancelModal(booking.id), `booking-${booking.id}`)
           } : booking.status === "VERIFIED" ? {
             L: common_vendor.o(($event) => completeOrder(), `booking-${booking.id}`)
@@ -580,14 +589,22 @@ const _sfc_main = {
       }, loadingMore.value ? {} : {}, {
         j: common_vendor.o(loadMore)
       }) : {}, {
-        k: showCancelPopup.value
+        k: showVerifyCodePopup.value
+      }, showVerifyCodePopup.value ? {
+        l: common_vendor.t(formatVerifyCodeDisplay(activeVerifyCode.value)),
+        m: common_vendor.o(closeVerifyCodeModal),
+        n: common_vendor.o(() => {
+        }),
+        o: common_vendor.o(closeVerifyCodeModal)
+      } : {}, {
+        p: showCancelPopup.value
       }, showCancelPopup.value ? {
-        l: common_vendor.o(closeCancelModal),
-        m: common_vendor.o(confirmCancel),
-        n: common_vendor.sr(cancelPopup, "afb09895-1", {
+        q: common_vendor.o(closeCancelModal),
+        r: common_vendor.o(confirmCancel),
+        s: common_vendor.sr(cancelPopup, "afb09895-1", {
           "k": "cancelPopup"
         }),
-        o: common_vendor.p({
+        t: common_vendor.p({
           type: "center",
           ["mask-click"]: false
         })

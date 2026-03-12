@@ -377,6 +377,67 @@
   background-color: #ff6b35;
   color: #ffffff;
 }
+.verify-code-overlay.data-v-afb09895 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+.verify-code-modal.data-v-afb09895 {
+  width: 600rpx;
+  max-width: 90vw;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.verify-code-modal .modal-header.data-v-afb09895 {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.verify-code-modal .modal-header .modal-title.data-v-afb09895 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.verify-code-modal .verify-code-content.data-v-afb09895 {
+  padding: 40rpx 30rpx;
+  text-align: center;
+}
+.verify-code-modal .verify-code-content .verify-code-text.data-v-afb09895 {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: 6rpx;
+  color: #ff6b35;
+  margin-bottom: 16rpx;
+  word-break: break-all;
+}
+.verify-code-modal .verify-code-content .verify-code-tip.data-v-afb09895 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.verify-code-modal .modal-actions.data-v-afb09895 {
+  display: flex;
+  border-top: 1rpx solid #f0f0f0;
+}
+.verify-code-modal .modal-actions .modal-btn.data-v-afb09895 {
+  flex: 1;
+  height: 100rpx;
+  border: none;
+  font-size: 28rpx;
+}
+.verify-code-modal .modal-actions .modal-btn.cancel-btn.data-v-afb09895 {
+  background-color: #f5f5f5;
+  color: #666666;
+}
 .cancel-modal .modal-content.data-v-afb09895 {
   padding: 40rpx 30rpx;
   text-align: center;

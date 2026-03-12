@@ -81,9 +81,11 @@ const useBookingStore = common_vendor.defineStore("booking", {
     getPendingBookings: (state) => {
       return state.bookingList.filter((booking) => booking.status === "PENDING");
     },
-    // 已确认的预订
+    // 已确认的预订（现包含已支付即为确认）
     getConfirmedBookings: (state) => {
-      return state.bookingList.filter((booking) => booking.status === "CONFIRMED");
+      return state.bookingList.filter(
+        (booking) => ["PAID", "CONFIRMED", "SHARING_SUCCESS", "FULL"].includes(booking.status)
+      );
     },
     // 是否有更多数据
     hasMoreData: (state) => {
@@ -113,7 +115,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         common_vendor.index.$on("order-cancelled", this.onOrderCancelled.bind(this));
         common_vendor.index.$on("booking-success", this.onBookingSuccess.bind(this));
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:138", "[BookingStore] ❌ 设置事件监听器失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:141", "[BookingStore] ❌ 设置事件监听器失败:", error);
       }
     },
     // 清理事件监听器
@@ -125,7 +127,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
           common_vendor.index.$off("booking-success", this.onBookingSuccess);
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:151", "[BookingStore] 清理事件监听器失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:154", "[BookingStore] 清理事件监听器失败:", error);
       }
     },
     // 处理订单过期事件
@@ -146,7 +148,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
           await this.refreshBookingList();
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:180", "[BookingStore] 处理订单取消失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:183", "[BookingStore] 处理订单取消失败:", error);
       }
     },
     // 处理预约成功事件
@@ -165,11 +167,11 @@ const useBookingStore = common_vendor.defineStore("booking", {
               });
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at stores/booking.js:204", "[BookingStore] 通知venue store失败:", error);
+            common_vendor.index.__f__("error", "at stores/booking.js:207", "[BookingStore] 通知venue store失败:", error);
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:208", "[BookingStore] 处理预约成功失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:211", "[BookingStore] 处理预约成功失败:", error);
       }
     },
     // 清除缓存
@@ -178,7 +180,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         common_vendor.index.removeStorageSync("booking_list_cache");
         common_vendor.index.removeStorageSync("booking_detail_cache");
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:218", "[BookingStore] 清除缓存失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:221", "[BookingStore] 清除缓存失败:", error);
       }
     },
     // 设置加载状态
@@ -271,7 +273,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         const result = response.data || response;
         return result;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:341", "[BookingStore] 创建预约失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:344", "[BookingStore] 创建预约失败:", error);
         utils_ui.showError(error.message || "预约失败");
         throw error;
       } finally {
@@ -290,7 +292,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setBookingDetail(response.data || response);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:367", "[BookingStore] 获取预订详情失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:370", "[BookingStore] 获取预订详情失败:", error);
         utils_ui.showError(error.message || "获取预订详情失败");
         throw error;
       } finally {
@@ -347,7 +349,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         }
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:445", "[BookingStore] 创建拼场预约失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:448", "[BookingStore] 创建拼场预约失败:", error);
         utils_ui.showError(error.message || "拼场预约失败");
         throw error;
       } finally {
@@ -396,7 +398,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         }
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:513", "[BookingStore] 获取用户预约列表失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:516", "[BookingStore] 获取用户预约列表失败:", error);
         if (error.message === "请求超时") {
           utils_ui.showError("加载超时，请检查网络连接");
         } else {
@@ -472,7 +474,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         });
         return { success: true, data: bookingData };
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:621", "[BookingStore] 获取预约详情失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:624", "[BookingStore] 获取预约详情失败:", error);
         if (error.message === "请求超时") {
           utils_ui.showError("加载超时，请检查网络连接");
         } else if (error.message === "未找到预约详情") {
@@ -514,7 +516,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
           const detailResponse = await this.getBookingDetail(bookingId, false);
           bookingDetail = detailResponse.data || this.bookingDetail;
         } catch (detailError) {
-          common_vendor.index.__f__("warn", "at stores/booking.js:671", "[BookingStore] 获取预约详情失败，继续执行取消操作:", detailError);
+          common_vendor.index.__f__("warn", "at stores/booking.js:674", "[BookingStore] 获取预约详情失败，继续执行取消操作:", detailError);
         }
         const response = await api_booking.cancelBooking(bookingId);
         const bookingIndex = this.bookingList.findIndex((b) => b.id === bookingId || b.orderNo === bookingId);
@@ -571,14 +573,14 @@ const useBookingStore = common_vendor.defineStore("booking", {
                 }
               }
             } catch (importError) {
-              common_vendor.index.__f__("warn", "at stores/booking.js:753", "[BookingStore] 统一时间段管理器不可用，使用备用方案:", importError);
+              common_vendor.index.__f__("warn", "at stores/booking.js:756", "[BookingStore] 统一时间段管理器不可用，使用备用方案:", importError);
               try {
                 const { default: cacheManager } = await "../utils/cache-manager.js";
                 if (cacheManager && typeof cacheManager.clearTimeSlotCache === "function") {
                   cacheManager.clearTimeSlotCache(actualVenueId, actualBookingDate);
                 }
               } catch (cacheError) {
-                common_vendor.index.__f__("warn", "at stores/booking.js:762", "[BookingStore] 缓存管理器也不可用:", cacheError);
+                common_vendor.index.__f__("warn", "at stores/booking.js:765", "[BookingStore] 缓存管理器也不可用:", cacheError);
               }
             }
             try {
@@ -589,10 +591,10 @@ const useBookingStore = common_vendor.defineStore("booking", {
                 await venueStore.refreshTimeSlotStatus(actualVenueId, actualBookingDate);
               }
             } catch (venueError) {
-              common_vendor.index.__f__("warn", "at stores/booking.js:776", "[BookingStore] 通知venue store失败:", venueError);
+              common_vendor.index.__f__("warn", "at stores/booking.js:779", "[BookingStore] 通知venue store失败:", venueError);
             }
           } catch (eventError) {
-            common_vendor.index.__f__("error", "at stores/booking.js:779", "[BookingStore] 使用统一时间段管理器释放时间段失败:", eventError);
+            common_vendor.index.__f__("error", "at stores/booking.js:782", "[BookingStore] 使用统一时间段管理器释放时间段失败:", eventError);
           }
         }
         common_vendor.index.$emit("orderCancelled", {
@@ -605,7 +607,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("预约已取消");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:797", "[BookingStore] 取消预约失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:800", "[BookingStore] 取消预约失败:", error);
         if (error.message === "请求超时") {
           utils_ui.showError("操作超时，请检查网络连接");
         } else {
@@ -636,7 +638,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("申请拼场成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:833", "[BookingStore] 申请拼场失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:836", "[BookingStore] 申请拼场失败:", error);
         utils_ui.showError(error.message || "申请拼场失败");
         throw error;
       } finally {
@@ -660,7 +662,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setPagination(pagination);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:858", "[BookingStore] 获取拼场订单失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:861", "[BookingStore] 获取拼场订单失败:", error);
         utils_ui.showError(error.message || "获取拼场订单失败");
         throw error;
       } finally {
@@ -674,7 +676,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         const response = await api_booking.getVenueAvailableSlots(venueId, date);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:873", "[BookingStore] 获取场馆可用时间段失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:876", "[BookingStore] 获取场馆可用时间段失败:", error);
         utils_ui.showError("获取可用时间段失败");
         throw error;
       } finally {
@@ -689,7 +691,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("拼场申请成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:889", "[BookingStore] 拼场预约申请失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:892", "[BookingStore] 拼场预约申请失败:", error);
         utils_ui.showError("拼场申请失败");
         throw error;
       } finally {
@@ -704,7 +706,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("创建拼场订单成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:905", "[BookingStore] 创建拼场订单失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:908", "[BookingStore] 创建拼场订单失败:", error);
         utils_ui.showError(error.message || "创建拼场订单失败");
         throw error;
       } finally {
@@ -719,7 +721,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setSharingDetail(response.data || response);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:921", "[BookingStore] 获取拼场订单详情失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:924", "[BookingStore] 获取拼场订单详情失败:", error);
         utils_ui.showError(error.message || "获取拼场订单详情失败");
         throw error;
       } finally {
@@ -734,7 +736,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("加入拼场成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:937", "[BookingStore] 加入拼场失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:940", "[BookingStore] 加入拼场失败:", error);
         utils_ui.showError(error.message || "加入拼场失败");
         throw error;
       } finally {
@@ -749,7 +751,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setUserSharingOrders(response.data || []);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:953", "[BookingStore] 获取我创建的拼场订单失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:956", "[BookingStore] 获取我创建的拼场订单失败:", error);
         utils_ui.showError(error.message || "获取我创建的拼场订单失败");
         throw error;
       } finally {
@@ -764,7 +766,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         utils_ui.showSuccess("处理拼场申请成功");
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:969", "[BookingStore] 处理拼场申请失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:972", "[BookingStore] 处理拼场申请失败:", error);
         utils_ui.showError(error.message || "处理拼场申请失败");
         throw error;
       } finally {
@@ -779,7 +781,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setUserSharingOrders(response.data || []);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:985", "[BookingStore] 获取拼场申请失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:988", "[BookingStore] 获取拼场申请失败:", error);
         utils_ui.showError(error.message || "获取拼场申请失败");
         throw error;
       } finally {
@@ -794,7 +796,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setJoinedSharingOrders(response.data || []);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:1001", "[BookingStore] 获取拼场申请失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:1004", "[BookingStore] 获取拼场申请失败:", error);
         utils_ui.showError(error.message || "获取拼场申请失败");
         throw error;
       } finally {
@@ -809,7 +811,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         this.setSharingDetail(response.data || response);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:1017", "[BookingStore] 获取拼场详情失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:1020", "[BookingStore] 获取拼场详情失败:", error);
         utils_ui.showError(error.message || "获取拼场详情失败");
         throw error;
       } finally {
@@ -828,7 +830,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         await this.getSharingDetail(sharingId);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:1040", "[BookingStore] 移除拼场参与者失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:1043", "[BookingStore] 移除拼场参与者失败:", error);
         utils_ui.showError(error.message || "移除参与者失败");
         throw error;
       } finally {
@@ -847,7 +849,7 @@ const useBookingStore = common_vendor.defineStore("booking", {
         await this.getSharingDetail(sharingId);
         return response;
       } catch (error) {
-        common_vendor.index.__f__("error", "at stores/booking.js:1063", "[BookingStore] 更新拼场设置失败:", error);
+        common_vendor.index.__f__("error", "at stores/booking.js:1066", "[BookingStore] 更新拼场设置失败:", error);
         utils_ui.showError(error.message || "更新拼场设置失败");
         throw error;
       } finally {

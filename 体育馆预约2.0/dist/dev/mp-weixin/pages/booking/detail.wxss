@@ -234,6 +234,11 @@
 .actions-section .action-btn.data-v-2f755c8f:last-child {
   margin-right: 0;
 }
+.actions-section .action-btn.checkin-btn.data-v-2f755c8f {
+  background-color: #52c41a;
+  color: #ffffff;
+  border-color: #52c41a;
+}
 .actions-section .action-btn.cancel-btn.data-v-2f755c8f {
   background-color: transparent;
   color: #ff4d4f;
@@ -308,6 +313,79 @@
 .cancel-modal .modal-actions .modal-btn.confirm-btn.data-v-2f755c8f {
   background-color: #ff6b35;
   color: #ffffff;
+}
+.verify-code-overlay.data-v-2f755c8f {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+.verify-code-modal.data-v-2f755c8f {
+  width: 600rpx;
+  max-width: 90vw;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin: 0 auto;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+.verify-code-modal .modal-header.data-v-2f755c8f {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+  width: 100%;
+}
+.verify-code-modal .modal-header .modal-title.data-v-2f755c8f {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.verify-code-modal .verify-code-content.data-v-2f755c8f {
+  padding: 40rpx 30rpx;
+  text-align: center;
+  width: 100%;
+}
+.verify-code-modal .verify-code-content .verify-code-text.data-v-2f755c8f {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 12rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 2rpx;
+  color: #ff6b35;
+  margin-bottom: 16rpx;
+  white-space: normal;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+.verify-code-modal .verify-code-content .verify-code-tip.data-v-2f755c8f {
+  font-size: 24rpx;
+  color: #999999;
+}
+.verify-code-modal .modal-actions.data-v-2f755c8f {
+  display: flex;
+  border-top: 1rpx solid #f0f0f0;
+  width: 100%;
+}
+.verify-code-modal .modal-actions .modal-btn.data-v-2f755c8f {
+  flex: 1;
+  height: 100rpx;
+  border: none;
+  font-size: 28rpx;
+}
+.verify-code-modal .modal-actions .modal-btn.cancel-btn.data-v-2f755c8f {
+  background-color: #f5f5f5;
+  color: #666666;
 }
 .loading-state.data-v-2f755c8f {
   display: flex;

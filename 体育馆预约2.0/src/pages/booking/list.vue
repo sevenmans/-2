@@ -100,9 +100,9 @@
             <button class="action-btn rebook-btn" @click.stop="rebookVenue(booking)">再次预约</button>
           </template>
 
-          <!-- 已支付状态 -->
+          <!-- 已支付状态（即待核销） -->
           <template v-else-if="booking.status === 'PAID'">
-            <button class="action-btn info-btn" @click.stop="viewOrderDetail(booking)">查看详情</button>
+            <button class="action-btn checkin-btn" @click.stop="showVerifyCodeModal(booking)">核销码</button>
             <button class="action-btn cancel-btn" @click.stop="showCancelModal(booking.id)">取消预约</button>
           </template>
 
@@ -113,15 +113,15 @@
             <button class="action-btn cancel-btn" @click.stop="showCancelModal(booking.id)">取消预约</button>
           </template>
 
-          <!-- 拼场成功/已满员状态 -->
+          <!-- 拼场成功/已满员状态（即待核销） -->
           <template v-else-if="booking.status === 'SHARING_SUCCESS' || booking.status === 'FULL'">
-            <button class="action-btn info-btn" @click.stop="viewOrderDetail(booking)">查看详情</button>
+            <button class="action-btn checkin-btn" @click.stop="showVerifyCodeModal(booking)">核销码</button>
             <button class="action-btn participants-btn" @click.stop="viewParticipants(booking)">查看参与者</button>
           </template>
 
-          <!-- 已确认状态 -->
+          <!-- 已确认状态（兼容历史数据） -->
           <template v-else-if="booking.status === 'CONFIRMED'">
-            <button class="action-btn checkin-btn" @click.stop="checkinOrder(booking)">签到</button>
+            <button class="action-btn checkin-btn" @click.stop="showVerifyCodeModal(booking)">核销码</button>
             <button class="action-btn cancel-btn" @click.stop="showCancelModal(booking.id)">取消预约</button>
           </template>
 
@@ -157,6 +157,21 @@
       <text v-else>加载更多</text>
     </view>
     
+    <view v-if="showVerifyCodePopup" class="verify-code-overlay" @click="closeVerifyCodeModal">
+      <view class="verify-code-modal" @click.stop>
+        <view class="modal-header">
+          <text class="modal-title">请向前台出示此核销码</text>
+        </view>
+        <view class="verify-code-content">
+          <text class="verify-code-text">{{ formatVerifyCodeDisplay(activeVerifyCode) }}</text>
+          <text class="verify-code-tip">管理员将使用此码完成核销</text>
+        </view>
+        <view class="modal-actions">
+          <button class="modal-btn cancel-btn" @click="closeVerifyCodeModal">关闭</button>
+        </view>
+      </view>
+    </view>
+
     <!-- 取消预约确认弹窗 -->
     <uni-popup v-if="showCancelPopup" ref="cancelPopup" type="center" :mask-click="false">
       <view class="cancel-modal">
@@ -181,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useBookingStore } from '@/stores/booking.js'
 import { useUserStore } from '@/stores/user.js'
 import { formatDate, formatTime } from '@/utils/helpers.js'
@@ -217,6 +232,8 @@ const statusGroupMap = {
 const currentBookingId = ref(null)
 const cancelPopup = ref(null)
 const showCancelPopup = ref(false)
+const showVerifyCodePopup = ref(false)
+const activeVerifyCode = ref('')
 
 // 🔥 修复问题2: 使用computed从store获取loadingMore状态
 const loadingMore = computed(() => bookingStore.loadingMore)
@@ -238,6 +255,15 @@ const showCancelModal = (bookingId) => {
       }
     }
   })
+}
+
+const showVerifyCodeModal = (booking) => {
+  activeVerifyCode.value = getVerifyCode(booking)
+  showVerifyCodePopup.value = true
+}
+
+const closeVerifyCodeModal = () => {
+  showVerifyCodePopup.value = false
 }
 
 // 计算属性（修复：使用新的getter名称）
@@ -498,7 +524,7 @@ const emptyStateText = computed(() => {
       const statusMap = {
         // 基础状态
         'PENDING': '待支付',
-        'PAID': '已支付，待确认',
+        'PAID': '待使用',
         'CONFIRMED': '待使用',
         'VERIFIED': '已核销',
         'COMPLETED': '已完成',
@@ -843,23 +869,18 @@ const emptyStateText = computed(() => {
       });
     };
 
-    // 签到
-    const checkinOrder = (_booking) => {
-      uni.showModal({
-        title: '确认签到',
-        content: '确认已到达场馆并开始使用？',
-        success: (res) => {
-          if (res.confirm) {
-            // TODO: 调用签到API
-            uni.showToast({
-              title: '签到成功',
-              icon: 'success'
-            });
-            initData(); // 刷新数据
-          }
-        }
-      });
-    };
+    const getVerifyCode = (booking) => {
+      if (!booking) return ''
+      if (booking.orderNo) return String(booking.orderNo)
+      if (booking.id !== undefined && booking.id !== null) return String(booking.id)
+      return ''
+    }
+
+    const formatVerifyCodeDisplay = (code) => {
+      if (!code) return '--'
+      const compact = String(code).replace(/\s+/g, '')
+      return compact.replace(/(.{4})/g, '$1 ').trim()
+    }
 
     // 完成订单
     const completeOrder = (_booking) => {
@@ -1304,6 +1325,77 @@ const emptyStateText = computed(() => {
       &.confirm-btn {
         background-color: #ff6b35;
         color: #ffffff;
+      }
+    }
+  }
+}
+
+.verify-code-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+
+.verify-code-modal {
+  width: 600rpx;
+  max-width: 90vw;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+
+  .modal-header {
+    padding: 30rpx;
+    text-align: center;
+    border-bottom: 1rpx solid #f0f0f0;
+
+    .modal-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #333333;
+    }
+  }
+
+  .verify-code-content {
+    padding: 40rpx 30rpx;
+    text-align: center;
+
+    .verify-code-text {
+      display: block;
+      font-size: 48rpx;
+      font-weight: 700;
+      letter-spacing: 6rpx;
+      color: #ff6b35;
+      margin-bottom: 16rpx;
+      word-break: break-all;
+    }
+
+    .verify-code-tip {
+      font-size: 24rpx;
+      color: #999999;
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    border-top: 1rpx solid #f0f0f0;
+
+    .modal-btn {
+      flex: 1;
+      height: 100rpx;
+      border: none;
+      font-size: 28rpx;
+
+      &.cancel-btn {
+        background-color: #f5f5f5;
+        color: #666666;
       }
     }
   }

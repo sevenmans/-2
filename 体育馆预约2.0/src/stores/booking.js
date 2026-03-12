@@ -91,9 +91,12 @@ export const useBookingStore = defineStore('booking', {
       return state.bookingList.filter(booking => booking.status === 'PENDING');
     },
     
-    // 已确认的预订
+    // 已确认的预订（现包含已支付即为确认）
     getConfirmedBookings: (state) => {
-      return state.bookingList.filter(booking => booking.status === 'CONFIRMED');
+      // 包含 PAID(已支付/待核销), CONFIRMED(旧数据), SHARING_SUCCESS(拼场成功)
+      return state.bookingList.filter(booking => 
+        ['PAID', 'CONFIRMED', 'SHARING_SUCCESS', 'FULL'].includes(booking.status)
+      );
     },
     
     // 是否有更多数据

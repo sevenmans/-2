@@ -180,6 +180,14 @@
         立即支付
       </button>
       
+      <!-- 已支付或已确认状态（待使用） -->
+      <button v-if="bookingDetail && (bookingDetail.status === 'PAID' || bookingDetail.status === 'CONFIRMED' || bookingDetail.status === 'SHARING_SUCCESS' || bookingDetail.status === 'FULL')" class="action-btn checkin-btn" @click="showVerifyCodeModal">
+        核销码
+      </button>
+
+      <button v-if="bookingDetail && (bookingDetail.status === 'PAID' || bookingDetail.status === 'CONFIRMED')" class="action-btn cancel-btn" @click="showCancelModal">
+        取消预约
+      </button>
 
       
       <button v-if="bookingDetail && bookingDetail.status === 'COMPLETED'" class="action-btn review-btn" @click="reviewVenue">
@@ -209,6 +217,23 @@
         </view>
       </view>
     </uni-popup>
+
+    <view v-if="showVerifyCodePopup" class="verify-code-overlay" @click="closeVerifyCodeModal">
+      <view class="verify-code-modal" @click.stop>
+        <view class="modal-header">
+          <text class="modal-title">请向前台出示此核销码</text>
+        </view>
+
+        <view class="verify-code-content">
+          <text class="verify-code-text">{{ formatVerifyCodeDisplay(activeVerifyCode) }}</text>
+          <text class="verify-code-tip">管理员将使用此码完成核销</text>
+        </view>
+
+        <view class="modal-actions">
+          <button class="modal-btn cancel-btn" @click="closeVerifyCodeModal">关闭</button>
+        </view>
+      </view>
+    </view>
     </view>
   </view>
 </template>
@@ -234,7 +259,9 @@ export default {
       bookingStore: null,
       venueStore: null,
       bookingId: '',
-      showCancelPopup: false
+      showCancelPopup: false,
+      showVerifyCodePopup: false,
+      activeVerifyCode: ''
     }
   },
 
@@ -419,6 +446,15 @@ export default {
       
       // 然后设置showCancelPopup为false，移除DOM元素
       this.showCancelPopup = false
+    },
+
+    showVerifyCodeModal() {
+      this.activeVerifyCode = this.getVerifyCode(this.bookingDetail)
+      this.showVerifyCodePopup = true
+    },
+
+    closeVerifyCodeModal() {
+      this.showVerifyCodePopup = false
     },
     
     // 确认取消
@@ -646,6 +682,19 @@ export default {
       }
     },
 
+    getVerifyCode(booking) {
+      if (!booking) return ''
+      if (booking.orderNo) return String(booking.orderNo)
+      if (booking.id !== undefined && booking.id !== null) return String(booking.id)
+      return ''
+    },
+
+    formatVerifyCodeDisplay(code) {
+      if (!code) return '--'
+      const compact = String(code).replace(/\s+/g, '')
+      return compact.replace(/(.{4})/g, '$1 ').trim()
+    },
+
     // 评价场馆
     reviewVenue() {
       uni.navigateTo({
@@ -735,7 +784,11 @@ export default {
     getStatusClass(status) {
       const statusMap = {
         'PENDING': 'status-pending',
-        'CONFIRMED': 'status-confirmed',
+        'PAID': 'status-paid', // 复用已支付样式
+        'CONFIRMED': 'status-paid', // 复用已支付样式
+        'SHARING_SUCCESS': 'status-paid', // 拼场成功视为已支付/待使用
+        'FULL': 'status-paid', // 满员视为已支付/待使用
+        'VERIFIED': 'status-completed', // 已核销视为完成
         'COMPLETED': 'status-completed',
         'CANCELLED': 'status-cancelled'
       }
@@ -746,7 +799,11 @@ export default {
     getStatusIcon(status) {
       const iconMap = {
         'PENDING': '⏳',
+        'PAID': '✅',
         'CONFIRMED': '✅',
+        'SHARING_SUCCESS': '✅',
+        'FULL': '✅',
+        'VERIFIED': '🎉',
         'COMPLETED': '🎉',
         'CANCELLED': '❌'
       }
@@ -756,8 +813,12 @@ export default {
     // 获取状态文本
     getStatusText(status) {
       const statusMap = {
-        'PENDING': '待确认',
-        'CONFIRMED': '已确认',
+        'PENDING': '待支付',
+        'PAID': '待使用',
+        'CONFIRMED': '待使用', // 兼容
+        'SHARING_SUCCESS': '拼场成功',
+        'FULL': '已满员',
+        'VERIFIED': '已核销',
         'COMPLETED': '已完成',
         'CANCELLED': '已取消'
       }
@@ -767,8 +828,12 @@ export default {
     // 获取状态描述
     getStatusDesc(status) {
       const descMap = {
-        'PENDING': '场馆正在确认您的预约',
-        'CONFIRMED': '预约已确认，请按时到场',
+        'PENDING': '请尽快完成支付，超时将自动取消',
+        'PAID': '您已成功预订，请向前台出示核销码',
+        'CONFIRMED': '您已成功预订，请向前台出示核销码',
+        'SHARING_SUCCESS': '拼场成功，请向前台出示核销码',
+        'FULL': '拼场已满员，请向前台出示核销码',
+        'VERIFIED': '核销成功，祝您运动愉快',
         'COMPLETED': '预约已完成，感谢您的使用',
         'CANCELLED': '预约已取消'
       }
@@ -1212,6 +1277,12 @@ export default {
       margin-right: 0;
     }
     
+    &.checkin-btn {
+      background-color: #52c41a;
+      color: #ffffff;
+      border-color: #52c41a;
+    }
+
     &.cancel-btn {
       background-color: transparent;
       color: #ff4d4f;
@@ -1299,6 +1370,89 @@ export default {
       &.confirm-btn {
         background-color: #ff6b35;
         color: #ffffff;
+      }
+    }
+  }
+}
+
+.verify-code-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+
+.verify-code-modal {
+  width: 600rpx;
+  max-width: 90vw;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin: 0 auto;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  .modal-header {
+    padding: 30rpx;
+    text-align: center;
+    border-bottom: 1rpx solid #f0f0f0;
+    width: 100%;
+
+    .modal-title {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #333333;
+    }
+  }
+
+  .verify-code-content {
+    padding: 40rpx 30rpx;
+    text-align: center;
+    width: 100%;
+
+    .verify-code-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 12rpx;
+      font-size: 44rpx;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 2rpx;
+      color: #ff6b35;
+      margin-bottom: 16rpx;
+      white-space: normal;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    .verify-code-tip {
+      font-size: 24rpx;
+      color: #999999;
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    border-top: 1rpx solid #f0f0f0;
+    width: 100%;
+
+    .modal-btn {
+      flex: 1;
+      height: 100rpx;
+      border: none;
+      font-size: 28rpx;
+
+      &.cancel-btn {
+        background-color: #f5f5f5;
+        color: #666666;
       }
     }
   }
