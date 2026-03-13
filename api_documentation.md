@@ -23,7 +23,7 @@
   - 返回：`ResponseEntity<?>`
 - `POST /api/auth/sms-code`（发送短信验证码）
   - 入参：`Map<String, String>`
-  - 返回：`ResponseEntity<Map<String, Object>>`
+  - 返回：`ResponseEntity<?>`
 - `POST /api/auth/wechat/login`（微信登录）
   - 入参：`Map<String, String>`
   - 返回：`ResponseEntity<?>`
@@ -56,6 +56,7 @@
   - Query：`page`、`pageSize`、`status`、`startDate`、`endDate`、`userId`
 - `GET /api/bookings/{id}`（预约详情）
 - `PUT /api/bookings/{id}/cancel`（取消预约）
+- `POST /api/bookings/{id}/admin-cancel`（管理员取消/逻辑退款）
 - `GET /api/bookings/venues/{venueId}/slots`（场馆可用时段）
   - Query：`date`
 - `POST /api/bookings/shared`（创建拼场预约）
@@ -92,10 +93,7 @@
 - `PATCH /api/venues/{id}/status`（更新场馆状态）
   - 入参：`Map<String, String>`
 - `GET /api/venues/sharing`（支持拼场场馆）
-- `PATCH /api/venues/{id}/manager`（分配场馆管理员）
-  - 入参：`Map<String, Long>`
-- `GET /api/venues/manager/{managerId}`（管理员管理的场馆）
-- `POST /api/venues/update-sharing-support`（批量更新拼场支持）
+- `GET /api/venues/manager/me`（当前管理员管理的场馆）
 
 ## 2.5 时段模块 TimeSlotController（`/api/timeslots`）
 
@@ -166,6 +164,8 @@
 - `POST /api/verification/orders/{id}/verify`（核销订单）
 - `POST /api/verification/orders/{id}/complete`（完成订单）
 - `GET /api/verification/orders/{id}/status`（核销状态）
+- `GET /api/verification/code/{code}`（按核销码查询订单）
+- `POST /api/verification/code/verify`（按核销码核销）
 
 ## 2.11 公告模块 AnnouncementController（`/api/announcements`）
 
@@ -182,15 +182,15 @@
 
 ## 2.12 管理员模块 AdminController（`/api/admin`）
 
-- `GET /api/admin/users`（用户列表）
-  - Query：`page`、`size`、`sortBy`、`sortDir`
-- `GET /api/admin/users/{userId}`（用户详情）
-- `PUT /api/admin/users/{userId}/roles`（更新用户角色）
-  - 入参：`Map<String, Object>`
-- `DELETE /api/admin/users/{userId}`（停用用户）
-- `PUT /api/admin/users/{userId}/activate`（激活用户）
+- `GET /api/admin/dashboard/stats`（管理员工作台统计）
+  - Query：`timeRange`、`startDate`、`endDate`
 
-## 2.13 健康检查接口
+## 2.13 管理员订单模块 AdminBookingController（`/api/admin/bookings`）
+
+- `GET /api/admin/bookings`（管理员订单列表）
+  - Query：`page`、`pageSize`、`status`、`keyword`、`venueId`、`type`、`startDate`、`endDate`
+
+## 2.14 健康检查接口
 
 - HealthController（多路径映射同一方法）：
   - `GET /api/health`
@@ -202,7 +202,7 @@
 - HealthCheckController：
   - `GET /api/health`
 
-## 2.14 测试接口（建议仅测试环境）
+## 2.15 测试接口（建议仅测试环境）
 
 - `POST /api/test/order-status/{orderId}/transition`
 - `GET /api/test/order-status/{orderId}/available-actions`
@@ -219,7 +219,6 @@
 - `src/api/auth.js`
   - `POST /auth/signin`
   - `POST /auth/signup`
-  - `POST /auth/sms-code`
   - `POST /auth/wechat/login`
   - `POST /auth/logout`
 - `src/api/user.js`
@@ -258,17 +257,10 @@
   - `POST /payments/orders/{id}/callback`
   - `GET /bookings/{id}`（支付页取订单详情）
 - `src/api/admin.js`
-  - `GET /admin/users`
-  - `GET /admin/users/{userId}`
-  - `PUT /admin/users/{userId}/roles`
-  - `DELETE /admin/users/{userId}`
-  - `PUT /admin/users/{userId}/activate`
   - `POST /venues`
   - `PUT /venues/{id}`
   - `PATCH /venues/{id}/status`
   - `DELETE /venues/{id}`
-  - `PATCH /venues/{id}/manager`
-  - `GET /venues/manager/{managerId}`
 - `src/api/verification.js`
   - `POST /verification/orders/{id}/verify`
   - `POST /verification/orders/{id}/complete`
@@ -302,6 +294,8 @@
   - 后端未找到对应映射。
 - `POST /auth/refresh`（`src/api/auth.js`）
   - 后端未找到对应映射。
+- `POST /auth/wechat/login`（`src/api/auth.js`）
+  - 后端未找到对应映射。
 - `PUT /users/me/profile`（`src/api/user.js`）
   - 后端当前是 `PUT /users/me`。
 - `GET /timeslots/check-availability`（`src/api/timeslot.js`）
@@ -318,6 +312,20 @@
   - 后端未找到对应映射。
 - `POST /payments/orders/{id}/refund`（`src/api/payment.js`）
   - 后端未找到对应映射。
+- `GET /admin/users`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `GET /admin/users/{userId}`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `PUT /admin/users/{userId}/roles`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `DELETE /admin/users/{userId}`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `PUT /admin/users/{userId}/activate`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `PATCH /venues/{id}/manager`（`src/api/admin.js`）
+  - 后端未找到对应映射。
+- `GET /venues/manager/{managerId}`（`src/api/admin.js`）
+  - 后端未找到对应映射。
 
 ---
 
@@ -327,3 +335,60 @@
 - 未实现接口在前端应标注“待后端支持”，避免上线后 404。
 - 后端新增接口后，优先同步更新本文档，再更新前端 API 封装。
 - 若同一业务存在新旧接口并存，建议保留一套主路径，避免维护分叉。
+
+---
+
+## 5. 管理员端联调补充（CRUD + 复杂查询 + 错误码）
+
+## 5.1 CRUD 总览（管理员端）
+
+- 场馆：
+  - `POST /api/venues`（C，场馆管理员）
+  - `GET /api/venues` / `GET /api/venues/{id}`（R）
+  - `PUT /api/venues/{id}`（U）
+  - `PATCH /api/venues/{id}/status`（U）
+  - `DELETE /api/venues/{id}`（D，场馆管理员）
+- 订单：
+  - `GET /api/admin/bookings`（R，复杂筛选）
+  - `GET /api/bookings/{id}`（R，详情增强）
+  - `POST /api/bookings/{id}/admin-cancel`（U，管理员取消）
+- 核销：
+  - `GET /api/verification/code/{code}`（R）
+  - `POST /api/verification/code/verify`（U）
+  - `POST /api/verification/orders/{id}/verify`（U）
+  - `POST /api/verification/orders/{id}/complete`（U）
+- 排期：
+  - `PATCH /api/timeslots/{id}/status`（U，锁场/解锁）
+
+## 5.2 复杂查询入参格式
+
+- `GET /api/admin/bookings`
+  - Query：`page`、`pageSize`、`status`、`keyword`、`venueId`、`type`、`startDate`、`endDate`
+  - 示例：
+    - `/api/admin/bookings?page=1&pageSize=20&status=PAID&type=SHARED`
+    - `/api/admin/bookings?page=1&pageSize=10&keyword=REQ_88`
+    - `/api/admin/bookings?page=1&pageSize=10&keyword=1380013&startDate=2026-03-01&endDate=2026-03-31`
+
+- `GET /api/admin/dashboard/stats`
+  - Query：`timeRange`（today/week/month/custom）、`startDate`、`endDate`
+  - 示例：
+    - `/api/admin/dashboard/stats?timeRange=today`
+    - `/api/admin/dashboard/stats?timeRange=custom&startDate=2026-03-01&endDate=2026-03-12`
+
+## 5.3 错误码示例（管理员端常见）
+
+- `400`：参数错误、状态流转非法、核销码非法
+- `401`：未登录/令牌失效
+- `403`：无权限（非本人管理场馆）
+- `404`：资源不存在
+- `409`：锁场冲突（时段存在订单）
+- `500`：服务内部错误
+
+- 示例（409）：
+```json
+{
+  "success": false,
+  "message": "存在冲突订单，无法设为维护中，请先处理订单",
+  "timeSlotId": 1234
+}
+```

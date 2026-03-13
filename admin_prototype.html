@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>体育馆预约系统 - 管理员端</title>
+    <style>
+        /* --- Reset & Base --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif; background-color: #f5f7fa; color: #333; font-size: 14px; line-height: 1.5; overflow: hidden; height: 100vh; width: 100vw; }
+        
+        /* --- Variables --- */
+        :root {
+            --primary: #ff6b35; /* Updated to match user side orange */
+            --success: #19be6b;
+            --warning: #ff9900;
+            --danger: #fa3534;
+            --info: #909399;
+            --text-main: #303133;
+            --text-regular: #606266;
+            --text-secondary: #909399;
+            --text-placeholder: #c0c4cc;
+            --border: #dcdfe6;
+            --bg-color: #f5f5f5;
+            --white: #ffffff;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
+            --tabbar-height: 50px;
+        }
+
+        /* --- Layout --- */
+        #app { height: 100%; width: 100%; position: relative; overflow: hidden; background: var(--bg-color); }
+        .page { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-color); display: flex; flex-direction: column; 
+            transform: translateX(100%); transition: transform 0.3s ease; z-index: 10;
+            padding-bottom: calc(var(--tabbar-height) + var(--safe-area-bottom)); /* Make space for tabbar */
+        }
+        .page.tab-page { transform: translateX(0); z-index: 1; display: none; } /* Tab pages are base layer */
+        .page.tab-page.active { display: flex; }
+        .page.sub-page { z-index: 20; } /* Sub pages slide in */
+        .page.sub-page.active { transform: translateX(0); }
+        .page.active { transform: translateX(0); } /* Fallback for initial page */
+        
+        #page-login { z-index: 2000; padding-bottom: 0; } /* Login page on top & full height */
+
+        /* Desktop Simulation (Mobile Shell) */
+        @media (min-width: 481px) {
+            body {
+                background: #333;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-image: linear-gradient(45deg, #2c3e50, #4ca1af);
+            }
+            #app {
+                width: 375px;
+                height: 812px; /* iPhone X height */
+                max-height: 90vh;
+                border-radius: 40px;
+                box-shadow: 0 0 0 10px #000, 0 0 50px rgba(0,0,0,0.5);
+                overflow: hidden;
+                position: relative;
+                border: 8px solid #000;
+            }
+            /* Add notch simulation */
+            #app::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 150px;
+                height: 30px;
+                background: #000;
+                border-bottom-left-radius: 16px;
+                border-bottom-right-radius: 16px;
+                z-index: 9999;
+                pointer-events: none;
+            }
+            /* Scrollbar styling for desktop */
+            ::-webkit-scrollbar { width: 4px; }
+            ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+        }
+        
+        .navbar {
+            height: calc(44px + var(--safe-area-top)); 
+            padding-top: var(--safe-area-top);
+            background: var(--primary); /* Updated to primary color */
+            display: flex; align-items: center; justify-content: center;
+            position: relative; border-bottom: none; flex-shrink: 0;
+            z-index: 100;
+            color: #fff;
+        }
+        .navbar-left { position: absolute; left: 16px; bottom: 0; height: 44px; display: flex; align-items: center; font-size: 24px; color: #fff; }
+        .navbar-title { font-size: 16px; font-weight: 600; color: #fff; }
+        .navbar-right { position: absolute; right: 16px; bottom: 0; height: 44px; display: flex; align-items: center; font-size: 14px; color: #fff; }
+
+        @media (min-width: 481px) {
+            .navbar {
+                padding-top: 30px; /* Match notch height */
+                height: 74px; 
+            }
+        }
+
+        .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px; }
+
+        /* --- TabBar --- */
+        .tabbar {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: calc(var(--tabbar-height) + var(--safe-area-bottom));
+            background: #fff; border-top: 0.5px solid #ebeef5;
+            display: flex; padding-bottom: var(--safe-area-bottom);
+            z-index: 50;
+            display: none; /* Hidden by default (login page) */
+        }
+        .tabbar.show { display: flex; }
+        .tab-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #666; font-size: 10px; cursor: pointer;
+            position: relative;
+        }
+        .tab-item.active { color: var(--primary); }
+        .tab-icon { font-size: 24px; margin-bottom: 2px; line-height: 1; }
+
+        /* Highlighted Tab Item (Scan/Verify) */
+        .tab-item.highlight {
+            overflow: visible;
+        }
+        .tab-item.highlight .tab-icon-wrapper {
+            position: absolute;
+            top: -20px;
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            color: #fff;
+            border: 4px solid var(--white);
+        }
+        .tab-item.highlight .tab-icon {
+            font-size: 28px;
+            margin-bottom: 0;
+        }
+        .tab-item.highlight .tab-text {
+            margin-top: 24px; /* Space for the floating icon */
+        }
+        
+        /* --- Order Card (Replicated from User Side) --- */
+        .booking-card {
+            background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; overflow: hidden;
+        }
+        
+        /* Status Badge Inline (New Style) */
+        .status-badge-inline {
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 12px; color: #fff;
+        }
+        .status-pending { background: #ff9900; }
+        .status-paid { background: #19be6b; } /* 待核销 */
+        .status-verified { background: #2979ff; } /* 已核销 */
+        .status-completed { background: #909399; }
+        .status-cancelled { background: #fa3534; }
+        .status-sharing_success { background: #19be6b; } /* 拼场成功 */
+
+        /* Venue Info */
+        .venue-info {
+            display: flex; gap: 12px; margin-bottom: 16px; padding-right: 60px; /* Space for badge */
+        }
+        .venue-image {
+            width: 80px; height: 80px; border-radius: 8px; background: #f0f0f0; object-fit: cover;
+        }
+        .venue-details {
+            display: flex; flex-direction: column; justify-content: space-between; flex: 1;
+        }
+        .venue-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .venue-location { font-size: 12px; color: #666; margin-bottom: 2px; }
+        .venue-type { 
+            display: inline-block; font-size: 10px; color: #2979ff; 
+            background: rgba(41, 121, 255, 0.1); padding: 2px 6px; border-radius: 4px; align-self: flex-start;
+        }
+
+        /* Info Rows */
+        .info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; font-size: 13px;
+        }
+        .info-label { color: #909399; }
+        .info-value { color: #303133; font-weight: 500; }
+        
+        .booking-type {
+            padding: 2px 8px; border-radius: 4px; font-size: 11px;
+        }
+        .booking-type-exclusive { background: #e6f7ff; color: #2979ff; }
+        .booking-type-shared { background: #fff0f6; color: #ff6b35; }
+
+        /* Card Footer */
+        .card-footer {
+            border-top: 0.5px solid #eee; margin-top: 12px; padding-top: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .price-value { font-size: 18px; font-weight: bold; color: #ff6b35; }
+        .price-label { font-size: 12px; color: #909399; margin-right: 4px; }
+
+
+        /* Button */
+        .btn { 
+            display: inline-flex; align-items: center; justify-content: center; 
+            padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; 
+            border: none; outline: none; background: var(--white); color: var(--text-regular); 
+            border: 1px solid var(--border); transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-primary { background: var(--primary); color: var(--white); border-color: var(--primary); }
+        .btn-success { background: var(--success); color: var(--white); border-color: var(--success); }
+        .btn-danger { background: var(--danger); color: var(--white); border-color: var(--danger); }
+        .btn-warning { background: var(--warning); color: var(--white); border-color: var(--warning); }
+        .btn-text { border: none; background: transparent; color: var(--primary); padding: 0 8px; }
+        .btn-block { display: flex; width: 100%; margin-bottom: 12px; padding: 12px; font-size: 16px; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; height: 28px; }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; color: var(--text-main); margin-bottom: 8px; font-weight: 500; }
+        .form-input { 
+            width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--border); 
+            border-radius: var(--radius-md); font-size: 14px; background: #fff;
+            outline: none; transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: var(--primary); }
+        .form-textarea {
+            width: 100%; padding: 12px; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-size: 14px; outline: none;
+            resize: none; min-height: 80px;
+        }
+
+        /* Tag */
+        .tag { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; line-height: 1.4; margin-right: 4px; }
+        .tag-primary { background: #ecf5ff; color: var(--primary); border: 0.5px solid #d9ecff; }
+        .tag-success { background: #f0f9eb; color: var(--success); border: 0.5px solid #e1f3d8; }
+        .tag-warning { background: #fdf6ec; color: var(--warning); border: 0.5px solid #faecd8; }
+        .tag-danger { background: #fef0f0; color: var(--danger); border: 0.5px solid #fde2e2; }
+        .tag-info { background: #f4f4f5; color: var(--info); border: 0.5px solid #e9e9eb; }
+
+        /* Grid */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+        /* Specific Components */
+        .stat-card { text-align: center; padding: 16px 8px; }
+        .stat-value { font-size: 20px; font-weight: bold; color: var(--text-main); margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .menu-item { 
+            background: var(--white); border-radius: var(--radius-md); padding: 16px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03); height: 90px;
+        }
+        .menu-icon { font-size: 24px; margin-bottom: 8px; }
+        .menu-text { font-size: 13px; color: var(--text-main); }
+
+        .list-item { 
+            display: flex; justify-content: space-between; padding: 12px 0; 
+            border-bottom: 0.5px solid #eee; 
+        }
+        .list-item:last-child { border-bottom: none; }
+        .item-label { color: var(--text-secondary); min-width: 80px; }
+        .item-value { color: var(--text-main); flex: 1; text-align: right; }
+
+        /* Toast & Modal */
+        .toast {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7); color: #fff; padding: 10px 20px;
+            border-radius: 8px; z-index: 1000; font-size: 14px; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+
+        .modal-mask {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 900; display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal {
+            background: #fff; width: 80%; max-width: 320px; border-radius: 12px;
+            overflow: hidden; animation: popIn 0.2s ease-out;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 16px; text-align: center; font-weight: 600; border-bottom: 0.5px solid #eee; }
+        .modal-body { padding: 20px 16px; text-align: center; color: var(--text-regular); }
+        .modal-footer { display: flex; border-top: 0.5px solid #eee; }
+        .modal-btn { flex: 1; padding: 14px; text-align: center; font-size: 16px; color: var(--text-main); border-right: 0.5px solid #eee; }
+        .modal-btn:last-child { border-right: none; color: var(--primary); font-weight: 500; }
+        
+        /* Filter Bar */
+        .filter-bar {
+            background: #fff; padding: 8px 12px; display: flex; gap: 8px; overflow-x: auto;
+            border-bottom: 0.5px solid #f0f0f0; margin-bottom: 8px;
+        }
+        .filter-item {
+            flex-shrink: 0; padding: 4px 12px; background: #f4f4f5; border-radius: 14px;
+            font-size: 12px; color: var(--text-regular);
+        }
+        .filter-item.active { background: #ecf5ff; color: var(--primary); }
+
+        /* TimeSlot Grid */
+        .timeslot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .timeslot-item {
+            background: #fff; border: 1px solid var(--border); border-radius: 4px;
+            padding: 8px 4px; text-align: center; font-size: 12px;
+        }
+        .timeslot-item.available { background: #f0f9eb; border-color: #e1f3d8; color: var(--success); }
+        .timeslot-item.maintenance { background: #fef0f0; border-color: #fde2e2; color: var(--danger); }
+        .timeslot-item.booked { background: #f4f4f5; border-color: #dcdfe6; color: var(--info); cursor: not-allowed; }
+        .timeslot-item.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(41, 121, 255, 0.2); }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- 1. Login Page -->
+    <div class="page active" id="page-login">
+        <div class="content" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="font-size: 24px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">球场管家</div>
+                <div style="color: var(--text-secondary);">管理员端</div>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">账号</label>
+                    <input type="text" class="form-input" id="login-username" value="admin" placeholder="请输入管理员账号">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-input" id="login-password" value="123456" placeholder="请输入密码">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="handleLogin()">登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Dashboard -->
+    <div class="page tab-page" id="page-dashboard">
+        <div class="navbar">
+            <div class="navbar-title">工作台</div>
+        </div>
+        <div class="content">
+            <!-- Time Filter -->
+            <div class="card" style="padding: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-weight: 600; font-size: 16px;">数据概览</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);" id="current-date-range">2023-10-01 ~ 2023-10-01</div>
+                </div>
+                <div class="filter-bar" style="border:none; margin:0; padding:0; justify-content: space-between; background: #f5f7fa; border-radius: 8px; padding: 4px;">
+                    <div class="filter-item active" style="flex:1; text-align:center;" onclick="switchDashTime(this, 'today')">今日</div>
+                    <div class="filter-item" style="flex:1; text-align:center;" onclick="switchDashTime(this, 'week')">本周</div>
+                    <div class="filter-item" style="flex:1; text-align:center;" onclick="switchDashTime(this, 'month')">本月</div>
+                    <div class="filter-item" style="flex:1; text-align:center;" onclick="switchDashTime(this, 'custom')">自定义</div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid-2">
+                <div class="card stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="stat-value" id="stat-income" style="color: white;">¥0</div>
+                    <div class="stat-label" style="color: rgba(255,255,255,0.8);">预计收益</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" id="stat-orders">0</div>
+                    <div class="stat-label">总订单数</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" id="stat-verify-wait" style="color: var(--warning);">0</div>
+                    <div class="stat-label">待核销</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" id="stat-verify-done" style="color: var(--success);">0</div>
+                    <div class="stat-label">已核销</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" id="stat-refund" style="color: var(--danger);">0</div>
+                    <div class="stat-label">退款/取消</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-value" id="stat-avg-price">¥0</div>
+                    <div class="stat-label">客单价</div>
+                </div>
+            </div>
+
+            <!-- Quick Verify -->
+            <div class="card" style="display: none;">
+                <!-- Hidden: Moved to Verification Tab -->
+            </div>
+
+            <!-- Menu Grid (Updated) -->
+            <div class="menu-grid">
+                <!-- All main features are now in TabBar or sub-pages -->
+                <div style="grid-column: span 3; text-align: center; color: var(--text-secondary); font-size: 12px; padding: 20px;">
+                    更多功能敬请期待
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Order List -->
+    <div class="page tab-page" id="page-order-list">
+        <div class="navbar">
+            <div class="navbar-title">订单管理</div>
+        </div>
+        <div style="background: #fff; padding: 8px 12px;">
+            <input type="text" class="form-input" id="order-search-input" placeholder="搜索手机号/核销码" oninput="renderOrderList()">
+        </div>
+        <div class="filter-bar" id="order-filter-bar">
+            <!-- JS will populate -->
+        </div>
+        <div class="content" id="order-list-container">
+            <!-- Order List Items -->
+        </div>
+    </div>
+
+    <!-- 4. Order Detail -->
+    <div class="page" id="page-order-detail">
+        <div class="navbar">
+            <div class="navbar-left" onclick="router.back()">←</div>
+            <div class="navbar-title">订单详情</div>
+        </div>
+        <div class="content" id="order-detail-container">
+            <!-- Populated by JS -->
+        </div>
+        <div class="footer-actions" id="order-detail-actions" style="position: absolute; bottom: 0; left: 0; width: 100%; background: #fff; padding: 12px; border-top: 1px solid #eee; display: flex; gap: 12px; padding-bottom: calc(12px + var(--safe-area-bottom));">
+            <!-- Buttons populated by JS -->
+        </div>
+    </div>
+
+    <!-- 5. Verification Center -->
+    <div class="page tab-page" id="page-verification">
+        <div class="navbar">
+            <div class="navbar-title">核销中心</div>
+        </div>
+        <div class="content">
+            <div class="card" style="text-align: center; padding: 40px 20px;">
+                <div style="font-size: 60px; margin-bottom: 20px;">📷</div>
+                <div class="form-group">
+                    <input type="text" class="form-input" id="verify-center-input" placeholder="输入核销码" style="text-align: center; font-size: 20px; height: 50px; letter-spacing: 2px;">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="verifyCenterCheck()">查询并核销</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">最近核销记录</div>
+                </div>
+                <div id="verify-history-list">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">暂无记录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Venue List -->
+    <div class="page tab-page" id="page-venue-list">
+        <div class="navbar">
+            <div class="navbar-title">场馆管理</div>
+            <div class="navbar-right" onclick="router.push('page-venue-edit', {mode: 'create'})">新增</div>
+        </div>
+        <div class="content" id="venue-list-container">
+            <!-- Venue Items -->
+        </div>
+    </div>
+
+    <!-- 7. Venue Edit -->
+    <div class="page" id="page-venue-edit">
+        <div class="navbar">
+            <div class="navbar-left" onclick="router.back()">←</div>
+            <div class="navbar-title" id="venue-edit-title">编辑场馆</div>
+        </div>
+        <div class="content">
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">场馆名称</label>
+                    <input type="text" class="form-input" id="venue-name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">场馆类型</label>
+                    <select class="form-input" id="venue-type">
+                        <option value="篮球">篮球</option>
+                        <option value="羽毛球">羽毛球</option>
+                        <option value="网球">网球</option>
+                        <option value="足球">足球</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">小时单价 (元)</label>
+                    <input type="number" class="form-input" id="venue-price">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">营业时间</label>
+                    <div class="grid-2">
+                        <input type="time" class="form-input" id="venue-open" value="09:00">
+                        <input type="time" class="form-input" id="venue-close" value="22:00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">联系电话</label>
+                    <input type="tel" class="form-input" id="venue-phone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">场馆图片 (上传)</label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 80px; height: 80px; background: #f5f7fa; border: 1px dashed #dcdfe6; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #909399; font-size: 24px;" onclick="uploadImageMock()">
+                            +
+                        </div>
+                        <input type="text" class="form-input" id="venue-image" placeholder="图片地址将显示在这里" readonly style="flex: 1;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">位置</label>
+                    <input type="text" class="form-input" id="venue-location" placeholder="如: A区3楼">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">场馆介绍</label>
+                    <textarea class="form-textarea" id="venue-desc" placeholder="请输入场馆介绍"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">设施标签 (逗号分隔)</label>
+                    <input type="text" class="form-input" id="venue-tags" placeholder="如: 木地板,空调">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="display: flex; justify-content: space-between;">
+                        <span>支持拼场</span>
+                        <input type="checkbox" id="venue-sharing">
+                    </label>
+                </div>
+                 <div class="form-group">
+                    <label class="form-label">自动生成天数</label>
+                    <select class="form-input" id="venue-auto-days">
+                        <option value="7">未来7天</option>
+                        <option value="15">未来15天</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="saveVenue()">保存</button>
+            <button class="btn btn-danger btn-block" id="btn-delete-venue" onclick="deleteVenue()" style="display: none;">删除场馆</button>
+        </div>
+    </div>
+
+    <!-- 8. Timeslot Management -->
+    <div class="page" id="page-timeslot">
+        <div class="navbar">
+            <div class="navbar-left" onclick="router.back()">←</div>
+            <div class="navbar-title">排期管理</div>
+        </div>
+        <div class="content">
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">选择场馆</label>
+                    <select class="form-input" id="ts-venue-select" onchange="renderTimeslots()">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">选择日期</label>
+                    <input type="date" class="form-input" id="ts-date-select" onchange="renderTimeslots()">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">时段状态</div>
+                    <div class="card-extra">
+                        <span class="tag tag-success">可用</span>
+                        <span class="tag tag-danger">维护</span>
+                        <span class="tag tag-info">占用</span>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">点击可用时段可设为维护，点击维护可解锁。</div>
+                <div class="timeslot-grid" id="timeslot-container">
+                    <!-- Grid items -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. Security -->
+    <div class="page tab-page" id="page-security">
+        <div class="navbar">
+            <div class="navbar-title">账号与安全</div>
+        </div>
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">修改密码</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">旧密码</label>
+                    <input type="password" class="form-input" id="sec-old-pass">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">新密码</label>
+                    <input type="password" class="form-input" id="sec-new-pass">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">确认新密码</label>
+                    <input type="password" class="form-input" id="sec-confirm-pass">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="updatePassword()">确认修改</button>
+            </div>
+            
+            <div class="card" style="margin-top: 20px;">
+                 <button class="btn btn-danger btn-block" onclick="handleLogout()">退出登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TabBar -->
+    <div class="tabbar" id="tabbar">
+        <div class="tab-item active" onclick="router.switchTab('page-dashboard')">
+            <div class="tab-icon">📊</div>
+            <div>工作台</div>
+        </div>
+        <div class="tab-item" onclick="router.switchTab('page-order-list')">
+            <div class="tab-icon">📋</div>
+            <div>订单</div>
+        </div>
+        <div class="tab-item highlight" onclick="router.switchTab('page-verification')">
+            <div class="tab-icon-wrapper">
+                <div class="tab-icon">📷</div>
+            </div>
+            <div class="tab-text">核销</div>
+        </div>
+        <div class="tab-item" onclick="router.switchTab('page-venue-list')">
+            <div class="tab-icon">🏟️</div>
+            <div>场馆</div>
+        </div>
+        <div class="tab-item" onclick="router.switchTab('page-security')">
+            <div class="tab-icon">👤</div>
+            <div>我的</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Global Toast -->
+<div class="toast" id="toast">提示信息</div>
+
+<!-- Global Modal -->
+<div class="modal-mask" id="modal-mask">
+    <div class="modal">
+        <div class="modal-header" id="modal-title">提示</div>
+        <div class="modal-body" id="modal-content">内容</div>
+        <div class="modal-footer">
+            <div class="modal-btn" onclick="Modal.close(false)" id="modal-cancel">取消</div>
+            <div class="modal-btn" onclick="Modal.close(true)" id="modal-confirm">确定</div>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Mock Data Store
+ */
+const store = {
+    user: {
+        username: 'admin',
+        role: 'ROLE_VENUE_ADMIN',
+        token: null
+    },
+    venues: [
+        { id: 1, name: '1号篮球场', type: '篮球', price: 100, status: 'OPEN', openTime: '09:00', closeTime: '22:00', supportSharing: true, facilityTags: ['木地板', '空调'], contactPhone: '13800138000', coverImage: '', location: 'A区1楼', description: '标准木地板篮球场', autoGenerateDays: 7 },
+        { id: 2, name: '2号羽毛球场', type: '羽毛球', price: 60, status: 'OPEN', openTime: '08:00', closeTime: '22:00', supportSharing: false, facilityTags: ['塑胶地'], contactPhone: '13800138000', coverImage: '', location: 'B区2楼', description: '专业羽毛球场地', autoGenerateDays: 7 },
+        { id: 3, name: '3号网球场', type: '网球', price: 150, status: 'MAINTENANCE', openTime: '10:00', closeTime: '20:00', supportSharing: false, facilityTags: ['室外'], contactPhone: '13800138000', coverImage: '', location: 'C区室外', description: '标准硬地网球场', autoGenerateDays: 7 }
+    ],
+    orders: [], // generated on init
+    timeslots: {}, // key: venueId_date, val: [{time, status}]
+    verifyHistory: []
+};
+
+// Utils
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+const formatDate = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+const Toast = {
+    show(msg, duration = 2000) {
+        const el = $('#toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), duration);
+    }
+};
+
+const Modal = {
+    callback: null,
+    show(title, content, onConfirm, showCancel = true) {
+        $('#modal-title').textContent = title;
+        $('#modal-content').textContent = content;
+        $('#modal-mask').style.display = 'flex';
+        $('#modal-cancel').style.display = showCancel ? 'block' : 'none';
+        this.callback = onConfirm;
+    },
+    close(isConfirm) {
+        $('#modal-mask').style.display = 'none';
+        if (isConfirm && this.callback) this.callback();
+    }
+};
+
+// Router
+const router = {
+    currentTab: null, // 'page-dashboard', 'page-order-list', etc.
+    stack: ['page-login'], // Stack for sub-pages or login
+    
+    switchTab(pageId) {
+        this.currentTab = pageId;
+        this.stack = []; // Clear stack
+        this.updateView();
+    },
+    
+    push(pageId, params = {}) {
+        this.stack.push(pageId);
+        this.updateView(pageId, params);
+    },
+    
+    back() {
+        if (this.stack.length > 0) {
+            this.stack.pop();
+            // If stack empty and no currentTab (e.g. login), keep login
+            if (this.stack.length === 0 && !this.currentTab) {
+                this.stack.push('page-login');
+            }
+            this.updateView();
+        }
+    },
+    
+    updateView(targetPageId, params) {
+        // 1. Reset all pages
+        $$('.page').forEach(el => {
+            el.classList.remove('active');
+            el.classList.remove('sub-page');
+            el.style.zIndex = '';
+        });
+        
+        // 2. Handle Tab Page
+        if (this.currentTab) {
+            const tabEl = $(`#${this.currentTab}`);
+            if (tabEl) tabEl.classList.add('active');
+            
+            // Show Tabbar
+            $('#tabbar').classList.add('show');
+            
+            // Update TabBar Active State
+            $$('.tab-item').forEach(el => el.classList.remove('active'));
+            const tabs = ['page-dashboard', 'page-order-list', 'page-verification', 'page-venue-list', 'page-security'];
+            const idx = tabs.indexOf(this.currentTab);
+            if (idx >= 0) $$('.tab-item')[idx].classList.add('active');
+        } else {
+            $('#tabbar').classList.remove('show');
+        }
+        
+        // 3. Handle Stack Pages (Login or Sub-pages)
+        this.stack.forEach((pageId, index) => {
+            const el = $(`#${pageId}`);
+            if (el) {
+                // Login page is special, covers everything
+                if (pageId === 'page-login') {
+                    el.classList.add('active');
+                    el.style.zIndex = 1000;
+                    $('#tabbar').classList.remove('show');
+                } else {
+                    el.classList.add('sub-page');
+                    el.classList.add('active');
+                    el.style.zIndex = 20 + index;
+                }
+            }
+        });
+        
+        // 4. Lifecycle Hooks
+        const activePageId = this.stack.length > 0 ? this.stack[this.stack.length - 1] : this.currentTab;
+        if (activePageId) {
+             if (activePageId === 'page-dashboard') renderDashboard();
+             if (activePageId === 'page-order-list') renderOrderList();
+             if (activePageId === 'page-order-detail') renderOrderDetail(params ? params.id : null);
+             if (activePageId === 'page-venue-list') renderVenueList();
+             if (activePageId === 'page-venue-edit') renderVenueEdit(params);
+             if (activePageId === 'page-timeslot') initTimeslotPage();
+             if (activePageId === 'page-verification') renderVerifyHistory();
+        }
+    }
+};
+
+// Init Mock Data
+function initData() {
+    const today = new Date();
+    const statuses = ['PENDING', 'PAID', 'VERIFIED', 'COMPLETED', 'CANCELLED', 'SHARING_SUCCESS'];
+    
+    for (let i = 0; i < 25; i++) {
+        const isSharing = Math.random() > 0.7;
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const venue = store.venues[Math.floor(Math.random() * store.venues.length)];
+        const orderId = 'ORD' + Date.now().toString().slice(-6) + i;
+        
+        store.orders.push({
+            id: orderId,
+            verifyCode: status === 'PENDING' || status === 'CANCELLED' ? null : orderId,
+            venueId: venue.id,
+            venueName: venue.name,
+            date: formatDate(today),
+            startTime: '14:00',
+            endTime: '15:00',
+            price: venue.price,
+            status: status, // PENDING, PAID, VERIFIED, COMPLETED, CANCELLED, SHARING_SUCCESS
+            type: isSharing ? 'SHARED' : 'EXCLUSIVE',
+            userPhone: '138' + Math.floor(Math.random()*100000000),
+            userName: '用户' + (i+1),
+            createTime: new Date(today.getTime() - Math.random() * 86400000).toLocaleString(),
+            // Sharing info
+            sharingInfo: isSharing ? {
+                teamName: '快乐篮球小队',
+                slogan: '缺2人，速来',
+                currentPeople: 2,
+                totalPeople: 4,
+                pricePerPerson: venue.price / 4,
+                participants: [
+                    { name: '队长A', phone: '138****0001', status: 'VERIFIED', code: orderId + '_1' },
+                    { name: '队员B', phone: '138****0002', status: 'PAID', code: orderId + '_2' }
+                ]
+            } : null
+        });
+    }
+    
+    // Sort orders by create time desc
+    store.orders.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
+}
+
+// Logic: Login
+function handleLogin() {
+    const user = $('#login-username').value;
+    const pass = $('#login-password').value;
+    if (user === 'admin' && pass === '123456') {
+        store.user.token = 'mock-token';
+        Toast.show('登录成功');
+        router.switchTab('page-dashboard');
+    } else {
+        Toast.show('账号或密码错误');
+    }
+}
+
+function handleLogout() {
+    Modal.show('确认', '确定要退出登录吗？', () => {
+        store.user.token = null;
+        router.currentTab = null;
+        router.stack = ['page-login'];
+        router.updateView();
+    });
+}
+
+// Logic: Dashboard
+function renderDashboard() {
+    // 1. Get current date range based on filter
+    const range = getDashDateRange();
+    $('#current-date-range').textContent = `${formatDate(range.start)} ~ ${formatDate(range.end)}`;
+
+    // 2. Filter orders by date
+    const filteredOrders = store.orders.filter(o => {
+        const d = new Date(o.createTime); // Use createTime for stats
+        return d >= range.start && d <= range.end;
+    });
+
+    // 3. Calc stats
+    const stats = {
+        total: filteredOrders.length,
+        income: filteredOrders.filter(o => o.status === 'COMPLETED').reduce((acc, cur) => acc + cur.price, 0),
+        wait: filteredOrders.filter(o => ['PAID', 'SHARING_SUCCESS'].includes(o.status)).length,
+        verified: filteredOrders.filter(o => o.status === 'VERIFIED').length,
+        refund: filteredOrders.filter(o => ['CANCELLED', 'EXPIRED'].includes(o.status)).length
+    };
+    
+    // Avg Price
+    const validOrdersCount = filteredOrders.filter(o => ['PAID', 'VERIFIED', 'COMPLETED', 'SHARING_SUCCESS'].includes(o.status)).length;
+    const avgPrice = validOrdersCount > 0 ? Math.round(stats.income / validOrdersCount) : 0;
+
+    $('#stat-orders').textContent = stats.total;
+    $('#stat-income').textContent = '¥' + stats.income;
+    $('#stat-verify-wait').textContent = stats.wait;
+    $('#stat-verify-done').textContent = stats.verified;
+    $('#stat-refund').textContent = stats.refund;
+    $('#stat-avg-price').textContent = '¥' + avgPrice;
+}
+
+let dashTimeType = 'today';
+function switchDashTime(el, type) {
+    if (type === 'custom') {
+        Toast.show('自定义时间范围功能开发中');
+        return;
+    }
+    
+    $$('.filter-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    dashTimeType = type;
+    renderDashboard();
+}
+
+function getDashDateRange() {
+    const now = new Date();
+    const start = new Date(now);
+    const end = new Date(now);
+    
+    start.setHours(0,0,0,0);
+    end.setHours(23,59,59,999);
+    
+    if (dashTimeType === 'week') {
+        const day = start.getDay() || 7; // 1-7
+        start.setDate(start.getDate() - day + 1);
+        end.setDate(start.getDate() + 6);
+    } else if (dashTimeType === 'month') {
+        start.setDate(1);
+        end.setMonth(end.getMonth() + 1);
+        end.setDate(0);
+    }
+    
+    return { start, end };
+}
+
+function quickVerify() {
+    const code = $('#dash-verify-code').value.trim();
+    if (!code) return Toast.show('请输入核销码');
+    handleVerifyLogic(code);
+}
+
+function verifyCenterCheck() {
+    const code = $('#verify-center-input').value.trim();
+    if (!code) return Toast.show('请输入核销码');
+    handleVerifyLogic(code);
+}
+
+function handleVerifyLogic(code) {
+    // Search in orders
+    let targetOrder = null;
+    let participant = null;
+    
+    // 1. Check main order codes
+    targetOrder = store.orders.find(o => o.verifyCode === code);
+    
+    // 2. Check participant codes
+    if (!targetOrder) {
+        for (const ord of store.orders) {
+            if (ord.type === 'SHARED' && ord.sharingInfo) {
+                const p = ord.sharingInfo.participants.find(p => p.code === code);
+                if (p) {
+                    targetOrder = ord;
+                    participant = p;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!targetOrder) {
+        return Toast.show('核销码无效或不存在');
+    }
+    
+    // Show Modal details
+    const content = `
+        订单号: ${targetOrder.id}
+        场馆: ${targetOrder.venueName}
+        时间: ${targetOrder.date} ${targetOrder.startTime}-${targetOrder.endTime}
+        用户: ${participant ? participant.name : targetOrder.userName}
+        状态: ${participant ? participant.status : targetOrder.status}
+    `;
+    
+    Modal.show('核销确认', content, () => {
+        // Execute Verify
+        let success = false;
+        if (participant) {
+            if (participant.status === 'PAID') {
+                participant.status = 'VERIFIED';
+                success = true;
+            } else {
+                Toast.show('该成员已核销或状态不可核销');
+            }
+        } else {
+            if (['PAID', 'SHARING_SUCCESS'].includes(targetOrder.status)) {
+                targetOrder.status = 'VERIFIED';
+                success = true;
+            } else {
+                Toast.show('订单状态不可核销: ' + targetOrder.status);
+            }
+        }
+        
+        if (success) {
+            Toast.show('核销成功');
+            // Add to history
+            store.verifyHistory.unshift({
+                code: code,
+                time: new Date().toLocaleTimeString(),
+                desc: `${targetOrder.venueName} - ${targetOrder.userName}`
+            });
+            if(store.verifyHistory.length > 5) store.verifyHistory.pop();
+            
+            // Refresh views
+            if ($('#page-dashboard').classList.contains('active')) renderDashboard();
+            if ($('#page-verification').classList.contains('active')) renderVerifyHistory();
+        }
+    });
+}
+
+function renderVerifyHistory() {
+    const container = $('#verify-history-list');
+    if (store.verifyHistory.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">暂无记录</div>';
+        return;
+    }
+    container.innerHTML = store.verifyHistory.map(h => `
+        <div class="list-item" style="padding: 12px 16px;">
+            <div>
+                <div style="font-weight: 500;">${h.code}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">${h.desc}</div>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary);">${h.time}</div>
+        </div>
+    `).join('');
+}
+
+// Logic: Order List
+let currentOrderFilter = 'ALL';
+function renderOrderList() {
+    const container = $('#order-list-container');
+    const search = $('#order-search-input').value.toLowerCase();
+    
+    // Filter Bar
+    const filters = [
+        { key: 'ALL', label: '全部' },
+        { key: 'PAID', label: '待核销' },
+        { key: 'VERIFIED', label: '已核销' },
+        { key: 'SHARED', label: '拼场' },
+        { key: 'CANCELLED', label: '退款/取消' }
+    ];
+    
+    $('#order-filter-bar').innerHTML = filters.map(f => `
+        <div class="filter-item ${currentOrderFilter === f.key ? 'active' : ''}" 
+             onclick="currentOrderFilter = '${f.key}'; renderOrderList()">
+            ${f.label}
+        </div>
+    `).join('');
+    
+    // Filter Data
+    const list = store.orders.filter(o => {
+        let match = true;
+        if (currentOrderFilter === 'SHARED') match = o.type === 'SHARED';
+        else if (currentOrderFilter !== 'ALL') match = o.status === currentOrderFilter;
+        
+        if (search) match = match && (o.id.toLowerCase().includes(search) || o.userPhone.includes(search));
+        return match;
+    });
+    
+    container.innerHTML = list.map(o => `
+        <div class="booking-card" onclick="router.push('page-order-detail', {id: '${o.id}'})">
+            <!-- Header: Venue Name & Status -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f5f5f5;">
+                <div style="font-size: 16px; font-weight: 600; color: #333;">${o.venueName}</div>
+                <div class="status-badge-inline ${getStatusClass(o.status)}">
+                    ${getStatusText(o.status)}
+                </div>
+            </div>
+            
+            <!-- Booking Info -->
+            <div class="booking-info">
+                <div class="info-row">
+                    <span class="info-label">订单号</span>
+                    <span class="info-value">${o.id}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">预约时间</span>
+                    <span class="info-value" style="color: var(--primary); font-weight: bold;">
+                        ${o.date} ${o.startTime}-${o.endTime}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">预约类型</span>
+                    <span class="booking-type ${o.type === 'SHARED' ? 'booking-type-shared' : 'booking-type-exclusive'}">
+                        ${o.type === 'SHARED' ? '拼场' : '包场'}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">用户</span>
+                    <span class="info-value">${o.userName} (${o.userPhone.slice(-4)})</span>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="card-footer" style="margin-top: 8px; padding-top: 8px; border: none;">
+                <div style="display: flex; align-items: center;">
+                    <span class="price-label">实付:</span>
+                    <span class="price-value">¥${o.price}</span>
+                </div>
+                <div style="font-size: 12px; color: #999;">${o.createTime.split(' ')[0]}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getStatusClass(status) {
+    const map = {
+        'PENDING': 'status-pending',
+        'PAID': 'status-paid',
+        'VERIFIED': 'status-verified',
+        'COMPLETED': 'status-completed',
+        'CANCELLED': 'status-cancelled',
+        'SHARING_SUCCESS': 'status-sharing_success'
+    };
+    return map[status] || '';
+}
+
+function getStatusColor(status) {
+    if (['PAID', 'SHARING_SUCCESS'].includes(status)) return 'tag-warning';
+    if (status === 'VERIFIED') return 'tag-success';
+    if (status === 'COMPLETED') return 'tag-info';
+    if (status === 'CANCELLED') return 'tag-danger';
+    return 'tag-info';
+}
+
+function getStatusText(status) {
+    const map = {
+        'PENDING': '待支付', 'PAID': '待核销', 'SHARING_SUCCESS': '拼场成功(待核销)',
+        'VERIFIED': '已核销', 'COMPLETED': '已完成', 'CANCELLED': '已退款/取消', 'EXPIRED': '已过期'
+    };
+    return map[status] || status;
+}
+
+// Logic: Order Detail
+function renderOrderDetail(id) {
+    const order = store.orders.find(o => o.id === id);
+    if (!order) return;
+    
+    const container = $('#order-detail-container');
+    
+    let participantsHtml = '';
+    if (order.type === 'SHARED' && order.sharingInfo) {
+        participantsHtml = `
+            <div class="card">
+                <div class="card-header"><div class="card-title">拼场成员</div></div>
+                ${order.sharingInfo.participants.map(p => `
+                    <div class="list-item">
+                        <div>${p.name} <span style="font-size:12px;color:#999">${p.phone}</span></div>
+                        <div class="tag ${p.status==='VERIFIED'?'tag-success':'tag-warning'}">${p.status}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    container.innerHTML = `
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">订单信息</div>
+                <div class="tag ${getStatusColor(order.status)}">${getStatusText(order.status)}</div>
+            </div>
+            <div class="list-item"><span class="item-label">订单号</span><span class="item-value">${order.id}</span></div>
+            <div class="list-item"><span class="item-label">预约人</span><span class="item-value">${order.userName} (${order.userPhone})</span></div>
+            <div class="list-item"><span class="item-label">场馆</span><span class="item-value">${order.venueName}</span></div>
+            <div class="list-item"><span class="item-label">时间</span><span class="item-value">${order.date} ${order.startTime}-${order.endTime}</span></div>
+            <div class="list-item"><span class="item-label">金额</span><span class="item-value">¥${order.price}</span></div>
+            <div class="list-item"><span class="item-label">下单时间</span><span class="item-value">${order.createTime}</span></div>
+        </div>
+        ${participantsHtml}
+    `;
+    
+    // Actions
+    const actions = $('#order-detail-actions');
+    let btns = '';
+    
+    if (['PAID', 'SHARING_SUCCESS'].includes(order.status)) {
+        btns += `<button class="btn btn-primary" style="flex:1" onclick="handleVerifyLogic('${order.verifyCode}')">核销</button>`;
+        btns += `<button class="btn btn-danger" style="flex:1" onclick="cancelOrder('${order.id}')">取消/退款</button>`;
+    } else if (order.status === 'VERIFIED') {
+        btns += `<button class="btn btn-success" style="flex:1" onclick="completeOrder('${order.id}')">完成订单</button>`;
+    }
+    
+    actions.innerHTML = btns || '<div style="width:100%;text-align:center;color:#999">当前状态不可操作</div>';
+}
+
+function cancelOrder(id) {
+    Modal.show('确认取消', '确定要取消此订单并退款吗？', () => {
+        const order = store.orders.find(o => o.id === id);
+        order.status = 'CANCELLED';
+        Toast.show('订单已取消并退款');
+        router.back();
+    });
+}
+
+function completeOrder(id) {
+    const order = store.orders.find(o => o.id === id);
+    order.status = 'COMPLETED';
+    Toast.show('订单已完成');
+    router.back();
+}
+
+// Logic: Venue List
+function renderVenueList() {
+    const container = $('#venue-list-container');
+    container.innerHTML = store.venues.map(v => `
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">${v.name}</div>
+                <div class="tag ${v.status === 'OPEN' ? 'tag-success' : 'tag-danger'}">${v.status === 'OPEN' ? '营业中' : '休息中'}</div>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                ${v.type} | ¥${v.price}/小时 | ${v.openTime}-${v.closeTime}
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-sm ${v.status==='OPEN'?'btn-danger':'btn-success'}" onclick="toggleVenueStatus(${v.id})">
+                    ${v.status==='OPEN'?'下架':'上架'}
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="router.push('page-venue-edit', {id: ${v.id}, mode: 'edit'})">编辑</button>
+                <button class="btn btn-sm" onclick="router.push('page-timeslot', {venueId: ${v.id}})">排期</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleVenueStatus(id) {
+    const v = store.venues.find(v => v.id === id);
+    v.status = v.status === 'OPEN' ? 'MAINTENANCE' : 'OPEN';
+    renderVenueList();
+    Toast.show('状态已更新');
+}
+
+// Logic: Venue Edit
+function renderVenueEdit(params) {
+    const isEdit = params.mode === 'edit';
+    $('#venue-edit-title').textContent = isEdit ? '编辑场馆' : '新增场馆';
+    $('#btn-delete-venue').style.display = isEdit ? 'block' : 'none';
+    
+    if (isEdit) {
+        const v = store.venues.find(v => v.id === params.id);
+        $('#venue-name').value = v.name;
+        $('#venue-type').value = v.type;
+        $('#venue-price').value = v.price;
+        $('#venue-open').value = v.openTime;
+        $('#venue-close').value = v.closeTime;
+        $('#venue-phone').value = v.contactPhone;
+        $('#venue-tags').value = v.facilityTags.join(',');
+        $('#venue-sharing').checked = v.supportSharing;
+        $('#venue-auto-days').value = v.autoGenerateDays;
+        
+        // New fields
+        $('#venue-image').value = v.coverImage || '';
+        $('#venue-location').value = v.location || '';
+        $('#venue-desc').value = v.description || '';
+        
+        // Store current editing id
+        $('#page-venue-edit').dataset.id = v.id;
+    } else {
+        // Reset form
+        $$('#page-venue-edit input').forEach(i => {
+            if(i.type !== 'checkbox' && i.type !== 'submit') i.value = '';
+        });
+        $('#venue-desc').value = ''; // Reset textarea
+        $('#venue-open').value = '09:00';
+        $('#venue-close').value = '22:00';
+        $('#page-venue-edit').dataset.id = '';
+    }
+}
+
+function saveVenue() {
+    const id = $('#page-venue-edit').dataset.id;
+    const data = {
+        name: $('#venue-name').value,
+        type: $('#venue-type').value,
+        price: Number($('#venue-price').value),
+        openTime: $('#venue-open').value,
+        closeTime: $('#venue-close').value,
+        contactPhone: $('#venue-phone').value,
+        facilityTags: $('#venue-tags').value.split(',').filter(t=>t),
+        supportSharing: $('#venue-sharing').checked,
+        autoGenerateDays: Number($('#venue-auto-days').value),
+        
+        // New fields
+        coverImage: $('#venue-image').value,
+        location: $('#venue-location').value,
+        description: $('#venue-desc').value,
+        
+        status: 'OPEN'
+    };
+    
+    if (id) {
+        const idx = store.venues.findIndex(v => v.id == id);
+        store.venues[idx] = { ...store.venues[idx], ...data };
+        Toast.show('更新成功');
+    } else {
+        data.id = store.venues.length + 1;
+        store.venues.push(data);
+        Toast.show('创建成功');
+    }
+    router.back();
+}
+
+function deleteVenue() {
+    const id = $('#page-venue-edit').dataset.id;
+    Modal.show('确认删除', '确定要删除该场馆吗？', () => {
+        store.venues = store.venues.filter(v => v.id != id);
+        Toast.show('删除成功');
+        router.back();
+    });
+}
+
+function uploadImageMock() {
+    Toast.show('模拟上传图片...');
+    setTimeout(() => {
+        $('#venue-image').value = 'https://via.placeholder.com/300x200?text=Venue+Image';
+        Toast.show('上传成功');
+    }, 1000);
+}
+
+// Logic: Timeslots
+function initTimeslotPage() {
+    const select = $('#ts-venue-select');
+    select.innerHTML = store.venues.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+    $('#ts-date-select').value = formatDate(new Date());
+    renderTimeslots();
+}
+
+function renderTimeslots() {
+    const venueId = $('#ts-venue-select').value;
+    const date = $('#ts-date-select').value;
+    const container = $('#timeslot-container');
+    
+    if (!venueId || !date) return;
+    
+    // Mock generate timeslots if not exist
+    const key = `${venueId}_${date}`;
+    if (!store.timeslots[key]) {
+        const slots = [];
+        const venue = store.venues.find(v => v.id == venueId);
+        let start = parseInt(venue.openTime);
+        let end = parseInt(venue.closeTime);
+        
+        for (let i = start; i < end; i++) {
+            // Check real orders to set status
+            const timeStr = `${String(i).padStart(2,'0')}:00`;
+            const hasOrder = store.orders.some(o => 
+                o.venueId == venueId && o.date === date && o.startTime === timeStr && 
+                ['PAID', 'VERIFIED', 'COMPLETED', 'SHARING_SUCCESS'].includes(o.status)
+            );
+            
+            slots.push({
+                time: `${timeStr}-${String(i+1).padStart(2,'0')}:00`,
+                status: hasOrder ? 'BOOKED' : 'AVAILABLE'
+            });
+        }
+        store.timeslots[key] = slots;
+    }
+    
+    const slots = store.timeslots[key];
+    container.innerHTML = slots.map((s, idx) => `
+        <div class="timeslot-item ${s.status.toLowerCase()}" onclick="toggleSlotStatus('${key}', ${idx})">
+            ${s.time}<br>
+            ${s.status === 'AVAILABLE' ? '可用' : (s.status === 'BOOKED' ? '已占' : '维护')}
+        </div>
+    `).join('');
+}
+
+function toggleSlotStatus(key, idx) {
+    const slot = store.timeslots[key][idx];
+    if (slot.status === 'BOOKED') {
+        Toast.show('该时段已有订单，不可操作');
+        return;
+    }
+    
+    if (slot.status === 'AVAILABLE') {
+        // Lock
+        Modal.show('确认锁场', '将该时段设为维护中？', () => {
+            slot.status = 'MAINTENANCE';
+            renderTimeslots();
+        });
+    } else if (slot.status === 'MAINTENANCE') {
+        // Unlock
+        slot.status = 'AVAILABLE';
+        renderTimeslots();
+        Toast.show('已解锁');
+    }
+}
+
+// Logic: Security
+function updatePassword() {
+    const old = $('#sec-old-pass').value;
+    const newP = $('#sec-new-pass').value;
+    const confirm = $('#sec-confirm-pass').value;
+    
+    if (old !== '123456') return Toast.show('旧密码错误');
+    if (newP.length < 6) return Toast.show('新密码至少6位');
+    if (newP !== confirm) return Toast.show('两次密码输入不一致');
+    
+    Toast.show('密码修改成功，请重新登录');
+    setTimeout(() => {
+        router.stack = ['page-login'];
+        router.updateView('page-login');
+        // Reset inputs
+        $('#sec-old-pass').value = '';
+        $('#sec-new-pass').value = '';
+        $('#sec-confirm-pass').value = '';
+    }, 1500);
+}
+
+// Init App
+initData();
+
+</script>
+</body>
+</html>
