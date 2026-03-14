@@ -1,13 +1,22 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+let loadingCount = 0;
 function showLoading(title = "加载中...") {
-  common_vendor.index.showLoading({
-    title,
-    mask: true
-  });
+  loadingCount += 1;
+  if (loadingCount === 1) {
+    common_vendor.index.showLoading({
+      title,
+      mask: true
+    });
+  }
 }
 function hideLoading() {
-  common_vendor.index.hideLoading();
+  if (loadingCount <= 0)
+    return;
+  loadingCount -= 1;
+  if (loadingCount === 0) {
+    common_vendor.index.hideLoading();
+  }
 }
 function showToast(options) {
   if (typeof options === "string") {

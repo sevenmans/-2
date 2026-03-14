@@ -14,3 +14,13 @@ export function completeOrder(orderId) {
 export function getVerificationStatus(orderId) {
   return get(`/verification/orders/${orderId}/status`)
 }
+
+// 按核销码查询订单（支持 ORD / REQ_）
+export function getOrderByVerifyCode(code) {
+  return get(`/verification/code/${encodeURIComponent(code)}`)
+}
+
+// 按核销码直接核销
+export function verifyByCode(code) {
+  return post('/verification/code/verify', { code })
+}

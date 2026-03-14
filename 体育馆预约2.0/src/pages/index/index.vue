@@ -68,7 +68,7 @@
           v-for="venue in safePopularVenues" 
           :key="venue.id" 
           class="venue-card"
-          @click="navigateTo(`/pages/venue/detail?id=${venue.id}`)"
+          @click="handleVenueClick(venue)"
         >
           <image 
             :src="(venue.images && venue.images[0]) || '/static/default-venue.jpg'" 
@@ -361,6 +361,17 @@ export default {
     navigateTo(url) {
       smartNavigate(url)
     },
+    handleVenueClick(venue) {
+      const status = String(venue?.status || '').toUpperCase()
+      if (status === 'CLOSED') {
+        uni.showToast({
+          title: '该球场已下架',
+          icon: 'none'
+        })
+        return
+      }
+      smartNavigate(`/pages/venue/detail?id=${venue.id}`)
+    },
     
     // 格式化日期
     formatDate(date) {
@@ -369,22 +380,28 @@ export default {
     
     // 获取状态样式类
     getStatusClass(status) {
+      const normalized = String(status || '').toUpperCase()
       const statusMap = {
+        'OPEN': 'status-available',
         'AVAILABLE': 'status-available',
+        'CLOSED': 'status-occupied',
         'MAINTENANCE': 'status-maintenance',
         'OCCUPIED': 'status-occupied'
       }
-      return statusMap[status] || 'status-available'
+      return statusMap[normalized] || 'status-available'
     },
     
     // 获取状态文本
     getStatusText(status) {
+      const normalized = String(status || '').toUpperCase()
       const statusMap = {
-        'AVAILABLE': '可用',
+        'OPEN': '可预约',
+        'AVAILABLE': '可预约',
+        'CLOSED': '不可用',
         'MAINTENANCE': '维护中',
         'OCCUPIED': '已占用'
       }
-      return statusMap[status] || '可用'
+      return statusMap[normalized] || '可预约'
     }
   }
 }

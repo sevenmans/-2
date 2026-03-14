@@ -223,6 +223,14 @@ function put(url, data = {}, options = {}) {
     ...options
   });
 }
+function del(url, params = {}, options = {}) {
+  return request({
+    url,
+    method: "DELETE",
+    data: params,
+    ...options
+  });
+}
 function patch(url, data = {}, options = {}) {
   return request({
     url,
@@ -305,6 +313,7 @@ exports.smartCache = utils_requestOptimizer.smartCache;
 exports.cacheManager = cacheManager;
 exports.clearCache = clearCache;
 exports.default = request;
+exports.del = del;
 exports.get = get;
 exports.patch = patch;
 exports.post = post;

@@ -263,6 +263,69 @@
 		},
 
 		{
+			"path": "pages/admin/dashboard",
+			"style": {
+				"navigationBarTitleText": "管理员工作台",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/orders/list",
+			"style": {
+				"navigationBarTitleText": "订单管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/orders/detail",
+			"style": {
+				"navigationBarTitleText": "订单详情",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/verification/index",
+			"style": {
+				"navigationBarTitleText": "核销中心",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/venues/list",
+			"style": {
+				"navigationBarTitleText": "场馆管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/venues/create",
+			"style": {
+				"navigationBarTitleText": "新增场馆",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/venues/edit",
+			"style": {
+				"navigationBarTitleText": "编辑场馆",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/timeslots/index",
+			"style": {
+				"navigationBarTitleText": "排期管理",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/admin/security/password",
+			"style": {
+				"navigationBarTitleText": "账号与安全",
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/payment/index",
 			"style": {
 				"navigationBarTitleText": "订单支付"

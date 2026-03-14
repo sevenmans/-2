@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "编辑场馆",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/NavBar"
+  }
+}

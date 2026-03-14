@@ -76,6 +76,7 @@
 
 <script>
 import { useUserStore } from '@/stores/user.js'
+import { isAdmin } from '@/utils/router-guard.js'
 
 export default {
   name: 'UserLogin',
@@ -87,8 +88,8 @@ export default {
       showAccountLogin: false,
 
       formData: {
-        phone: '13402838501',  // 默认手机号
-        password: 'yangyu123..'  // 默认密码
+        phone: '13402838501',
+        password: 'yangyu123..'
       }
     }
   },
@@ -182,18 +183,19 @@ export default {
       }
     },
     
-    // 处理登录成功
     handleLoginSuccess() {
-      
-      // 清除路由守卫缓存，确保登录状态更新
       this.userStore.setLoginStatus(true)
+      
+      // 管理员角色分流：直接进入管理员工作台
+      const userInfo = this.userStore.userInfo
+      if (isAdmin(userInfo)) {
+        uni.reLaunch({ url: '/pages/admin/dashboard' })
+        return
+      }
       
       if (this.redirectUrl) {
         try {
-          // 解码重定向URL
           const decodedUrl = decodeURIComponent(this.redirectUrl)
-          
-          // 检查是否是tabBar页面
           const tabBarPages = [
             '/pages/index/index',
             '/pages/venue/list', 
@@ -208,34 +210,25 @@ export default {
           if (isTabBarPage) {
             uni.switchTab({
               url: pagePath,
-              fail: (err) => {
-                console.error('[Login] switchTab失败:', err)
-                // 失败时跳转到首页
+              fail: () => {
                 uni.switchTab({ url: '/pages/index/index' })
               }
             })
           } else {
             uni.redirectTo({
               url: decodedUrl,
-              fail: (err) => {
-                console.error('[Login] redirectTo失败:', err)
-                // 失败时跳转到首页
+              fail: () => {
                 uni.switchTab({ url: '/pages/index/index' })
               }
             })
           }
         } catch (error) {
-          console.error('[Login] 处理重定向URL失败:', error)
-          // 出错时跳转到首页
           uni.switchTab({ url: '/pages/index/index' })
         }
       } else {
-        // 没有重定向页面，跳转到首页
         uni.switchTab({
           url: '/pages/index/index',
-          fail: (err) => {
-            console.error('[Login] 跳转首页失败:', err)
-          }
+          fail: () => {}
         })
       }
     },

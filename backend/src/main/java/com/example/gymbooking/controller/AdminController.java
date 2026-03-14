@@ -1,8 +1,13 @@
 package com.example.gymbooking.controller;
 
+import com.example.gymbooking.model.Order;
 import com.example.gymbooking.model.Role;
 import com.example.gymbooking.model.User;
+import com.example.gymbooking.model.Venue;
+import com.example.gymbooking.repository.OrderRepository;
 import com.example.gymbooking.repository.UserRepository;
+import com.example.gymbooking.repository.VenueRepository;
+import com.example.gymbooking.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,8 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,13 +33,149 @@ public class AdminController {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VenueRepository venueRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    /**
+     * 管理员工作台统计
+     */
+    @GetMapping("/dashboard/stats")
+    @PreAuthorize("hasRole('ROLE_VENUE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<Map<String, Object>> getDashboardStats(
+            @RequestParam(defaultValue = "today") String timeRange,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !(authentication.getPrincipal() instanceof UserDetailsImpl)) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "未获取到有效登录信息");
+                return ResponseEntity.status(401).body(errorResponse);
+            }
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<Long> venueIds = venueRepository.findByManagerId(userDetails.getId()).stream()
+                    .map(Venue::getId)
+                    .collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("timeRange", timeRange);
+
+            if (venueIds.isEmpty()) {
+                response.put("venueCount", 0);
+                response.put("totalOrders", 0);
+                response.put("pendingVerificationCount", 0);
+                response.put("verifiedCount", 0);
+                response.put("revenue", 0.0);
+                response.put("rangeStart", null);
+                response.put("rangeEnd", null);
+                return ResponseEntity.ok(response);
+            }
+
+            LocalDateTime[] dateRange = resolveDateRange(timeRange, startDate, endDate);
+            LocalDateTime rangeStart = dateRange[0];
+            LocalDateTime rangeEnd = dateRange[1];
+
+            long totalOrders = orderRepository.countByVenueIdInAndBookingTimeBetween(venueIds, rangeStart, rangeEnd);
+            long pendingVerificationCount = orderRepository.countByVenueIdInAndStatusInAndBookingTimeBetween(
+                    venueIds,
+                    Arrays.asList(
+                            Order.OrderStatus.PAID,
+                            Order.OrderStatus.CONFIRMED,
+                            Order.OrderStatus.SHARING_SUCCESS
+                    ),
+                    rangeStart,
+                    rangeEnd
+            );
+            long verifiedCount = orderRepository.countByVenueIdInAndStatusInAndBookingTimeBetween(
+                    venueIds,
+                    Arrays.asList(
+                            Order.OrderStatus.VERIFIED,
+                            Order.OrderStatus.COMPLETED
+                    ),
+                    rangeStart,
+                    rangeEnd
+            );
+            Double revenue = orderRepository.sumTotalPriceByVenueIdInAndStatusInAndBookingTimeBetween(
+                    venueIds,
+                    Collections.singletonList(Order.OrderStatus.COMPLETED),
+                    rangeStart,
+                    rangeEnd
+            );
+
+            response.put("venueCount", venueIds.size());
+            response.put("totalOrders", totalOrders);
+            response.put("pendingVerificationCount", pendingVerificationCount);
+            response.put("verifiedCount", verifiedCount);
+            response.put("revenue", revenue == null ? 0.0 : revenue);
+            response.put("rangeStart", rangeStart);
+            response.put("rangeEnd", rangeEnd);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "获取工作台统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    private LocalDateTime[] resolveDateRange(String timeRange, String startDate, String endDate) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime rangeStart;
+        LocalDateTime rangeEnd;
+
+        switch (timeRange == null ? "today" : timeRange.toLowerCase()) {
+            case "today":
+                rangeStart = today.atStartOfDay();
+                rangeEnd = LocalDateTime.of(today, LocalTime.MAX);
+                break;
+            case "week":
+                LocalDate weekStart = today.with(java.time.DayOfWeek.MONDAY);
+                LocalDate weekEnd = today.with(java.time.DayOfWeek.SUNDAY);
+                rangeStart = weekStart.atStartOfDay();
+                rangeEnd = LocalDateTime.of(weekEnd, LocalTime.MAX);
+                break;
+            case "month":
+                LocalDate monthStart = today.with(TemporalAdjusters.firstDayOfMonth());
+                LocalDate monthEnd = today.with(TemporalAdjusters.lastDayOfMonth());
+                rangeStart = monthStart.atStartOfDay();
+                rangeEnd = LocalDateTime.of(monthEnd, LocalTime.MAX);
+                break;
+            case "custom":
+                if (startDate == null || endDate == null) {
+                    throw new IllegalArgumentException("自定义时间范围必须提供 startDate 和 endDate");
+                }
+                LocalDate customStart = LocalDate.parse(startDate);
+                LocalDate customEnd = LocalDate.parse(endDate);
+                if (customEnd.isBefore(customStart)) {
+                    throw new IllegalArgumentException("endDate 不能早于 startDate");
+                }
+                rangeStart = customStart.atStartOfDay();
+                rangeEnd = LocalDateTime.of(customEnd, LocalTime.MAX);
+                break;
+            default:
+                throw new IllegalArgumentException("不支持的 timeRange: " + timeRange);
+        }
+        return new LocalDateTime[]{rangeStart, rangeEnd};
+    }
     
     /**
      * 获取所有用户（分页）
      * 仅限超级管理员访问
      */
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, Object>> getAllUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -80,7 +227,7 @@ public class AdminController {
      * 仅限超级管理员访问
      */
     @GetMapping("/users/{userId}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, Object>> getUserDetails(@PathVariable Long userId) {
         try {
             Optional<User> userOpt = userRepository.findById(userId);
@@ -118,7 +265,7 @@ public class AdminController {
      * 仅限超级管理员访问
      */
     @PutMapping("/users/{userId}/roles")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, Object>> updateUserRoles(
             @PathVariable Long userId, 
             @RequestBody Map<String, Object> updateData) {
@@ -136,6 +283,7 @@ public class AdminController {
             
             // 更新角色
             if (updateData.containsKey("roles")) {
+                @SuppressWarnings("unchecked")
                 List<String> roleNames = (List<String>) updateData.get("roles");
                 Set<Role> roles = new HashSet<>();
                 
@@ -187,7 +335,7 @@ public class AdminController {
      * 仅限超级管理员访问
      */
     @DeleteMapping("/users/{userId}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, Object>> deactivateUser(@PathVariable Long userId) {
         try {
             Optional<User> userOpt = userRepository.findById(userId);
@@ -221,7 +369,7 @@ public class AdminController {
      * 仅限超级管理员访问
      */
     @PutMapping("/users/{userId}/activate")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, Object>> activateUser(@PathVariable Long userId) {
         try {
             Optional<User> userOpt = userRepository.findById(userId);

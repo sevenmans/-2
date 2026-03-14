@@ -1,7 +1,7 @@
 "use strict";
 const utils_request = require("../utils/request.js");
 function getVenueList(params) {
-  return utils_request.get("/venues", params);
+  return utils_request.get("/venues", params, { cache: false });
 }
 function getVenueDetail(id) {
   return utils_request.get(`/venues/${id}`);
@@ -13,7 +13,7 @@ function getVenueTypes() {
   return utils_request.get("/venues/types");
 }
 function getPopularVenues(limit = 5) {
-  return utils_request.get("/venues/popular", { limit });
+  return utils_request.get("/venues/popular", { limit }, { cache: false });
 }
 function searchVenues(params) {
   return utils_request.get("/venues/search", params);

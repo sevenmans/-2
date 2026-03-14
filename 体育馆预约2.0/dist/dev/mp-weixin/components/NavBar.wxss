@@ -1,0 +1,133 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.nav-bar.data-v-c3ceb15a {
+  width: 100%;
+  background-color: #ffffff;
+}
+.status-bar.data-v-c3ceb15a {
+  width: 100%;
+}
+.nav-content.data-v-c3ceb15a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30rpx;
+  position: relative;
+}
+.nav-left.data-v-c3ceb15a {
+  display: flex;
+  align-items: center;
+  min-width: 120rpx;
+}
+.nav-left .back-btn.data-v-c3ceb15a {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 0;
+}
+.nav-left .back-btn .back-icon.data-v-c3ceb15a {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-right: 8rpx;
+  line-height: 1;
+}
+.nav-left .back-btn .back-text.data-v-c3ceb15a {
+  font-size: 28rpx;
+  color: #333333;
+}
+.nav-center.data-v-c3ceb15a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 20rpx;
+}
+.nav-center .nav-title.data-v-c3ceb15a {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-right.data-v-c3ceb15a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 120rpx;
+}
+.nav-right .nav-right-text.data-v-c3ceb15a {
+  font-size: 28rpx;
+  color: #333333;
+}
+.nav-border.data-v-c3ceb15a {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1rpx;
+  background-color: #f0f0f0;
+}
+@media (prefers-color-scheme: dark) {
+.nav-bar.data-v-c3ceb15a {
+    background-color: #1f1f1f;
+}
+.nav-title.data-v-c3ceb15a,
+  .back-icon.data-v-c3ceb15a,
+  .back-text.data-v-c3ceb15a,
+  .nav-right-text.data-v-c3ceb15a {
+    color: #ffffff;
+}
+.nav-border.data-v-c3ceb15a {
+    background-color: #333333;
+}
+}
+.nav-bar.theme-primary.data-v-c3ceb15a {
+  background-color: #ff6b35;
+}
+.nav-bar.theme-primary .nav-title.data-v-c3ceb15a,
+.nav-bar.theme-primary .back-icon.data-v-c3ceb15a,
+.nav-bar.theme-primary .back-text.data-v-c3ceb15a,
+.nav-bar.theme-primary .nav-right-text.data-v-c3ceb15a {
+  color: #ffffff;
+}
+.nav-bar.theme-transparent.data-v-c3ceb15a {
+  background-color: transparent;
+}
+.nav-bar.theme-transparent .nav-border.data-v-c3ceb15a {
+  display: none;
+}
+.nav-bar.theme-gradient.data-v-c3ceb15a {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+}
+.nav-bar.theme-gradient .nav-title.data-v-c3ceb15a,
+.nav-bar.theme-gradient .back-icon.data-v-c3ceb15a,
+.nav-bar.theme-gradient .back-text.data-v-c3ceb15a,
+.nav-bar.theme-gradient .nav-right-text.data-v-c3ceb15a {
+  color: #ffffff;
+}

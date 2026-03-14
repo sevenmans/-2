@@ -2,7 +2,7 @@ import { get } from '@/utils/request.js'
 
 // 获取场馆列表
 export function getVenueList(params) {
-  return get('/venues', params)
+  return get('/venues', params, { cache: false })
 }
 
 // 获取场馆详情
@@ -22,7 +22,7 @@ export function getVenueTypes() {
 
 // 获取热门场馆
 export function getPopularVenues(limit = 5) {
-  return get('/venues/popular', { limit })
+  return get('/venues/popular', { limit }, { cache: false })
 }
 
 // 搜索场馆

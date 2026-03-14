@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
+const utils_routerGuard = require("../../utils/router-guard.js");
 const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   name: "UserLogin",
@@ -11,9 +12,7 @@ const _sfc_main = {
       showAccountLogin: false,
       formData: {
         phone: "13402838501",
-        // 默认手机号
         password: "yangyu123.."
-        // 默认密码
       }
     };
   },
@@ -66,7 +65,7 @@ const _sfc_main = {
           this.handleLoginSuccess();
         }, 1500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/login.vue:161", "登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/login.vue:162", "登录失败:", error);
         let errorMessage = "登录失败";
         if (error.message) {
           if (error.message.includes("用户名或密码错误") || error.message.includes("账号或密码错误")) {
@@ -88,9 +87,13 @@ const _sfc_main = {
         });
       }
     },
-    // 处理登录成功
     handleLoginSuccess() {
       this.userStore.setLoginStatus(true);
+      const userInfo = this.userStore.userInfo;
+      if (utils_routerGuard.isAdmin(userInfo)) {
+        common_vendor.index.reLaunch({ url: "/pages/admin/dashboard" });
+        return;
+      }
       if (this.redirectUrl) {
         try {
           const decodedUrl = decodeURIComponent(this.redirectUrl);
@@ -106,29 +109,25 @@ const _sfc_main = {
           if (isTabBarPage) {
             common_vendor.index.switchTab({
               url: pagePath,
-              fail: (err) => {
-                common_vendor.index.__f__("error", "at pages/user/login.vue:212", "[Login] switchTab失败:", err);
+              fail: () => {
                 common_vendor.index.switchTab({ url: "/pages/index/index" });
               }
             });
           } else {
             common_vendor.index.redirectTo({
               url: decodedUrl,
-              fail: (err) => {
-                common_vendor.index.__f__("error", "at pages/user/login.vue:221", "[Login] redirectTo失败:", err);
+              fail: () => {
                 common_vendor.index.switchTab({ url: "/pages/index/index" });
               }
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/user/login.vue:228", "[Login] 处理重定向URL失败:", error);
           common_vendor.index.switchTab({ url: "/pages/index/index" });
         }
       } else {
         common_vendor.index.switchTab({
           url: "/pages/index/index",
-          fail: (err) => {
-            common_vendor.index.__f__("error", "at pages/user/login.vue:237", "[Login] 跳转首页失败:", err);
+          fail: () => {
           }
         });
       }

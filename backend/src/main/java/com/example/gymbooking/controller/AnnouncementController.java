@@ -95,7 +95,7 @@ public class AnnouncementController {
      * 创建公告（仅超级管理员）
      */
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<?> createAnnouncement(@RequestBody Announcement announcement) {
         try {
             // 设置作者信息
@@ -126,7 +126,7 @@ public class AnnouncementController {
      * 更新公告（仅超级管理员）
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<?> updateAnnouncement(@PathVariable Long id, @RequestBody Announcement announcement) {
         Optional<Announcement> announcementData = announcementRepository.findById(id);
 
@@ -154,7 +154,7 @@ public class AnnouncementController {
      * 删除公告（仅超级管理员）
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<?> deleteAnnouncement(@PathVariable Long id) {
         try {
             announcementRepository.deleteById(id);
@@ -169,7 +169,7 @@ public class AnnouncementController {
      * 批量删除公告（仅超级管理员）
      */
     @DeleteMapping("/batch")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<?> deleteAnnouncementsBatch(@RequestBody List<Long> ids) {
         try {
             announcementRepository.deleteAllById(ids);
@@ -184,7 +184,7 @@ public class AnnouncementController {
      * 更新公告状态（仅超级管理员）
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<?> updateAnnouncementStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> statusUpdate) {

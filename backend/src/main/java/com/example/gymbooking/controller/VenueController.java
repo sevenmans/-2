@@ -1,14 +1,16 @@
 package com.example.gymbooking.controller;
 
 import com.example.gymbooking.model.Venue;
+import com.example.gymbooking.security.services.UserDetailsImpl;
 import com.example.gymbooking.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -245,8 +247,14 @@ public class VenueController {
      * 创建新场馆
      */
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Venue> createVenue(@RequestBody Venue venue) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+            if (venue.getManagerId() == null) {
+                venue.setManagerId(userDetails.getId());
+            }
+        }
         Venue newVenue = venueService.createVenue(venue);
         return ResponseEntity.status(HttpStatus.CREATED).body(newVenue);
     }
@@ -269,7 +277,7 @@ public class VenueController {
      * 删除场馆
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Void> deleteVenue(@PathVariable Long id) {
         try {
             venueService.deleteVenue(id);
@@ -304,12 +312,35 @@ public class VenueController {
         List<Venue> venues = venueService.getSharingVenues();
         return ResponseEntity.ok(venues);
     }
+
+    /**
+     * 获取当前登录管理员管理的场馆列表
+     */
+    @GetMapping("/manager/me")
+    @PreAuthorize("hasRole('ROLE_VENUE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<?> getMyManagedVenues() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetailsImpl)) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "未获取到有效登录信息");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        boolean isSuperAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_SUPER_ADMIN".equals(authority.getAuthority()));
+        if (isSuperAdmin) {
+            return ResponseEntity.ok(venueService.getAllVenues());
+        }
+        List<Venue> venues = venueService.getVenuesByManagerId(userDetails.getId());
+        return ResponseEntity.ok(venues);
+    }
     
     /**
      * 分配管理员到场馆
      */
     @PatchMapping("/{id}/manager")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Venue> assignManager(
             @PathVariable Long id,
             @RequestBody Map<String, Long> managerMap) {
@@ -337,7 +368,7 @@ public class VenueController {
      * 确保所有篮球和足球场都支持拼场
      */
     @PostMapping("/update-sharing-support")
-    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
     public ResponseEntity<Map<String, String>> updateSharingSupportForAllVenues() {
         try {
             venueService.updateSharingSupportForAllVenues();

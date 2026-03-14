@@ -176,7 +176,8 @@ export default {
       this.$emit('left-click')
       
       // 如果显示返回按钮且没有监听left-click事件，默认执行返回
-      if (this.showBack && !this.$listeners['left-click']) {
+      const hasLeftClickListener = !!(this.$attrs && (this.$attrs.onLeftClick || this.$attrs['onLeft-click']))
+      if (this.showBack && !hasLeftClickListener) {
         this.goBack()
       }
     },

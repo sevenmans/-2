@@ -1,14 +1,23 @@
+let loadingCount = 0
+
 // 显示加载提示
 export function showLoading(title = '加载中...') {
-  uni.showLoading({
-    title,
-    mask: true
-  })
+  loadingCount += 1
+  if (loadingCount === 1) {
+    uni.showLoading({
+      title,
+      mask: true
+    })
+  }
 }
 
 // 隐藏加载提示
 export function hideLoading() {
-  uni.hideLoading()
+  if (loadingCount <= 0) return
+  loadingCount -= 1
+  if (loadingCount === 0) {
+    uni.hideLoading()
+  }
 }
 
 // 显示消息提示

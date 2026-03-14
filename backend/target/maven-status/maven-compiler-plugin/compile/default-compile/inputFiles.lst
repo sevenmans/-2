@@ -4,6 +4,7 @@
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/config/SchedulingConfig.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/config/WebConfig.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/config/WebSocketConfig.java
+/Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AdminBookingController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AdminController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AnnouncementController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AuthController.java

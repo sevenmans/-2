@@ -177,27 +177,44 @@ const _sfc_main = {
     navigateTo(url) {
       utils_navigation.smartNavigate(url);
     },
+    handleVenueClick(venue) {
+      const status = String((venue == null ? void 0 : venue.status) || "").toUpperCase();
+      if (status === "CLOSED") {
+        common_vendor.index.showToast({
+          title: "该球场已下架",
+          icon: "none"
+        });
+        return;
+      }
+      utils_navigation.smartNavigate(`/pages/venue/detail?id=${venue.id}`);
+    },
     // 格式化日期
     formatDate(date) {
       return utils_helpers.formatDate(date, "MM-DD");
     },
     // 获取状态样式类
     getStatusClass(status) {
+      const normalized = String(status || "").toUpperCase();
       const statusMap = {
+        "OPEN": "status-available",
         "AVAILABLE": "status-available",
+        "CLOSED": "status-occupied",
         "MAINTENANCE": "status-maintenance",
         "OCCUPIED": "status-occupied"
       };
-      return statusMap[status] || "status-available";
+      return statusMap[normalized] || "status-available";
     },
     // 获取状态文本
     getStatusText(status) {
+      const normalized = String(status || "").toUpperCase();
       const statusMap = {
-        "AVAILABLE": "可用",
+        "OPEN": "可预约",
+        "AVAILABLE": "可预约",
+        "CLOSED": "不可用",
         "MAINTENANCE": "维护中",
         "OCCUPIED": "已占用"
       };
-      return statusMap[status] || "可用";
+      return statusMap[normalized] || "可预约";
     }
   }
 };
@@ -241,7 +258,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         g: common_vendor.t($options.getStatusText(venue.status)),
         h: common_vendor.n($options.getStatusClass(venue.status)),
         i: venue.id,
-        j: common_vendor.o(($event) => $options.navigateTo(`/pages/venue/detail?id=${venue.id}`), venue.id)
+        j: common_vendor.o(($event) => $options.handleVenueClick(venue), venue.id)
       };
     }),
     j: $options.safePopularVenues.length === 0

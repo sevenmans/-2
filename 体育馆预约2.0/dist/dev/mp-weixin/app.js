@@ -53,6 +53,15 @@ if (!Math) {
   "./pages/test/field-mapping-validation.js";
   "./pages/test/pinia-migration-final-validation.js";
   "./pages/test/timeslot-display-fix-test.js";
+  "./pages/admin/dashboard.js";
+  "./pages/admin/orders/list.js";
+  "./pages/admin/orders/detail.js";
+  "./pages/admin/verification/index.js";
+  "./pages/admin/venues/list.js";
+  "./pages/admin/venues/create.js";
+  "./pages/admin/venues/edit.js";
+  "./pages/admin/timeslots/index.js";
+  "./pages/admin/security/password.js";
   "./pages/payment/index.js";
   "./pages/payment/success.js";
   "./pages/payment/failed.js";

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "场馆管理",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "nav-bar": "../../../components/NavBar",
+    "admin-tab-bar": "../../../components/admin/AdminTabBar"
+  }
+}

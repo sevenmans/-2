@@ -3,10 +3,13 @@ import { getToken, getUserInfo } from './auth.js'
 
 let isRedirectingToLogin = false
 
+const ADMIN_ROLE = 'ROLE_VENUE_ADMIN'
+const ADMIN_PATH_PREFIX = '/pages/admin/'
+
 // 游客页面（未登录可访问）
 export const guestPages = [
   '/pages/user/login',
-  '/pages/index/index' // 允许未登录访问首页
+  '/pages/index/index'
 ]
 
 // 所有页面都需要登录，除了登录页面
@@ -23,9 +26,16 @@ const authPages = [
   '/pages/sharing/detail'
 ]
 
+// 判断用户是否拥有管理员角色
+export function isAdmin(userInfo) {
+  if (!userInfo || !userInfo.roles) return false
+  return Array.isArray(userInfo.roles)
+    ? userInfo.roles.includes(ADMIN_ROLE)
+    : userInfo.roles === ADMIN_ROLE
+}
+
 // 路由守卫
 export function setupRouterGuard() {
-  // 页面跳转前拦截
   uni.addInterceptor('navigateTo', {
     invoke(params) {
       return checkPermission(params.url)
@@ -53,26 +63,17 @@ export function setupRouterGuard() {
 
 // 检查页面访问权限
 function checkPermission(url) {
-  // 提取页面路径
   const pagePath = url.split('?')[0]
   
-  // 检查是否是游客页面（登录页面和首页）
   const isGuestPage = guestPages.some(page => pagePath.includes(page))
-  
-  // 如果是游客页面，直接允许访问
   if (isGuestPage) {
     return true
   }
   
-  // 如果不是游客页面，则需要检查登录状态
-  // 检查登录状态（需要同时有token和userInfo）
   const token = getToken()
   const userInfo = getUserInfo()
   
   if (!token || !userInfo) {
-    // 需要登录但未登录，跳转到登录页
-    
-    // 避免重复提示
     const pages = getCurrentPages()
     const isFromLoginPage = pages.length > 0 && pages[pages.length - 1].route.includes('/pages/user/login')
     
@@ -85,10 +86,7 @@ function checkPermission(url) {
     }
     isRedirectingToLogin = true
     
-    // 保存当前页面路径作为重定向URL
     const redirectUrl = encodeURIComponent(url)
-    
-    // 使用 reLaunch 而不是 navigateTo，确保用户不能通过返回按钮绕过登录
     uni.reLaunch({
       url: `/pages/user/login?redirect=${redirectUrl}`
     })
@@ -96,6 +94,15 @@ function checkPermission(url) {
       isRedirectingToLogin = false
     }, 800)
     return false
+  }
+  
+  // 管理员页面权限校验
+  if (pagePath.includes(ADMIN_PATH_PREFIX)) {
+    if (!isAdmin(userInfo)) {
+      showToast('无管理员权限')
+      uni.reLaunch({ url: '/pages/index/index' })
+      return false
+    }
   }
   
   return true

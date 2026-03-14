@@ -48,7 +48,7 @@
       <view class="venue-tags">
         <text class="venue-tag">{{ venueDetail.type }}</text>
         <text v-if="venueDetail.supportSharing" class="venue-tag">支持拼场</text>
-        <text class="venue-tag">{{ venueDetail.status === 'ACTIVE' ? '营业中' : '暂停营业' }}</text>
+        <text class="venue-tag">{{ getVenueStatusText(venueDetail.status) }}</text>
       </view>
     </view>
     
@@ -505,6 +505,15 @@ export default {
         return 0;
       }
     },
+    getVenueStatusText(status) {
+      const statusMap = {
+        OPEN: '营业中',
+        CLOSED: '已下架',
+        MAINTENANCE: '维护中'
+      }
+      const normalized = String(status || '').toUpperCase()
+      return statusMap[normalized] || '营业中'
+    },
 
     // 简化的初始化数据方法
     async initData() {
@@ -540,6 +549,24 @@ export default {
         }
 
         await Promise.all(requests);
+        const venueStatus = String(this.venueDetail.status || '').toUpperCase()
+        if (venueStatus === 'CLOSED') {
+          uni.showToast({
+            title: '该球场已下架',
+            icon: 'none'
+          })
+          const pages = getCurrentPages()
+          setTimeout(() => {
+            if (pages.length > 1) {
+              uni.navigateBack()
+            } else {
+              uni.reLaunch({
+                url: '/pages/venue/list'
+              })
+            }
+          }, 300)
+          return
+        }
         
         console.log('[VenueDetail] 数据初始化完成');
         

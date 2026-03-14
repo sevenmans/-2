@@ -1,0 +1,278 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.load-more.data-v-67b8b8fc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx;
+  min-height: 80rpx;
+}
+.loading-container.data-v-67b8b8fc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-container .loading-spinner.data-v-67b8b8fc {
+  display: flex;
+  align-items: center;
+  margin-right: 16rpx;
+}
+.loading-container .loading-spinner .spinner-dot.data-v-67b8b8fc {
+  width: 8rpx;
+  height: 8rpx;
+  background-color: #ff6b35;
+  border-radius: 50%;
+  margin: 0 2rpx;
+  -webkit-animation: loading-bounce-67b8b8fc 1.4s ease-in-out infinite both;
+          animation: loading-bounce-67b8b8fc 1.4s ease-in-out infinite both;
+}
+.loading-container .loading-spinner .spinner-dot.data-v-67b8b8fc:nth-child(1) {
+  -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+}
+.loading-container .loading-spinner .spinner-dot.data-v-67b8b8fc:nth-child(2) {
+  -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+}
+.loading-container .loading-text.data-v-67b8b8fc {
+  font-size: 24rpx;
+  color: #999999;
+}
+@-webkit-keyframes loading-bounce-67b8b8fc {
+0%, 80%, 100% {
+    -webkit-transform: scale(0);
+            transform: scale(0);
+}
+40% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+}
+}
+@keyframes loading-bounce-67b8b8fc {
+0%, 80%, 100% {
+    -webkit-transform: scale(0);
+            transform: scale(0);
+}
+40% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+}
+}
+.loadmore-container.data-v-67b8b8fc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  background-color: #f8f8f8;
+  transition: all 0.3s;
+}
+.loadmore-container.data-v-67b8b8fc:active {
+  background-color: #f0f0f0;
+}
+.loadmore-container .loadmore-text.data-v-67b8b8fc {
+  font-size: 24rpx;
+  color: #666666;
+  margin-right: 8rpx;
+}
+.loadmore-container .loadmore-icon.data-v-67b8b8fc {
+  font-size: 20rpx;
+  color: #999999;
+  -webkit-animation: bounce-67b8b8fc 2s infinite;
+          animation: bounce-67b8b8fc 2s infinite;
+}
+@-webkit-keyframes bounce-67b8b8fc {
+0%, 20%, 50%, 80%, 100% {
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+}
+40% {
+    -webkit-transform: translateY(-6rpx);
+            transform: translateY(-6rpx);
+}
+60% {
+    -webkit-transform: translateY(-3rpx);
+            transform: translateY(-3rpx);
+}
+}
+@keyframes bounce-67b8b8fc {
+0%, 20%, 50%, 80%, 100% {
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+}
+40% {
+    -webkit-transform: translateY(-6rpx);
+            transform: translateY(-6rpx);
+}
+60% {
+    -webkit-transform: translateY(-3rpx);
+            transform: translateY(-3rpx);
+}
+}
+.nomore-container.data-v-67b8b8fc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.nomore-container .nomore-line.data-v-67b8b8fc {
+  flex: 1;
+  height: 1rpx;
+  background-color: #e8e8e8;
+  max-width: 120rpx;
+}
+.nomore-container .nomore-text.data-v-67b8b8fc {
+  font-size: 24rpx;
+  color: #999999;
+  margin: 0 20rpx;
+}
+.error-container.data-v-67b8b8fc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  background-color: #fff2f0;
+  transition: all 0.3s;
+}
+.error-container.data-v-67b8b8fc:active {
+  background-color: #ffebe8;
+}
+.error-container .error-icon.data-v-67b8b8fc {
+  font-size: 32rpx;
+  margin-bottom: 8rpx;
+}
+.error-container .error-text.data-v-67b8b8fc {
+  font-size: 24rpx;
+  color: #ff4d4f;
+  margin-bottom: 4rpx;
+}
+.error-container .retry-text.data-v-67b8b8fc {
+  font-size: 20rpx;
+  color: #999999;
+}
+.empty-container.data-v-67b8b8fc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 30rpx;
+}
+.empty-container .empty-image.data-v-67b8b8fc {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.6;
+}
+.empty-container .empty-text.data-v-67b8b8fc {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+.empty-container .refresh-btn.data-v-67b8b8fc {
+  padding: 16rpx 32rpx;
+  background-color: #ff6b35;
+  color: #ffffff;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+}
+.status-loading.data-v-67b8b8fc {
+  background-color: transparent;
+}
+.status-more.data-v-67b8b8fc {
+  background-color: transparent;
+}
+.status-nomore.data-v-67b8b8fc {
+  background-color: transparent;
+}
+.status-error.data-v-67b8b8fc {
+  background-color: transparent;
+}
+.status-empty.data-v-67b8b8fc {
+  background-color: #fafafa;
+  min-height: 400rpx;
+}
+.load-more.compact.data-v-67b8b8fc {
+  padding: 20rpx;
+  min-height: 60rpx;
+}
+.load-more.compact .loading-container .loading-text.data-v-67b8b8fc,
+.load-more.compact .loading-container .loadmore-text.data-v-67b8b8fc,
+.load-more.compact .loading-container .nomore-text.data-v-67b8b8fc,
+.load-more.compact .loading-container .error-text.data-v-67b8b8fc,
+.load-more.compact .loadmore-container .loading-text.data-v-67b8b8fc,
+.load-more.compact .loadmore-container .loadmore-text.data-v-67b8b8fc,
+.load-more.compact .loadmore-container .nomore-text.data-v-67b8b8fc,
+.load-more.compact .loadmore-container .error-text.data-v-67b8b8fc,
+.load-more.compact .nomore-container .loading-text.data-v-67b8b8fc,
+.load-more.compact .nomore-container .loadmore-text.data-v-67b8b8fc,
+.load-more.compact .nomore-container .nomore-text.data-v-67b8b8fc,
+.load-more.compact .nomore-container .error-text.data-v-67b8b8fc,
+.load-more.compact .error-container .loading-text.data-v-67b8b8fc,
+.load-more.compact .error-container .loadmore-text.data-v-67b8b8fc,
+.load-more.compact .error-container .nomore-text.data-v-67b8b8fc,
+.load-more.compact .error-container .error-text.data-v-67b8b8fc {
+  font-size: 22rpx;
+}
+.load-more.compact .empty-container.data-v-67b8b8fc {
+  padding: 40rpx 30rpx;
+}
+.load-more.compact .empty-container .empty-image.data-v-67b8b8fc {
+  width: 120rpx;
+  height: 120rpx;
+}
+.load-more.compact .empty-container .empty-text.data-v-67b8b8fc {
+  font-size: 24rpx;
+}
+@media (prefers-color-scheme: dark) {
+.loadmore-container.data-v-67b8b8fc {
+    background-color: #2a2a2a;
+}
+.error-container.data-v-67b8b8fc {
+    background-color: #3a2a2a;
+}
+.status-empty.data-v-67b8b8fc {
+    background-color: #1a1a1a;
+}
+.nomore-line.data-v-67b8b8fc {
+    background-color: #404040;
+}
+.loading-text.data-v-67b8b8fc,
+  .loadmore-text.data-v-67b8b8fc,
+  .nomore-text.data-v-67b8b8fc,
+  .empty-text.data-v-67b8b8fc {
+    color: #cccccc;
+}
+.error-text.data-v-67b8b8fc {
+    color: #ff7875;
+}
+.retry-text.data-v-67b8b8fc {
+    color: #999999;
+}
+}

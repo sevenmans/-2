@@ -88,6 +88,36 @@ const looseToNumber = (val) => {
   const n2 = parseFloat(val);
   return isNaN(n2) ? val : n2;
 };
+function normalizeStyle(value) {
+  if (isArray(value)) {
+    const res = {};
+    for (let i2 = 0; i2 < value.length; i2++) {
+      const item = value[i2];
+      const normalized = isString(item) ? parseStringStyle(item) : normalizeStyle(item);
+      if (normalized) {
+        for (const key in normalized) {
+          res[key] = normalized[key];
+        }
+      }
+    }
+    return res;
+  } else if (isString(value) || isObject(value)) {
+    return value;
+  }
+}
+const listDelimiterRE = /;(?![^(]*\))/g;
+const propertyDelimiterRE = /:([^]+)/;
+const styleCommentRE = /\/\*[^]*?\*\//g;
+function parseStringStyle(cssText) {
+  const ret = {};
+  cssText.replace(styleCommentRE, "").split(listDelimiterRE).forEach((item) => {
+    if (item) {
+      const tmp = item.split(propertyDelimiterRE);
+      tmp.length > 1 && (ret[tmp[0].trim()] = tmp[1].trim());
+    }
+  });
+  return ret;
+}
 function normalizeClass(value) {
   let res = "";
   if (isString(value)) {
@@ -5104,6 +5134,22 @@ function getCreateApp() {
     return my[method];
   }
 }
+function stringifyStyle(value) {
+  if (isString(value)) {
+    return value;
+  }
+  return stringify(normalizeStyle(value));
+}
+function stringify(styles) {
+  let ret = "";
+  if (!styles || isString(styles)) {
+    return ret;
+  }
+  for (const key in styles) {
+    ret += `${key.startsWith(`--`) ? key : hyphenate(key)}:${styles[key]};`;
+  }
+  return ret;
+}
 function vOn(value, key) {
   const instance = getCurrentInstance();
   const ctx = instance.ctx;
@@ -5236,6 +5282,7 @@ function setRef(ref2, id, opts = {}) {
 }
 const o$1 = (value, key) => vOn(value, key);
 const f$1 = (source, renderItem) => vFor(source, renderItem);
+const s$1 = (value) => stringifyStyle(value);
 const e$1 = (target, ...sources) => extend(target, ...sources);
 const n$1 = (value) => normalizeClass(value);
 const t$1 = (val) => toDisplayString(val);
@@ -7060,7 +7107,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.5,198.18.0.1";
   const port = "8090";
-  const id = "mp-weixin_2--c2M";
+  const id = "mp-weixin_YAWmI6";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -8826,6 +8873,69 @@ const pages = [
     path: "pages/test/timeslot-display-fix-test",
     style: {
       navigationBarTitleText: "🔧 时间段显示修复测试"
+    }
+  },
+  {
+    path: "pages/admin/dashboard",
+    style: {
+      navigationBarTitleText: "管理员工作台",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/orders/list",
+    style: {
+      navigationBarTitleText: "订单管理",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/orders/detail",
+    style: {
+      navigationBarTitleText: "订单详情",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/verification/index",
+    style: {
+      navigationBarTitleText: "核销中心",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/venues/list",
+    style: {
+      navigationBarTitleText: "场馆管理",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/venues/create",
+    style: {
+      navigationBarTitleText: "新增场馆",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/venues/edit",
+    style: {
+      navigationBarTitleText: "编辑场馆",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/timeslots/index",
+    style: {
+      navigationBarTitleText: "排期管理",
+      navigationStyle: "custom"
+    }
+  },
+  {
+    path: "pages/admin/security/password",
+    style: {
+      navigationBarTitleText: "账号与安全",
+      navigationStyle: "custom"
     }
   },
   {
@@ -11786,6 +11896,7 @@ exports.onUnmounted = onUnmounted;
 exports.p = p$1;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
+exports.s = s$1;
 exports.sr = sr;
 exports.t = t$1;
 exports.unref = unref;

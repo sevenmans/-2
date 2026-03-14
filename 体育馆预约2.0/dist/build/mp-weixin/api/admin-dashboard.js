@@ -1,0 +1,1 @@
+"use strict";const t=require("../utils/request.js");exports.adminCancelBooking=function(n){return t.post(`/bookings/${n}/admin-cancel`)},exports.getAdminBookings=function(n){return t.get("/admin/bookings",n)},exports.getAdminDashboardStats=function(n){return t.get("/admin/dashboard/stats",n)};

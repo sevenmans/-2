@@ -1,1 +1,1 @@
-"use strict";require("../common/vendor.js");exports.guestPages=["/pages/user/login","/pages/user/register","/pages/index/index"];
+"use strict";require("../common/vendor.js");const e="ROLE_VENUE_ADMIN";exports.guestPages=["/pages/user/login","/pages/index/index"],exports.isAdmin=function(s){return!(!s||!s.roles)&&(Array.isArray(s.roles)?s.roles.includes(e):s.roles===e)};
