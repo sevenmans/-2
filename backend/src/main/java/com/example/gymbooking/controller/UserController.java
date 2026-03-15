@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
@@ -907,28 +906,46 @@ public class UserController {
         virtualOrder.setMaxParticipants(2);
         virtualOrder.setAllowSharing(true);
 
-        // 根据申请状态设置订单状态
-        switch (request.getStatus()) {
-            case PENDING:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
-                break;
-            case APPROVED_PENDING_PAYMENT:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING); // 待支付
-                break;
-            case PAID:
-                virtualOrder.setStatus(Order.OrderStatus.SHARING_SUCCESS); // 已支付才是拼场成功
-                break;
-            case APPROVED:
-                // APPROVED状态表示申请被批准但还未支付，应该是PENDING状态
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
-                break;
-            case REJECTED:
-            case CANCELLED:
-            case TIMEOUT_CANCELLED:
-                virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
-                break;
-            default:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
+        // 🔧 修复：虚拟订单状态需要同时考虑申请状态和主订单状态
+        // 如果主订单已核销或已完成，虚拟订单也应该同步状态
+        Order.OrderStatus mainOrderStatus = originalOrder.getStatus();
+
+        if (mainOrderStatus == Order.OrderStatus.VERIFIED) {
+            // 主订单已核销，虚拟订单也应该是已核销
+            virtualOrder.setStatus(Order.OrderStatus.VERIFIED);
+            logger.info("✅ 主订单已核销，虚拟订单状态同步为 VERIFIED");
+        } else if (mainOrderStatus == Order.OrderStatus.COMPLETED) {
+            // 主订单已完成，虚拟订单也应该是已完成
+            virtualOrder.setStatus(Order.OrderStatus.COMPLETED);
+            logger.info("✅ 主订单已完成，虚拟订单状态同步为 COMPLETED");
+        } else if (mainOrderStatus == Order.OrderStatus.CANCELLED) {
+            // 主订单已取消，虚拟订单也应该是已取消
+            virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
+            logger.info("✅ 主订单已取消，虚拟订单状态同步为 CANCELLED");
+        } else {
+            // 主订单未核销/完成时，根据申请状态设置
+            switch (request.getStatus()) {
+                case PENDING:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+                    break;
+                case APPROVED_PENDING_PAYMENT:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING); // 待支付
+                    break;
+                case PAID:
+                    virtualOrder.setStatus(Order.OrderStatus.SHARING_SUCCESS); // 已支付才是拼场成功
+                    break;
+                case APPROVED:
+                    // APPROVED状态表示申请被批准但还未支付，应该是PENDING状态
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+                    break;
+                case REJECTED:
+                case CANCELLED:
+                case TIMEOUT_CANCELLED:
+                    virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
+                    break;
+                default:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+            }
         }
 
         // 设置创建时间

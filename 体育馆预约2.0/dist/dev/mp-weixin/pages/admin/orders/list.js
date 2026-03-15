@@ -53,7 +53,7 @@ const _sfc_main = {
       this.ordersStore.pagination.page = 1;
       this.ordersStore.list = [];
     }
-    this.fetchOrders();
+    this.fetchOrders(true);
   },
   methods: {
     calcNavBarHeight() {
@@ -85,9 +85,9 @@ const _sfc_main = {
       this.ordersStore.setFilter("status", backendStatus);
       this.fetchOrders();
     },
-    async fetchOrders() {
+    async fetchOrders(forceRefresh = false) {
       try {
-        await this.ordersStore.fetchOrders(false);
+        await this.ordersStore.fetchOrders(false, forceRefresh);
       } catch (e) {
         common_vendor.index.showToast({ title: e.message || "加载失败", icon: "none" });
       }
@@ -113,6 +113,7 @@ const _sfc_main = {
           try {
             await this.ordersStore.cancelOrder(order.id);
             common_vendor.index.showToast({ title: "已取消并退款", icon: "success" });
+            await this.fetchOrders(true);
             try {
               stores_adminDashboard.useAdminDashboardStore().refreshStats();
             } catch {
@@ -170,13 +171,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         i: common_vendor.n(order.type === "SHARED" ? "tag-shared" : "tag-exclusive"),
         j: common_vendor.t(order.userName),
         k: common_vendor.t(order.phoneTail),
-        l: common_vendor.t(order.price),
-        m: $options.canCancel(order)
+        l: common_vendor.t(order.type === "SHARED" ? "合计" : "实付"),
+        m: common_vendor.t(order.price),
+        n: $options.canCancel(order)
       }, $options.canCancel(order) ? {
-        n: common_vendor.o(($event) => $options.handleCancel(order), order.id)
+        o: common_vendor.o(($event) => $options.handleCancel(order), order.id)
       } : {}, {
-        o: order.id,
-        p: common_vendor.o(($event) => $options.goDetail(order.id), order.id)
+        p: order.id,
+        q: common_vendor.o(($event) => $options.goDetail(order.id), order.id)
       });
     }),
     j: $options.orders.length > 0

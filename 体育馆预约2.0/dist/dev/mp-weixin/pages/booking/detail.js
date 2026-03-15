@@ -58,12 +58,20 @@ const _sfc_main = {
   methods: {
     // 初始化数据
     async initData() {
+      var _a, _b;
       try {
         if (!this.bookingId) {
           throw new Error("订单ID无效，请重新进入页面");
         }
+        if ((_b = (_a = this.bookingStore) == null ? void 0 : _a.cache) == null ? void 0 : _b.bookingDetails) {
+          this.bookingStore.cache.bookingDetails.delete(this.bookingId);
+          const numericBookingId = Number(this.bookingId);
+          if (Number.isFinite(numericBookingId)) {
+            this.bookingStore.cache.bookingDetails.delete(numericBookingId);
+          }
+        }
         utils_request.clearCache(`/bookings/${this.bookingId}`);
-        await this.bookingStore.getBookingDetail(this.bookingId);
+        await this.bookingStore.getBookingDetail(this.bookingId, false);
         await this.$nextTick();
         if (!this.bookingDetail) {
           throw new Error("未能获取到订单数据，请检查网络连接");
@@ -72,7 +80,7 @@ const _sfc_main = {
           throw new Error("订单数据不完整，订单可能不存在或已被删除");
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/detail.vue:360", "初始化数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/detail.vue:365", "初始化数据失败:", error);
         common_vendor.index.showModal({
           title: "加载失败",
           content: error.message || "无法获取订单详情，请检查订单号是否正确",
@@ -96,7 +104,7 @@ const _sfc_main = {
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
         common_vendor.index.stopPullDownRefresh();
-        common_vendor.index.__f__("error", "at pages/booking/detail.vue:388", "刷新数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/detail.vue:393", "刷新数据失败:", error);
       }
     },
     // 🔥 修复问题1: 处理订单取消事件
@@ -107,19 +115,19 @@ const _sfc_main = {
           await this.$nextTick();
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/detail.vue:408", "[BookingDetail] ❌ 处理订单取消事件失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/detail.vue:413", "[BookingDetail] ❌ 处理订单取消事件失败:", error);
       }
     },
     // 显示取消预约弹窗
     showCancelModal() {
-      common_vendor.index.__f__("log", "at pages/booking/detail.vue:414", "显示取消预约弹窗");
+      common_vendor.index.__f__("log", "at pages/booking/detail.vue:419", "显示取消预约弹窗");
       this.showCancelPopup = true;
       this.$nextTick(() => {
         if (this.$refs.cancelPopup) {
-          common_vendor.index.__f__("log", "at pages/booking/detail.vue:420", "打开弹窗，cancelPopup ref:", this.$refs.cancelPopup);
+          common_vendor.index.__f__("log", "at pages/booking/detail.vue:425", "打开弹窗，cancelPopup ref:", this.$refs.cancelPopup);
           this.$refs.cancelPopup.open();
         } else {
-          common_vendor.index.__f__("error", "at pages/booking/detail.vue:423", "cancelPopup引用不存在，使用系统弹窗");
+          common_vendor.index.__f__("error", "at pages/booking/detail.vue:428", "cancelPopup引用不存在，使用系统弹窗");
           this.showCancelPopup = false;
           common_vendor.index.showModal({
             title: "取消预约",
@@ -135,7 +143,7 @@ const _sfc_main = {
     },
     // 关闭取消预约弹窗
     closeCancelModal() {
-      common_vendor.index.__f__("log", "at pages/booking/detail.vue:440", "关闭取消预约弹窗");
+      common_vendor.index.__f__("log", "at pages/booking/detail.vue:445", "关闭取消预约弹窗");
       if (this.$refs.cancelPopup) {
         this.$refs.cancelPopup.close();
       }
@@ -164,7 +172,7 @@ const _sfc_main = {
           await this.bookingStore.getBookingDetail(this.bookingId, false);
           await this.$nextTick();
         } catch (e) {
-          common_vendor.index.__f__("warn", "at pages/booking/detail.vue:479", "[BookingDetail] 快速刷新详情失败(忽略)：", e);
+          common_vendor.index.__f__("warn", "at pages/booking/detail.vue:484", "[BookingDetail] 快速刷新详情失败(忽略)：", e);
         }
         if (this.bookingDetail && typeof common_vendor.index !== "undefined" && common_vendor.index.$emit) {
           const venueId = this.bookingDetail.venueId;
@@ -180,19 +188,19 @@ const _sfc_main = {
                 this.venueStore.cache.timeSlots.clear();
               }
               this.venueStore.setTimeSlots([]);
-              common_vendor.index.__f__("log", "at pages/booking/detail.vue:506", "[BookingDetail] ✅ 已清除 venue store 缓存");
+              common_vendor.index.__f__("log", "at pages/booking/detail.vue:511", "[BookingDetail] ✅ 已清除 venue store 缓存");
             }
             const { default: cacheManager } = await "../../utils/cache-manager.js";
             if (cacheManager) {
               cacheManager.clearTimeSlotCache(venueId, date);
               const timeSlotKey = cacheManager.generateTimeSlotKey ? cacheManager.generateTimeSlotKey(venueId, date) : `timeslots_${venueId}_${date}`;
               cacheManager.delete(timeSlotKey);
-              common_vendor.index.__f__("log", "at pages/booking/detail.vue:519", "[BookingDetail] ✅ 已清除缓存管理器缓存");
+              common_vendor.index.__f__("log", "at pages/booking/detail.vue:524", "[BookingDetail] ✅ 已清除缓存管理器缓存");
             }
             const { default: unifiedTimeSlotManager } = await "../../utils/unified-timeslot-manager.js";
             if (unifiedTimeSlotManager) {
               unifiedTimeSlotManager.clearCache(venueId, date);
-              common_vendor.index.__f__("log", "at pages/booking/detail.vue:526", "[BookingDetail] ✅ 已清除统一时间段管理器缓存");
+              common_vendor.index.__f__("log", "at pages/booking/detail.vue:531", "[BookingDetail] ✅ 已清除统一时间段管理器缓存");
             }
             try {
               const storageKeys = [
@@ -207,12 +215,12 @@ const _sfc_main = {
                 } catch (e) {
                 }
               });
-              common_vendor.index.__f__("log", "at pages/booking/detail.vue:545", "[BookingDetail] ✅ 已清除本地存储缓存");
+              common_vendor.index.__f__("log", "at pages/booking/detail.vue:550", "[BookingDetail] ✅ 已清除本地存储缓存");
             } catch (storageError) {
-              common_vendor.index.__f__("warn", "at pages/booking/detail.vue:547", "[BookingDetail] 清除本地存储缓存失败:", storageError);
+              common_vendor.index.__f__("warn", "at pages/booking/detail.vue:552", "[BookingDetail] 清除本地存储缓存失败:", storageError);
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/booking/detail.vue:551", "[BookingDetail] ❌ 清除缓存失败:", error);
+            common_vendor.index.__f__("error", "at pages/booking/detail.vue:556", "[BookingDetail] ❌ 清除缓存失败:", error);
           }
           common_vendor.index.$emit("force-refresh-timeslots", {
             venueId,
@@ -273,14 +281,14 @@ const _sfc_main = {
             });
           }
         } catch (verifyError) {
-          common_vendor.index.__f__("error", "at pages/booking/detail.vue:631", "[BookingDetail] 验证后端状态失败:", verifyError);
+          common_vendor.index.__f__("error", "at pages/booking/detail.vue:636", "[BookingDetail] 验证后端状态失败:", verifyError);
         }
         if (!this.bookingDetail || this.bookingDetail.status !== "CANCELLED") {
           await this.refreshData();
         }
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/booking/detail.vue:641", "取消预约失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/detail.vue:646", "取消预约失败:", error);
         common_vendor.index.showToast({
           title: error.message || "取消失败",
           icon: "error"
@@ -290,8 +298,8 @@ const _sfc_main = {
     // 🎯 使用统一时间段管理器立即释放时间段
     async useUnifiedTimeSlotManagerForRelease() {
       try {
-        common_vendor.index.__f__("log", "at pages/booking/detail.vue:652", "[BookingDetail] 🚨🚨🚨 开始使用统一时间段管理器立即释放时间段 🚨🚨🚨");
-        common_vendor.index.__f__("log", "at pages/booking/detail.vue:653", "[BookingDetail] 预约详情:", {
+        common_vendor.index.__f__("log", "at pages/booking/detail.vue:657", "[BookingDetail] 🚨🚨🚨 开始使用统一时间段管理器立即释放时间段 🚨🚨🚨");
+        common_vendor.index.__f__("log", "at pages/booking/detail.vue:658", "[BookingDetail] 预约详情:", {
           venueId: this.bookingDetail.venueId,
           date: this.bookingDetail.bookingDate || this.bookingDetail.date,
           startTime: this.bookingDetail.startTime,
@@ -300,7 +308,7 @@ const _sfc_main = {
         });
         const { default: unifiedTimeSlotManager } = await "../../utils/unified-timeslot-manager.js";
         if (unifiedTimeSlotManager && typeof unifiedTimeSlotManager.immediateReleaseTimeSlots === "function") {
-          common_vendor.index.__f__("log", "at pages/booking/detail.vue:665", "[BookingDetail] ✅ 统一时间段管理器可用，开始调用立即释放方法");
+          common_vendor.index.__f__("log", "at pages/booking/detail.vue:670", "[BookingDetail] ✅ 统一时间段管理器可用，开始调用立即释放方法");
           await unifiedTimeSlotManager.immediateReleaseTimeSlots(
             this.bookingDetail.venueId,
             this.bookingDetail.bookingDate || this.bookingDetail.date,
@@ -308,14 +316,14 @@ const _sfc_main = {
             this.bookingDetail.endTime,
             this.bookingDetail.bookingType || "EXCLUSIVE"
           );
-          common_vendor.index.__f__("log", "at pages/booking/detail.vue:673", "[BookingDetail] 🎉 统一时间段管理器立即释放完成");
+          common_vendor.index.__f__("log", "at pages/booking/detail.vue:678", "[BookingDetail] 🎉 统一时间段管理器立即释放完成");
         } else {
-          common_vendor.index.__f__("error", "at pages/booking/detail.vue:675", "[BookingDetail] ❌ 统一时间段管理器不可用或方法不存在");
-          common_vendor.index.__f__("log", "at pages/booking/detail.vue:676", "[BookingDetail] unifiedTimeSlotManager:", unifiedTimeSlotManager);
-          common_vendor.index.__f__("log", "at pages/booking/detail.vue:677", "[BookingDetail] immediateReleaseTimeSlots 方法存在:", typeof (unifiedTimeSlotManager == null ? void 0 : unifiedTimeSlotManager.immediateReleaseTimeSlots));
+          common_vendor.index.__f__("error", "at pages/booking/detail.vue:680", "[BookingDetail] ❌ 统一时间段管理器不可用或方法不存在");
+          common_vendor.index.__f__("log", "at pages/booking/detail.vue:681", "[BookingDetail] unifiedTimeSlotManager:", unifiedTimeSlotManager);
+          common_vendor.index.__f__("log", "at pages/booking/detail.vue:682", "[BookingDetail] immediateReleaseTimeSlots 方法存在:", typeof (unifiedTimeSlotManager == null ? void 0 : unifiedTimeSlotManager.immediateReleaseTimeSlots));
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/detail.vue:681", "[BookingDetail] ❌ 使用统一时间段管理器失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/detail.vue:686", "[BookingDetail] ❌ 使用统一时间段管理器失败:", error);
       }
     },
     getVerifyCode(booking) {
@@ -348,7 +356,7 @@ const _sfc_main = {
         });
         return;
       }
-      common_vendor.index.__f__("log", "at pages/booking/detail.vue:715", "跳转到支付页面，订单ID:", this.bookingDetail.id);
+      common_vendor.index.__f__("log", "at pages/booking/detail.vue:720", "跳转到支付页面，订单ID:", this.bookingDetail.id);
       common_vendor.index.navigateTo({
         url: `/pages/payment/index?orderId=${this.bookingDetail.id}&type=booking`
       });
@@ -535,7 +543,7 @@ const _sfc_main = {
             dateTime = new Date(bookingTime);
           }
           if (isNaN(dateTime.getTime())) {
-            common_vendor.index.__f__("error", "at pages/booking/detail.vue:916", "虚拟订单日期格式化错误 - 无效的时间:", bookingTime);
+            common_vendor.index.__f__("error", "at pages/booking/detail.vue:921", "虚拟订单日期格式化错误 - 无效的时间:", bookingTime);
             return "--";
           }
           return dateTime.toLocaleDateString("zh-CN", {
@@ -544,7 +552,7 @@ const _sfc_main = {
             day: "2-digit"
           }).replace(/\//g, "-");
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/detail.vue:926", "虚拟订单日期格式化错误:", error);
+          common_vendor.index.__f__("error", "at pages/booking/detail.vue:931", "虚拟订单日期格式化错误:", error);
           return "--";
         }
       } else {
@@ -571,7 +579,7 @@ const _sfc_main = {
               isoTime = startTime.replace(" ", "T");
             }
             startDateTime = new Date(isoTime);
-            common_vendor.index.__f__("log", "at pages/booking/detail.vue:960", "预约详情时间转换 - 原始:", startTime, "转换后:", isoTime, "解析结果:", startDateTime);
+            common_vendor.index.__f__("log", "at pages/booking/detail.vue:965", "预约详情时间转换 - 原始:", startTime, "转换后:", isoTime, "解析结果:", startDateTime);
           } else {
             startDateTime = new Date(startTime);
           }
@@ -582,13 +590,13 @@ const _sfc_main = {
                 isoEndTime = endTime.replace(" ", "T");
               }
               endDateTime = new Date(isoEndTime);
-              common_vendor.index.__f__("log", "at pages/booking/detail.vue:972", "预约详情结束时间转换 - 原始:", endTime, "转换后:", isoEndTime, "解析结果:", endDateTime);
+              common_vendor.index.__f__("log", "at pages/booking/detail.vue:977", "预约详情结束时间转换 - 原始:", endTime, "转换后:", isoEndTime, "解析结果:", endDateTime);
             } else {
               endDateTime = new Date(endTime);
             }
           }
           if (isNaN(startDateTime.getTime())) {
-            common_vendor.index.__f__("error", "at pages/booking/detail.vue:980", "虚拟订单时间格式化错误 - 无效的开始时间:", startTime);
+            common_vendor.index.__f__("error", "at pages/booking/detail.vue:985", "虚拟订单时间格式化错误 - 无效的开始时间:", startTime);
             return "--";
           }
           const startTimeStr = startDateTime.toLocaleTimeString("zh-CN", {
@@ -606,7 +614,7 @@ const _sfc_main = {
           }
           return endTimeStr ? `${startTimeStr} - ${endTimeStr}` : startTimeStr;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/detail.vue:1003", "虚拟订单时间格式化错误:", error);
+          common_vendor.index.__f__("error", "at pages/booking/detail.vue:1008", "虚拟订单时间格式化错误:", error);
           return "--";
         }
       } else {

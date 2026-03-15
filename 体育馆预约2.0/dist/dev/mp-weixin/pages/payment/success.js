@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_payment = require("../../api/payment.js");
 const utils_request = require("../../utils/request.js");
+const stores_adminOrders = require("../../stores/admin-orders.js");
 const _sfc_main = {
   name: "PaymentSuccess",
   data() {
@@ -15,6 +16,7 @@ const _sfc_main = {
   onLoad(options) {
     this.orderId = options.orderId;
     this.fromPage = options.from || "";
+    this.notifyAdminOrdersNeedRefresh();
     if (this.orderId) {
       this.loadOrderInfo();
     } else {
@@ -29,6 +31,15 @@ const _sfc_main = {
     }
   },
   methods: {
+    notifyAdminOrdersNeedRefresh() {
+      utils_request.clearCache("/admin/bookings");
+      utils_request.clearCache("/admin/dashboard/stats");
+      try {
+        const adminOrdersStore = stores_adminOrders.useAdminOrdersStore();
+        adminOrdersStore.needRefresh = true;
+      } catch {
+      }
+    },
     // 加载订单信息
     async loadOrderInfo() {
       try {
@@ -57,7 +68,7 @@ const _sfc_main = {
         common_vendor.index.hideLoading();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/payment/success.vue:123", "加载订单信息失败:", error);
+        common_vendor.index.__f__("error", "at pages/payment/success.vue:134", "加载订单信息失败:", error);
         this.orderInfo = {
           orderNo: `ORD${Date.now()}`,
           totalPrice: 0,
@@ -101,7 +112,7 @@ const _sfc_main = {
             }
           }
           if (isNaN(startDateTime.getTime())) {
-            common_vendor.index.__f__("error", "at pages/payment/success.vue:178", "无效的开始时间:", startTime);
+            common_vendor.index.__f__("error", "at pages/payment/success.vue:189", "无效的开始时间:", startTime);
             return "时间格式错误";
           }
           const dateStr = startDateTime.toLocaleDateString("zh-CN", {
@@ -124,7 +135,7 @@ const _sfc_main = {
           }
           return result;
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/payment/success.vue:205", "时间格式化错误:", error);
+          common_vendor.index.__f__("error", "at pages/payment/success.vue:216", "时间格式化错误:", error);
           return "时间格式错误";
         }
       }

@@ -104,4 +104,29 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     List<TimeSlot> findByDateRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    // 检查某天是否有被预约的时间段（用于判断是否可以修改该天的时间段）
+    @Query("SELECT COUNT(t) > 0 FROM TimeSlot t WHERE t.venueId = :venueId AND t.date = :date " +
+           "AND t.status NOT IN ('AVAILABLE', 'EXPIRED', 'MAINTENANCE')")
+    boolean hasBookedSlotsOnDate(
+            @Param("venueId") Long venueId,
+            @Param("date") LocalDate date);
+
+    // 删除指定场馆指定日期的所有可用时间段（未被预约的）
+    @Modifying
+    @Query("DELETE FROM TimeSlot t WHERE t.venueId = :venueId AND t.date = :date " +
+           "AND t.status IN ('AVAILABLE', 'EXPIRED', 'MAINTENANCE')")
+    void deleteAvailableSlotsOnDate(
+            @Param("venueId") Long venueId,
+            @Param("date") LocalDate date);
+
+    // 查询场馆已生成时间段的日期列表（用于排期管理日期选择）
+    @Query("SELECT DISTINCT t.date FROM TimeSlot t WHERE t.venueId = :venueId AND t.date >= :startDate ORDER BY t.date")
+    List<LocalDate> findDistinctDatesByVenueId(
+            @Param("venueId") Long venueId,
+            @Param("startDate") LocalDate startDate);
+
+    // 查询场馆所有已生成时间段的日期列表
+    @Query("SELECT DISTINCT t.date FROM TimeSlot t WHERE t.venueId = :venueId ORDER BY t.date")
+    List<LocalDate> findAllDistinctDatesByVenueId(@Param("venueId") Long venueId);
 }

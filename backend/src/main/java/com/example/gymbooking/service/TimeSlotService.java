@@ -297,15 +297,85 @@ public class TimeSlotService {
         // 查找指定时间范围内的时间段
         List<TimeSlot> slots = timeSlotRepository.findByVenueIdAndDateAndTimeRange(
             venueId, date, startTime, endTime);
-        
+
         // 将状态设置为可用
         for (TimeSlot slot : slots) {
-            if (slot.getStatus() == TimeSlot.SlotStatus.BOOKED || 
+            if (slot.getStatus() == TimeSlot.SlotStatus.BOOKED ||
                 slot.getStatus() == TimeSlot.SlotStatus.SHARING) {
                 slot.setStatus(TimeSlot.SlotStatus.AVAILABLE);
                 slot.setOrderId(null); // 清除订单ID
                 timeSlotRepository.save(slot);
             }
         }
+    }
+
+    /**
+     * 获取场馆已生成时间段的日期列表（从指定日期开始）
+     * 用于排期管理日期选择限制和营业时间变更同步
+     */
+    public List<LocalDate> getGeneratedDatesForVenue(Long venueId, LocalDate startDate) {
+        return timeSlotRepository.findDistinctDatesByVenueId(venueId, startDate);
+    }
+
+    /**
+     * 获取场馆所有已生成时间段的日期列表
+     * 用于排期管理页面显示可选日期
+     */
+    public List<LocalDate> getAllGeneratedDatesForVenue(Long venueId) {
+        return timeSlotRepository.findAllDistinctDatesByVenueId(venueId);
+    }
+
+    /**
+     * 检查指定日期是否有被预约的时间段
+     * 用于判断是否可以修改该天的时间段
+     */
+    public boolean hasBookedSlotsOnDate(Long venueId, LocalDate date) {
+        return timeSlotRepository.hasBookedSlotsOnDate(venueId, date);
+    }
+
+    /**
+     * 重新生成指定日期的时间段
+     * 删除旧的可用时间段，按照新的营业时间和价格重新生成
+     */
+    @Transactional
+    public void regenerateTimeSlotsForDate(Long venueId, LocalDate date, LocalTime openTime, LocalTime closeTime, Double hourlyPrice) {
+        logger.info("[TimeSlotService] 重新生成时间段 - venueId: {}, date: {}, openTime: {}, closeTime: {}, price: {}",
+                   venueId, date, openTime, closeTime, hourlyPrice);
+
+        // 删除该天的所有可用时间段（状态为 AVAILABLE、EXPIRED、MAINTENANCE）
+        timeSlotRepository.deleteAvailableSlotsOnDate(venueId, date);
+
+        // 生成新的时间段（半小时为单位）
+        List<TimeSlot> newSlots = new ArrayList<>();
+        LocalTime currentTime = openTime;
+
+        while (currentTime.isBefore(closeTime)) {
+            LocalTime endTime = currentTime.plusMinutes(30);
+            if (endTime.isAfter(closeTime)) {
+                break;
+            }
+
+            // 计算半小时的价格
+            Double slotPrice = hourlyPrice != null ? hourlyPrice / 2 : 50.0;
+
+            TimeSlot slot = new TimeSlot(venueId, date, currentTime, endTime, slotPrice);
+            newSlots.add(slot);
+
+            currentTime = endTime;
+        }
+
+        // 保存新生成的时间段
+        List<TimeSlot> savedSlots = timeSlotRepository.saveAll(newSlots);
+        logger.info("[TimeSlotService] 重新生成完成，共 {} 个时间段", savedSlots.size());
+    }
+
+    /**
+     * 删除场馆的所有时间段（用于删除场馆时）
+     */
+    @Transactional
+    public void deleteAllByVenueId(Long venueId) {
+        logger.info("[TimeSlotService] 删除场馆 {} 的所有时间段", venueId);
+        timeSlotRepository.deleteByVenueId(venueId);
+        logger.info("[TimeSlotService] 场馆 {} 的时间段删除完成", venueId);
     }
 }

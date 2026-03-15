@@ -16,7 +16,7 @@ function deleteVenue(id) {
   return utils_request.del(`/venues/${id}`);
 }
 function getVenueDetail(id) {
-  return utils_request.get(`/venues/${id}`);
+  return utils_request.get(`/venues/${id}`, {}, { cache: false });
 }
 function getVenueTimeslots(venueId, date) {
   return utils_request.get(`/timeslots/venue/${venueId}/date/${date}`);
@@ -24,8 +24,12 @@ function getVenueTimeslots(venueId, date) {
 function updateTimeslotStatus(id, data) {
   return utils_request.patch(`/timeslots/${id}/status`, data);
 }
+function getGeneratedDates(venueId) {
+  return utils_request.get(`/timeslots/venue/${venueId}/generated-dates`);
+}
 exports.createVenue = createVenue;
 exports.deleteVenue = deleteVenue;
+exports.getGeneratedDates = getGeneratedDates;
 exports.getMyManagedVenues = getMyManagedVenues;
 exports.getVenueDetail = getVenueDetail;
 exports.getVenueTimeslots = getVenueTimeslots;

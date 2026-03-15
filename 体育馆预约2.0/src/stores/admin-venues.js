@@ -9,6 +9,7 @@ import {
   getVenueTimeslots,
   updateTimeslotStatus
 } from '@/api/admin.js'
+import { clearCache } from '@/utils/request.js'
 
 export const useAdminVenuesStore = defineStore('adminVenues', {
   state: () => ({
@@ -61,7 +62,11 @@ export const useAdminVenuesStore = defineStore('adminVenues', {
 
     async removeVenue(id) {
       await deleteVenue(id)
-      this.managerVenues = this.managerVenues.filter(v => v.id !== id)
+      // 清除缓存，确保下次获取最新数据
+      clearCache('/venues/manager/me')
+      // 确保 ID 类型一致再过滤
+      const numId = Number(id)
+      this.managerVenues = this.managerVenues.filter(v => Number(v.id) !== numId)
     },
 
     async toggleVenueStatus(id, status) {

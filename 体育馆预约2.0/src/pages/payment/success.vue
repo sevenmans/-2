@@ -49,7 +49,8 @@
 
 <script>
 import { getOrderDetail } from '@/api/payment.js'
-import { get } from '@/utils/request.js'
+import { get, clearCache } from '@/utils/request.js'
+import { useAdminOrdersStore } from '@/stores/admin-orders.js'
 // 已移除popup-protection相关导入
 
 export default {
@@ -65,6 +66,7 @@ export default {
   onLoad(options) {
     this.orderId = options.orderId
     this.fromPage = options.from || '' // 记录来源页面
+    this.notifyAdminOrdersNeedRefresh()
 
     if (this.orderId) {
       this.loadOrderInfo()
@@ -82,6 +84,15 @@ export default {
   },
   
   methods: {
+    notifyAdminOrdersNeedRefresh() {
+      clearCache('/admin/bookings')
+      clearCache('/admin/dashboard/stats')
+      try {
+        const adminOrdersStore = useAdminOrdersStore()
+        adminOrdersStore.needRefresh = true
+      } catch {}
+    },
+
     // 加载订单信息
     async loadOrderInfo() {
       try {

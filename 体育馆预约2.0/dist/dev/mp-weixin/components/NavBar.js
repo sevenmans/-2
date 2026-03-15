@@ -33,6 +33,11 @@ const _sfc_main = {
       type: String,
       default: ""
     },
+    // 右侧文字颜色
+    rightTextColor: {
+      type: String,
+      default: ""
+    },
     // 是否显示底部边框
     showBorder: {
       type: Boolean,
@@ -85,6 +90,12 @@ const _sfc_main = {
     titleStyle() {
       return {
         color: this.titleColor
+      };
+    },
+    // 右侧文字样式
+    rightTextStyle() {
+      return {
+        color: this.rightTextColor || this.titleColor
       };
     },
     // 总高度
@@ -152,13 +163,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     g: common_vendor.s($options.titleStyle),
     h: $props.rightText
   }, $props.rightText ? {
-    i: common_vendor.t($props.rightText)
+    i: common_vendor.t($props.rightText),
+    j: common_vendor.s($options.rightTextStyle)
   } : {}, {
-    j: common_vendor.o((...args) => $options.handleRightClick && $options.handleRightClick(...args)),
-    k: $data.navBarHeight + "px",
-    l: $props.showBorder
+    k: common_vendor.o((...args) => $options.handleRightClick && $options.handleRightClick(...args)),
+    l: $data.navBarHeight + "px",
+    m: $props.showBorder
   }, $props.showBorder ? {} : {}, {
-    m: common_vendor.s($options.navBarStyle)
+    n: common_vendor.s($options.navBarStyle)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c3ceb15a"]]);

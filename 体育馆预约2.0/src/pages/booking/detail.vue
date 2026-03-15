@@ -312,7 +312,6 @@ export default {
   onShow() {
     try {
       if (this.bookingId) {
-        // 页面重新显示时，强制无缓存刷新，确保状态即时
         this.bookingStore.getBookingDetail(this.bookingId, false)
           .then(() => this.$nextTick())
           .catch(() => {})
@@ -337,12 +336,18 @@ export default {
           throw new Error('订单ID无效，请重新进入页面')
         }
 
-        // 清除可能存在的无效缓存
+        if (this.bookingStore?.cache?.bookingDetails) {
+          this.bookingStore.cache.bookingDetails.delete(this.bookingId)
+          const numericBookingId = Number(this.bookingId)
+          if (Number.isFinite(numericBookingId)) {
+            this.bookingStore.cache.bookingDetails.delete(numericBookingId)
+          }
+        }
         clearCache(`/bookings/${this.bookingId}`)
 
         
 
-        await this.bookingStore.getBookingDetail(this.bookingId)
+        await this.bookingStore.getBookingDetail(this.bookingId, false)
 
         // 等待一下确保数据已经更新到store
         await this.$nextTick()

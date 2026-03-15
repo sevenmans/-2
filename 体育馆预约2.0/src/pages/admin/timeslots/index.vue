@@ -20,9 +20,13 @@
           </view>
           <view class="form-group" style="margin-bottom: 0;">
             <text class="form-label">选择日期</text>
-            <picker mode="date" :value="selectedDate" @change="onDateChange">
+            <!-- 使用普通选择器替代日期选择器，只显示已生成时间段的日期 -->
+            <picker v-if="generatedDates.length > 0" :range="generatedDates" :value="dateIndex" @change="onDatePickerChange">
               <view class="form-input picker-input">{{ selectedDate || '请选择日期' }}</view>
             </picker>
+            <view v-else class="form-input picker-input disabled-input" @click="handleNoDateClick">
+              {{ selectedVenueId ? (datesLoading ? '加载中...' : '暂无可选日期') : '请先选择场馆' }}
+            </view>
           </view>
         </view>
 
@@ -75,6 +79,7 @@
 <script>
 import NavBar from '@/components/NavBar.vue'
 import { useAdminVenuesStore } from '@/stores/admin-venues.js'
+import { getGeneratedDates } from '@/api/admin.js'
 
 export default {
   components: { NavBar },
@@ -85,7 +90,9 @@ export default {
       navBarHeight: 0,
       selectedVenueId: '',
       selectedDate: '',
-      venues: []
+      venues: [],
+      generatedDates: [], // 已生成时间段的日期列表
+      datesLoading: false // 日期加载状态
     }
   },
 
@@ -98,15 +105,16 @@ export default {
     currentVenueName() {
       const v = this.venues.find(v => String(v.id) === String(this.selectedVenueId))
       return v ? v.name : ''
+    },
+    dateIndex() {
+      // 获取当前选中日期在列表中的索引
+      return this.generatedDates.findIndex(d => d === this.selectedDate)
     }
   },
 
   onLoad(options) {
     this.venuesStore = useAdminVenuesStore()
     this.calcNavBarHeight()
-
-    const today = new Date()
-    this.selectedDate = this.formatDate(today)
 
     if (options.venueId) {
       this.selectedVenueId = options.venueId
@@ -136,26 +144,70 @@ export default {
       try {
         await this.venuesStore.fetchManagedVenues()
         this.venues = this.venuesStore.managerVenues || []
-        if (this.selectedVenueId && this.selectedDate) {
-          this.loadTimeslots()
+        // 如果有预选场馆，加载该场馆的可选日期
+        if (this.selectedVenueId) {
+          await this.loadGeneratedDates()
         }
       } catch (e) {
         uni.showToast({ title: '加载场馆失败', icon: 'none' })
       }
     },
 
-    onVenueChange(e) {
+    async onVenueChange(e) {
       const venue = this.venues[e.detail.value]
       if (venue) {
         this.selectedVenueId = venue.id
+        this.selectedDate = '' // 重置选中的日期
+        this.generatedDates = [] // 重置日期列表
+        await this.loadGeneratedDates()
+      }
+    },
+
+    // 加载场馆已生成时间段的日期列表
+    async loadGeneratedDates() {
+      if (!this.selectedVenueId) return
+
+      this.datesLoading = true
+      try {
+        const res = await getGeneratedDates(this.selectedVenueId)
+        const rawData = res.data || res
+        const dates = rawData.data || rawData || []
+        this.generatedDates = Array.isArray(dates) ? dates : []
+
+        console.log('[排期管理] 加载到可选日期:', this.generatedDates.length, '个')
+
+        // 如果有可选日期，默认选中第一个（通常是今天）
+        if (this.generatedDates.length > 0) {
+          // 优先选择今天
+          const today = this.formatDate(new Date())
+          if (this.generatedDates.includes(today)) {
+            this.selectedDate = today
+          } else {
+            this.selectedDate = this.generatedDates[0]
+          }
+          this.loadTimeslots()
+        }
+      } catch (e) {
+        console.error('[排期管理] 加载可选日期失败:', e)
+        uni.showToast({ title: '加载可选日期失败', icon: 'none' })
+      } finally {
+        this.datesLoading = false
+      }
+    },
+
+    onDatePickerChange(e) {
+      const dateStr = this.generatedDates[e.detail.value]
+      if (dateStr) {
+        this.selectedDate = dateStr
         this.loadTimeslots()
       }
     },
 
-    onDateChange(e) {
-      this.selectedDate = e.detail.value
-      if (this.selectedVenueId) {
-        this.loadTimeslots()
+    handleNoDateClick() {
+      if (!this.selectedVenueId) {
+        uni.showToast({ title: '请先选择场馆', icon: 'none' })
+      } else if (!this.datesLoading) {
+        uni.showToast({ title: '该场馆暂无已生成的时间段', icon: 'none' })
       }
     },
 
@@ -277,6 +329,12 @@ export default {
 }
 
 .picker-input { color: #606266; }
+
+.disabled-input {
+  color: #909399;
+  background: #f5f7fa;
+  cursor: not-allowed;
+}
 
 .card-title {
   font-size: 30rpx;

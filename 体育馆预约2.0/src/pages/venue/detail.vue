@@ -307,12 +307,15 @@ export default {
 
     // 处理设施列表
     facilitiesList() {
+      // 优先使用后端返回的 facilityTags 数组
+      if (this.venueDetail.facilityTags && Array.isArray(this.venueDetail.facilityTags) && this.venueDetail.facilityTags.length > 0) {
+        return this.venueDetail.facilityTags.filter(f => f && f.trim())
+      }
+      // 兼容 facilities 字符串格式（同时支持中英文逗号分隔）
       if (this.venueDetail.facilities) {
-        // 如果facilities是字符串，按逗号分割
         if (typeof this.venueDetail.facilities === 'string') {
-          return this.venueDetail.facilities.split(',').map(f => f.trim()).filter(f => f)
+          return this.venueDetail.facilities.split(/[,，]/).map(f => f.trim()).filter(f => f)
         }
-        // 如果已经是数组，直接返回
         if (Array.isArray(this.venueDetail.facilities)) {
           return this.venueDetail.facilities
         }
@@ -519,7 +522,7 @@ export default {
     async initData() {
       try {
         console.log(`[VenueDetail] 开始初始化数据，场馆ID: ${this.venueId}`);
-        
+
         if (!this.venueId) {
           console.error('[VenueDetail] 场馆ID为空');
           uni.showToast({
@@ -528,14 +531,12 @@ export default {
           });
           return;
         }
-        
+
         this.loading = true;
-        
-        this.loading = true;
-        
+
         // 🔥 性能优化：先初始化日期获取 selectedDate，让详情和时间段接口并行请求
         this.initDates();
-        
+
         const requests = [
           this.venueStore.getVenueDetail(this.venueId)
             .then(() => console.log('[VenueDetail] 获取场馆详情成功'))
@@ -1190,9 +1191,11 @@ export default {
     
     // 联系场馆
     contactVenue() {
-      if (this.venueDetail.phone) {
+      // 后端字段名是 contactPhone
+      const phone = this.venueDetail.contactPhone
+      if (phone) {
         uni.makePhoneCall({
-          phoneNumber: this.venueDetail.phone
+          phoneNumber: phone
         })
       } else {
         uni.showToast({

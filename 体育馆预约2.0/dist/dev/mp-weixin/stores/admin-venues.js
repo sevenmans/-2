@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const api_admin = require("../api/admin.js");
+const utils_request = require("../utils/request.js");
 const useAdminVenuesStore = common_vendor.defineStore("adminVenues", {
   state: () => ({
     managerVenues: [],
@@ -16,7 +17,7 @@ const useAdminVenuesStore = common_vendor.defineStore("adminVenues", {
         const res = await api_admin.getMyManagedVenues();
         this.managerVenues = res.data || res || [];
       } catch (e) {
-        common_vendor.index.__f__("error", "at stores/admin-venues.js:29", "[AdminVenues] fetchManagedVenues error:", e);
+        common_vendor.index.__f__("error", "at stores/admin-venues.js:30", "[AdminVenues] fetchManagedVenues error:", e);
         throw e;
       } finally {
         this.loading = false;
@@ -50,7 +51,9 @@ const useAdminVenuesStore = common_vendor.defineStore("adminVenues", {
     },
     async removeVenue(id) {
       await api_admin.deleteVenue(id);
-      this.managerVenues = this.managerVenues.filter((v) => v.id !== id);
+      utils_request.clearCache("/venues/manager/me");
+      const numId = Number(id);
+      this.managerVenues = this.managerVenues.filter((v) => Number(v.id) !== numId);
     },
     async toggleVenueStatus(id, status) {
       await api_admin.updateVenueStatus(id, { status });
@@ -64,7 +67,7 @@ const useAdminVenuesStore = common_vendor.defineStore("adminVenues", {
         const res = await api_admin.getVenueTimeslots(venueId, date);
         this.timeslots = res.data || res || [];
       } catch (e) {
-        common_vendor.index.__f__("error", "at stores/admin-venues.js:79", "[AdminVenues] fetchTimeslots error:", e);
+        common_vendor.index.__f__("error", "at stores/admin-venues.js:84", "[AdminVenues] fetchTimeslots error:", e);
         throw e;
       } finally {
         this.timeslotLoading = false;

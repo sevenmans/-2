@@ -281,11 +281,6 @@
   color: #ffffff;
   border-color: #ff6b35;
 }
-.booking-list .booking-card .card-actions .action-btn.review-btn.data-v-afb09895 {
-  background-color: transparent;
-  color: #1890ff;
-  border-color: #1890ff;
-}
 .booking-list .booking-card .card-actions .action-btn.rebook-btn.data-v-afb09895 {
   background-color: #ff6b35;
   color: #ffffff;

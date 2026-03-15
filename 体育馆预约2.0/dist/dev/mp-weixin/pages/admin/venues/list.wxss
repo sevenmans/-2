@@ -142,3 +142,29 @@
   font-size: 28rpx;
   color: #909399;
 }
+.fab-container.data-v-93f01705 {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(180rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.fab-btn.data-v-93f01705 {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 32rpx;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.4);
+}
+.fab-icon.data-v-93f01705 {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin-right: 8rpx;
+  line-height: 1;
+}
+.fab-text.data-v-93f01705 {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #ffffff;
+}

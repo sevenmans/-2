@@ -122,7 +122,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     }),
     g: $data.navBarHeight + "px",
-    h: common_vendor.p({
+    h: common_vendor.o((...args) => $options.goCreate && $options.goCreate(...args)),
+    i: common_vendor.p({
       current: "venues"
     })
   });

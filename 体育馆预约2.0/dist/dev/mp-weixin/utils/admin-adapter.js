@@ -29,7 +29,7 @@ function adaptAdminStats(raw) {
   return {
     totalOrders: raw.totalOrders ?? raw.total ?? 0,
     income: raw.income ?? raw.revenue ?? raw.estimatedRevenue ?? 0,
-    pendingVerification: raw.pendingVerification ?? raw.waitVerify ?? 0,
+    pendingVerification: raw.pendingVerification ?? raw.pendingVerificationCount ?? raw.waitVerify ?? 0,
     verified: raw.verified ?? raw.verifiedCount ?? 0,
     refundOrCancel: raw.refundOrCancel ?? raw.cancelledCount ?? 0,
     avgPrice: raw.avgPrice ?? raw.averagePrice ?? 0,
@@ -42,6 +42,16 @@ function adaptAdminOrder(raw) {
     return null;
   const status = raw.status || "";
   const refundType = raw.refundType || "";
+  const bookingType = raw.bookingType || raw.type || "EXCLUSIVE";
+  const isShared = bookingType === "SHARED";
+  const toSafeAmount = (value) => {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount : 0;
+  };
+  const totalPrice = toSafeAmount(raw.totalPrice ?? raw.price ?? 0);
+  const pricePerTeam = toSafeAmount(raw.pricePerTeam);
+  const basePrice = pricePerTeam > 0 ? pricePerTeam : totalPrice;
+  const displayPrice = isShared ? basePrice * 2 : totalPrice;
   let statusText = STATUS_TEXT_MAP[status] || status;
   if (status === "CANCELLED" && refundType === "LOGIC_REFUND") {
     statusText = "已退款";
@@ -71,12 +81,13 @@ function adaptAdminOrder(raw) {
     date,
     startTime,
     endTime,
-    price: raw.totalPrice ?? raw.price ?? 0,
+    price: displayPrice.toFixed(2),
+    amountLabel: isShared ? "合计" : "实付",
     status,
     statusText,
     statusColor: STATUS_COLOR_MAP[status] || "#909399",
-    type: raw.bookingType || raw.type || "EXCLUSIVE",
-    typeText: (raw.bookingType || raw.type) === "SHARED" ? "拼场" : "包场",
+    type: bookingType,
+    typeText: bookingType === "SHARED" ? "拼场" : "包场",
     userName: raw.userName || raw.nickname || "",
     userPhone: raw.userPhone || raw.phone || "",
     phoneTail: (raw.userPhone || raw.phone || "").slice(-4),

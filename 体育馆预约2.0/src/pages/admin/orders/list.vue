@@ -84,7 +84,7 @@
           <!-- 底部：金额 + 操作 -->
           <view class="card-footer">
             <view class="price-area">
-              <text class="price-label">实付:</text>
+              <text class="price-label">{{ order.type === 'SHARED' ? '合计' : '实付' }}:</text>
               <text class="price-value">¥{{ order.price }}</text>
             </view>
             <view class="action-area">
@@ -163,7 +163,7 @@ export default {
       this.ordersStore.pagination.page = 1
       this.ordersStore.list = []
     }
-    this.fetchOrders()
+    this.fetchOrders(true)
   },
 
   methods: {
@@ -203,9 +203,9 @@ export default {
       this.fetchOrders()
     },
 
-    async fetchOrders() {
+    async fetchOrders(forceRefresh = false) {
       try {
-        await this.ordersStore.fetchOrders(false)
+        await this.ordersStore.fetchOrders(false, forceRefresh)
       } catch (e) {
         uni.showToast({ title: e.message || '加载失败', icon: 'none' })
       }
@@ -232,6 +232,7 @@ export default {
           try {
             await this.ordersStore.cancelOrder(order.id)
             uni.showToast({ title: '已取消并退款', icon: 'success' })
+            await this.fetchOrders(true)
             // 刷新统计
             try { useAdminDashboardStore().refreshStats() } catch {}
           } catch (e) {

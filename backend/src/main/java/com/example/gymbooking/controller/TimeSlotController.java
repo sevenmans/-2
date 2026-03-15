@@ -304,4 +304,44 @@ public class TimeSlotController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    /**
+     * 获取场馆已生成时间段的日期列表（用于排期管理日期选择限制）
+     * 返回从今天开始的所有已生成时间段的日期
+     */
+    @GetMapping("/venue/{venueId}/generated-dates")
+    @PreAuthorize("hasRole('ROLE_VENUE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<Map<String, Object>> getGeneratedDatesForVenue(@PathVariable("venueId") Long venueId) {
+        try {
+            logger.info("[TimeSlotController] 获取场馆已生成时间段的日期列表 - venueId: {}", venueId);
+
+            // 获取从今天开始的所有已生成时间段的日期
+            LocalDate today = LocalDate.now();
+            List<LocalDate> dates = timeSlotService.getGeneratedDatesForVenue(venueId, today);
+
+            // 转换为字符串格式返回（yyyy-MM-dd）
+            List<String> dateStrings = dates.stream()
+                    .map(LocalDate::toString)
+                    .collect(Collectors.toList());
+
+            logger.info("[TimeSlotController] 返回 {} 个可选日期", dateStrings.size());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", dateStrings);
+            response.put("count", dateStrings.size());
+            response.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("[TimeSlotController] 获取已生成日期列表失败", e);
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "获取已生成日期列表失败: " + e.getMessage());
+            errorResponse.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
 }

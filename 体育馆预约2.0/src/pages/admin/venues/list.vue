@@ -48,6 +48,14 @@
       </scroll-view>
     </view>
 
+    <!-- 浮动新增按钮 -->
+    <view class="fab-container" @tap="goCreate">
+      <view class="fab-btn">
+        <text class="fab-icon">+</text>
+        <text class="fab-text">新增场馆</text>
+      </view>
+    </view>
+
     <AdminTabBar current="venues" />
   </view>
 </template>
@@ -272,5 +280,36 @@ export default {
 .loading-text {
   font-size: 28rpx;
   color: #909399;
+}
+
+// 浮动新增按钮
+.fab-container {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(180rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.fab-btn {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 32rpx;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.4);
+}
+
+.fab-icon {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin-right: 8rpx;
+  line-height: 1;
+}
+
+.fab-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #ffffff;
 }
 </style>

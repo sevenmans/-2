@@ -1,4 +1,4 @@
-import { get, post } from '@/utils/request.js'
+import { get, put } from '@/utils/request.js'
 
 export function getAdminDashboardStats(params) {
   return get('/admin/dashboard/stats', params)
@@ -9,5 +9,5 @@ export function getAdminBookings(params, options = {}) {
 }
 
 export function adminCancelBooking(id) {
-  return post(`/bookings/${id}/admin-cancel`)
+  return put(`/bookings/${id}/cancel`)
 }

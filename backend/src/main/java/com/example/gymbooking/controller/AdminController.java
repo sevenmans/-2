@@ -71,8 +71,14 @@ public class AdminController {
                 response.put("venueCount", 0);
                 response.put("totalOrders", 0);
                 response.put("pendingVerificationCount", 0);
+                response.put("pendingVerification", 0);
                 response.put("verifiedCount", 0);
+                response.put("verified", 0);
                 response.put("revenue", 0.0);
+                response.put("income", 0.0);
+                response.put("refundOrCancel", 0);
+                response.put("cancelledCount", 0);
+                response.put("avgPrice", 0.0);
                 response.put("rangeStart", null);
                 response.put("rangeEnd", null);
                 return ResponseEntity.ok(response);
@@ -102,18 +108,39 @@ public class AdminController {
                     rangeStart,
                     rangeEnd
             );
+            long cancelledCount = orderRepository.countByVenueIdInAndStatusInAndBookingTimeBetween(
+                    venueIds,
+                    Collections.singletonList(Order.OrderStatus.CANCELLED),
+                    rangeStart,
+                    rangeEnd
+            );
             Double revenue = orderRepository.sumTotalPriceByVenueIdInAndStatusInAndBookingTimeBetween(
                     venueIds,
                     Collections.singletonList(Order.OrderStatus.COMPLETED),
                     rangeStart,
                     rangeEnd
             );
+            Double totalAmount = orderRepository.sumTotalPriceByVenueIdInAndStatusInAndBookingTimeBetween(
+                    venueIds,
+                    Arrays.asList(Order.OrderStatus.values()),
+                    rangeStart,
+                    rangeEnd
+            );
+            double safeRevenue = revenue == null ? 0.0 : revenue;
+            double safeTotalAmount = totalAmount == null ? 0.0 : totalAmount;
+            double avgPrice = totalOrders > 0 ? safeTotalAmount / totalOrders : 0.0;
 
             response.put("venueCount", venueIds.size());
             response.put("totalOrders", totalOrders);
             response.put("pendingVerificationCount", pendingVerificationCount);
+            response.put("pendingVerification", pendingVerificationCount);
             response.put("verifiedCount", verifiedCount);
-            response.put("revenue", revenue == null ? 0.0 : revenue);
+            response.put("verified", verifiedCount);
+            response.put("revenue", safeRevenue);
+            response.put("income", safeRevenue);
+            response.put("refundOrCancel", cancelledCount);
+            response.put("cancelledCount", cancelledCount);
+            response.put("avgPrice", avgPrice);
             response.put("rangeStart", rangeStart);
             response.put("rangeEnd", rangeEnd);
             return ResponseEntity.ok(response);

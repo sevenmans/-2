@@ -162,8 +162,7 @@ public class VerificationController {
     public ResponseEntity<?> completeOrder(@PathVariable Long id) {
         try {
             UserDetailsImpl currentUser = getCurrentUser();
-            Order order = orderRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("订单不存在"));
+            Order order = resolveOrderForCompletion(id);
 
             if (!isVenueManagedByCurrentAdmin(order.getVenueId(), currentUser.getId())) {
                 return ResponseEntity.status(403).body(new MessageResponse("无权限完成该订单"));
@@ -188,6 +187,30 @@ public class VerificationController {
             return ResponseEntity.badRequest()
                     .body(new MessageResponse("完成订单失败: " + e.getMessage()));
         }
+    }
+
+    private Order resolveOrderForCompletion(Long id) {
+        if (id == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        if (id >= 0) {
+            return orderRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("订单不存在"));
+        }
+        Long requestId = -id;
+        SharingRequest sharingRequest = sharingRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("虚拟订单对应申请不存在"));
+        Long orderId = sharingRequest.getOrderId();
+        if (orderId == null && sharingRequest.getSharingOrderId() != null) {
+            SharingOrder sharingOrder = sharingOrderRepository.findById(sharingRequest.getSharingOrderId())
+                    .orElseThrow(() -> new RuntimeException("拼场订单不存在"));
+            orderId = sharingOrder.getOrderId();
+        }
+        if (orderId == null) {
+            throw new RuntimeException("虚拟订单未关联主订单");
+        }
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("虚拟订单关联主订单不存在"));
     }
 
     /**

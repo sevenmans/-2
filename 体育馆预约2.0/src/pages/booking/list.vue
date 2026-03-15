@@ -73,7 +73,7 @@
           </view>
           
           <view class="price-info">
-            <text class="price-label">费用：</text>
+            <text class="price-label">{{ getBookingPriceLabel(booking) }}</text>
             <text class="price-value">¥{{ getBookingPrice(booking) }}</text>
           </view>
 
@@ -132,7 +132,6 @@
 
           <!-- 已完成状态 -->
           <template v-else-if="booking.status === 'COMPLETED'">
-            <button class="action-btn review-btn" @click.stop="reviewVenue(booking)">评价场馆</button>
             <button class="action-btn rebook-btn" @click.stop="rebookVenue(booking)">再次预约</button>
           </template>
 
@@ -203,6 +202,8 @@ import { formatDate, formatTime } from '@/utils/helpers.js'
 import CountdownTimer from '@/components/CountdownTimer.vue'
 import { shouldShowCountdown } from '@/utils/countdown.js'
 import { onShow, onPullDownRefresh, onReachBottom } from '@dcloudio/uni-app'
+import { completeUserOrder } from '@/api/order.js'
+import { clearCache } from '@/utils/request.js'
 // 使用uni-app自动导入机制
 
 // 使用Pinia stores
@@ -465,12 +466,7 @@ const emptyStateText = computed(() => {
       }
     };
 
-    // 评价场馆
-    const reviewVenue = (booking) => {
-      uni.navigateTo({
-        url: `/pages/venue/review?venueId=${booking.venueId}&bookingId=${booking.id}`
-      });
-    };
+
 
     // 再次预约
     const rebookVenue = (booking) => {
@@ -633,20 +629,17 @@ const emptyStateText = computed(() => {
     const getBookingPrice = (booking) => {
       if (!booking) return '0.00';
 
-      // 检查是否是虚拟订单（负数ID）
+      const isShared = booking.bookingType === 'SHARED';
       const virtualOrder = isVirtualOrder(booking);
-
-      let price;
-      if (virtualOrder) {
-        // 虚拟订单使用 paymentAmount
-        price = booking.paymentAmount || 0;
-      } else {
-        // 普通订单使用 totalPrice
-        price = booking.totalPrice || 0;
-      }
-
-      return price.toFixed(2);
+      const basePrice = virtualOrder ? (booking.paymentAmount ?? booking.totalPrice ?? 0) : (booking.totalPrice ?? 0);
+      const displayPrice = isShared ? basePrice * 2 : basePrice;
+      return Number(displayPrice).toFixed(2);
     };
+
+    const getBookingPriceLabel = (booking) => {
+      if (!booking) return '费用：'
+      return booking.bookingType === 'SHARED' ? '合计：' : '费用：'
+    }
 
     // 格式化预约日期（兼容虚拟订单和普通订单）
     const formatBookingDate = (booking) => {
@@ -883,22 +876,38 @@ const emptyStateText = computed(() => {
     }
 
     // 完成订单
-    const completeOrder = (_booking) => {
+    const completeOrder = (booking) => {
       uni.showModal({
         title: '完成订单',
         content: '确认完成此次预约？',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            // TODO: 调用完成订单API
-            uni.showToast({
-              title: '订单已完成',
-              icon: 'success'
-            });
-            initData(); // 刷新数据
+            try {
+              await completeUserOrder(booking.id)
+              // 清除缓存确保数据同步
+              clearCache('/bookings')
+              clearCache(`/bookings/${booking.id}`)
+              uni.showToast({
+                title: '订单已完成',
+                icon: 'success'
+              })
+              // 强制刷新数据，绕过缓存
+              await bookingStore.getUserBookings({
+                page: 1,
+                pageSize: 10,
+                refresh: true,
+                force: true
+              })
+            } catch (e) {
+              uni.showToast({
+                title: e.message || '操作失败',
+                icon: 'none'
+              })
+            }
           }
         }
-      });
-    };
+      })
+    }
 
 
 </script>
@@ -1215,13 +1224,7 @@ const emptyStateText = computed(() => {
           color: #ffffff;
           border-color: #ff6b35;
         }
-        
-        &.review-btn {
-          background-color: transparent;
-          color: #1890ff;
-          border-color: #1890ff;
-        }
-        
+
         &.rebook-btn {
           background-color: #ff6b35;
           color: #ffffff;

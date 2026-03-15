@@ -24,3 +24,8 @@ export function cancelOrder(id) {
 export function getAllOrders(params) {
   return get('/order/all', params)
 }
+
+// 用户完成订单（将已核销的订单标记为已完成）
+export function completeUserOrder(id) {
+  return post(`/order/${id}/complete`)
+}

@@ -681,19 +681,67 @@ public class BookingController {
                 logger.info("🏟️ 找到场馆位置: {}", venue.getLocation());
             });
 
-            // 🔧 修复：如果是拼场订单，获取SharingOrder表中的队伍名称和联系方式
+            // 🔧 修复：如果是拼场订单，获取SharingOrder表中完整的拼场信息
             if (order.getBookingType() == Order.BookingType.SHARED) {
-                logger.info("🤝 检测到拼场订单，查询SharingOrder表获取队伍信息");
+                logger.info("🤝 检测到拼场订单，查询SharingOrder表获取完整拼场信息");
                 SharingOrder sharingOrder = sharingOrderRepository.findByOrderId(order.getId());
                 if (sharingOrder != null) {
+                    // 基本信息
                     response.put("teamName", sharingOrder.getTeamName());
                     response.put("contactInfo", sharingOrder.getContactInfo());
-                    logger.info("🤝 找到拼场订单信息 - 队伍名称: {}, 联系方式: {}",
-                        sharingOrder.getTeamName(), sharingOrder.getContactInfo());
+                    // 拼场详情
+                    response.put("sharingDescription", sharingOrder.getDescription());
+                    response.put("currentPeople", sharingOrder.getCurrentParticipants());
+                    response.put("totalPeople", sharingOrder.getMaxParticipants());
+                    response.put("pricePerPerson", sharingOrder.getPricePerTeam());
+                    response.put("sharingOrderId", sharingOrder.getId());
+                    response.put("sharingStatus", sharingOrder.getStatus().name());
+
+                    logger.info("🤝 找到拼场订单信息 - 队伍名称: {}, 当前人数: {}/{}, 每队费用: {}",
+                        sharingOrder.getTeamName(), sharingOrder.getCurrentParticipants(),
+                        sharingOrder.getMaxParticipants(), sharingOrder.getPricePerTeam());
+
+                    // 获取参与者列表（已接受或已支付的申请）
+                    List<SharingRequest> requests = sharingRequestRepository.findByOrderId(order.getId());
+                    List<Map<String, Object>> participants = new ArrayList<>();
+
+                    // 添加发起者作为第一个参与者
+                    Map<String, Object> initiator = new HashMap<>();
+                    initiator.put("name", sharingOrder.getTeamName());
+                    initiator.put("phone", sharingOrder.getContactInfo());
+                    initiator.put("username", sharingOrder.getCreatorUsername());
+                    initiator.put("status", "INITIATOR");
+                    initiator.put("isInitiator", true);
+                    participants.add(initiator);
+
+                    // 添加已接受/已支付的申请者
+                    for (SharingRequest request : requests) {
+                        // 只添加有效状态的申请
+                        if (request.getStatus() == SharingRequest.RequestStatus.APPROVED ||
+                            request.getStatus() == SharingRequest.RequestStatus.PAID ||
+                            request.getStatus() == SharingRequest.RequestStatus.APPROVED_PENDING_PAYMENT) {
+                            Map<String, Object> participant = new HashMap<>();
+                            participant.put("name", request.getApplicantTeamName());
+                            participant.put("phone", request.getApplicantContact());
+                            participant.put("username", request.getApplicantUsername());
+                            participant.put("status", request.getStatus().name());
+                            participant.put("isInitiator", false);
+                            participant.put("requestId", request.getId());
+                            participant.put("isPaid", request.getIsPaid() != null && request.getIsPaid());
+                            participants.add(participant);
+                        }
+                    }
+                    response.put("participants", participants);
+                    logger.info("🤝 拼场参与者数量: {}", participants.size());
                 } else {
                     logger.warn("⚠️ 拼场订单但未找到对应的SharingOrder记录, orderId: {}", order.getId());
                     response.put("teamName", "未设置");
                     response.put("contactInfo", "未设置");
+                    response.put("sharingDescription", "");
+                    response.put("currentPeople", 0);
+                    response.put("totalPeople", 2);
+                    response.put("pricePerPerson", 0);
+                    response.put("participants", new ArrayList<>());
                 }
             }
 
@@ -869,6 +917,11 @@ public class BookingController {
             errorResponse.put("message", "取消预约失败: " + e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
         }
+    }
+
+    @PostMapping("/{id}/admin-cancel")
+    public ResponseEntity<Map<String, Object>> adminCancelBooking(@PathVariable Long id) {
+        return cancelBooking(id);
     }
     
     /**
@@ -2198,28 +2251,46 @@ public class BookingController {
         virtualOrder.setMaxParticipants(2);
         virtualOrder.setAllowSharing(true);
 
-        // 根据申请状态设置订单状态
-        switch (request.getStatus()) {
-            case PENDING:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
-                break;
-            case APPROVED_PENDING_PAYMENT:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING); // 待支付
-                break;
-            case PAID:
-                virtualOrder.setStatus(Order.OrderStatus.SHARING_SUCCESS); // 已支付才是拼场成功
-                break;
-            case APPROVED:
-                // APPROVED状态表示申请被批准但还未支付，应该是PENDING状态
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
-                break;
-            case REJECTED:
-            case CANCELLED:
-            case TIMEOUT_CANCELLED:
-                virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
-                break;
-            default:
-                virtualOrder.setStatus(Order.OrderStatus.PENDING);
+        // 🔧 修复：虚拟订单状态需要同时考虑申请状态和主订单状态
+        // 如果主订单已核销或已完成，虚拟订单也应该同步状态
+        Order.OrderStatus mainOrderStatus = originalOrder.getStatus();
+
+        if (mainOrderStatus == Order.OrderStatus.VERIFIED) {
+            // 主订单已核销，虚拟订单也应该是已核销
+            virtualOrder.setStatus(Order.OrderStatus.VERIFIED);
+            logger.info("✅ 主订单已核销，虚拟订单状态同步为 VERIFIED");
+        } else if (mainOrderStatus == Order.OrderStatus.COMPLETED) {
+            // 主订单已完成，虚拟订单也应该是已完成
+            virtualOrder.setStatus(Order.OrderStatus.COMPLETED);
+            logger.info("✅ 主订单已完成，虚拟订单状态同步为 COMPLETED");
+        } else if (mainOrderStatus == Order.OrderStatus.CANCELLED) {
+            // 主订单已取消，虚拟订单也应该是已取消
+            virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
+            logger.info("✅ 主订单已取消，虚拟订单状态同步为 CANCELLED");
+        } else {
+            // 主订单未核销/完成时，根据申请状态设置
+            switch (request.getStatus()) {
+                case PENDING:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+                    break;
+                case APPROVED_PENDING_PAYMENT:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING); // 待支付
+                    break;
+                case PAID:
+                    virtualOrder.setStatus(Order.OrderStatus.SHARING_SUCCESS); // 已支付才是拼场成功
+                    break;
+                case APPROVED:
+                    // APPROVED状态表示申请被批准但还未支付，应该是PENDING状态
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+                    break;
+                case REJECTED:
+                case CANCELLED:
+                case TIMEOUT_CANCELLED:
+                    virtualOrder.setStatus(Order.OrderStatus.CANCELLED);
+                    break;
+                default:
+                    virtualOrder.setStatus(Order.OrderStatus.PENDING);
+            }
         }
 
         // 设置创建时间

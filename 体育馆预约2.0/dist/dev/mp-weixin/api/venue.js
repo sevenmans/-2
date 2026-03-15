@@ -4,7 +4,7 @@ function getVenueList(params) {
   return utils_request.get("/venues", params, { cache: false });
 }
 function getVenueDetail(id) {
-  return utils_request.get(`/venues/${id}`);
+  return utils_request.get(`/venues/${id}`, {}, { cache: false });
 }
 function getVenueTimeSlots(venueId, date, params = {}) {
   return utils_request.get(`/timeslots/venue/${venueId}/date/${date}`, params);

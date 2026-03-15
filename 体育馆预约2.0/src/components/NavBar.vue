@@ -25,7 +25,7 @@
       <!-- 右侧区域 -->
       <view class="nav-right" @click="handleRightClick">
         <slot name="right">
-          <text class="nav-right-text" v-if="rightText">{{ rightText }}</text>
+          <text class="nav-right-text" v-if="rightText" :style="rightTextStyle">{{ rightText }}</text>
         </slot>
       </view>
     </view>
@@ -72,6 +72,12 @@ export default {
     
     // 右侧文字
     rightText: {
+      type: String,
+      default: ''
+    },
+
+    // 右侧文字颜色
+    rightTextColor: {
       type: String,
       default: ''
     },
@@ -137,6 +143,13 @@ export default {
     titleStyle() {
       return {
         color: this.titleColor
+      }
+    },
+
+    // 右侧文字样式
+    rightTextStyle() {
+      return {
+        color: this.rightTextColor || this.titleColor
       }
     },
     

@@ -66,6 +66,11 @@
 .picker-input.data-v-b07c5cf4 {
   color: #606266;
 }
+.disabled-input.data-v-b07c5cf4 {
+  color: #909399;
+  background: #f5f7fa;
+  cursor: not-allowed;
+}
 .card-title.data-v-b07c5cf4 {
   font-size: 30rpx;
   font-weight: 600;

@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const stores_adminVenues = require("../../../stores/admin-venues.js");
+const api_admin = require("../../../api/admin.js");
 const NavBar = () => "../../../components/NavBar.js";
 const _sfc_main = {
   components: { NavBar },
@@ -10,7 +11,11 @@ const _sfc_main = {
       navBarHeight: 0,
       selectedVenueId: "",
       selectedDate: "",
-      venues: []
+      venues: [],
+      generatedDates: [],
+      // 已生成时间段的日期列表
+      datesLoading: false
+      // 日期加载状态
     };
   },
   computed: {
@@ -28,13 +33,14 @@ const _sfc_main = {
     currentVenueName() {
       const v = this.venues.find((v2) => String(v2.id) === String(this.selectedVenueId));
       return v ? v.name : "";
+    },
+    dateIndex() {
+      return this.generatedDates.findIndex((d) => d === this.selectedDate);
     }
   },
   onLoad(options) {
     this.venuesStore = stores_adminVenues.useAdminVenuesStore();
     this.calcNavBarHeight();
-    const today = /* @__PURE__ */ new Date();
-    this.selectedDate = this.formatDate(today);
     if (options.venueId) {
       this.selectedVenueId = options.venueId;
     }
@@ -58,24 +64,61 @@ const _sfc_main = {
       try {
         await this.venuesStore.fetchManagedVenues();
         this.venues = this.venuesStore.managerVenues || [];
-        if (this.selectedVenueId && this.selectedDate) {
-          this.loadTimeslots();
+        if (this.selectedVenueId) {
+          await this.loadGeneratedDates();
         }
       } catch (e) {
         common_vendor.index.showToast({ title: "加载场馆失败", icon: "none" });
       }
     },
-    onVenueChange(e) {
+    async onVenueChange(e) {
       const venue = this.venues[e.detail.value];
       if (venue) {
         this.selectedVenueId = venue.id;
+        this.selectedDate = "";
+        this.generatedDates = [];
+        await this.loadGeneratedDates();
+      }
+    },
+    // 加载场馆已生成时间段的日期列表
+    async loadGeneratedDates() {
+      if (!this.selectedVenueId)
+        return;
+      this.datesLoading = true;
+      try {
+        const res = await api_admin.getGeneratedDates(this.selectedVenueId);
+        const rawData = res.data || res;
+        const dates = rawData.data || rawData || [];
+        this.generatedDates = Array.isArray(dates) ? dates : [];
+        common_vendor.index.__f__("log", "at pages/admin/timeslots/index.vue:177", "[排期管理] 加载到可选日期:", this.generatedDates.length, "个");
+        if (this.generatedDates.length > 0) {
+          const today = this.formatDate(/* @__PURE__ */ new Date());
+          if (this.generatedDates.includes(today)) {
+            this.selectedDate = today;
+          } else {
+            this.selectedDate = this.generatedDates[0];
+          }
+          this.loadTimeslots();
+        }
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/admin/timeslots/index.vue:191", "[排期管理] 加载可选日期失败:", e);
+        common_vendor.index.showToast({ title: "加载可选日期失败", icon: "none" });
+      } finally {
+        this.datesLoading = false;
+      }
+    },
+    onDatePickerChange(e) {
+      const dateStr = this.generatedDates[e.detail.value];
+      if (dateStr) {
+        this.selectedDate = dateStr;
         this.loadTimeslots();
       }
     },
-    onDateChange(e) {
-      this.selectedDate = e.detail.value;
-      if (this.selectedVenueId) {
-        this.loadTimeslots();
+    handleNoDateClick() {
+      if (!this.selectedVenueId) {
+        common_vendor.index.showToast({ title: "请先选择场馆", icon: "none" });
+      } else if (!this.datesLoading) {
+        common_vendor.index.showToast({ title: "该场馆暂无已生成的时间段", icon: "none" });
       }
     },
     async loadTimeslots() {
@@ -162,14 +205,21 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: $data.venues,
     e: $options.venueIndex,
     f: common_vendor.o((...args) => $options.onVenueChange && $options.onVenueChange(...args)),
-    g: common_vendor.t($data.selectedDate || "请选择日期"),
-    h: $data.selectedDate,
-    i: common_vendor.o((...args) => $options.onDateChange && $options.onDateChange(...args)),
-    j: $options.timeslotLoading
-  }, $options.timeslotLoading ? {} : $options.timeslots.length === 0 ? {
-    l: common_vendor.t($data.selectedVenueId ? "暂无时段数据" : "请先选择场馆和日期")
+    g: $data.generatedDates.length > 0
+  }, $data.generatedDates.length > 0 ? {
+    h: common_vendor.t($data.selectedDate || "请选择日期"),
+    i: $data.generatedDates,
+    j: $options.dateIndex,
+    k: common_vendor.o((...args) => $options.onDatePickerChange && $options.onDatePickerChange(...args))
   } : {
-    m: common_vendor.f($options.timeslots, (slot, k0, i0) => {
+    l: common_vendor.t($data.selectedVenueId ? $data.datesLoading ? "加载中..." : "暂无可选日期" : "请先选择场馆"),
+    m: common_vendor.o((...args) => $options.handleNoDateClick && $options.handleNoDateClick(...args))
+  }, {
+    n: $options.timeslotLoading
+  }, $options.timeslotLoading ? {} : $options.timeslots.length === 0 ? {
+    p: common_vendor.t($data.selectedVenueId ? "暂无时段数据" : "请先选择场馆和日期")
+  } : {
+    q: common_vendor.f($options.timeslots, (slot, k0, i0) => {
       return {
         a: common_vendor.t($options.formatSlotTime(slot)),
         b: common_vendor.t($options.getSlotStatusText(slot.status)),
@@ -179,8 +229,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     })
   }, {
-    k: $options.timeslots.length === 0,
-    n: $data.navBarHeight + "px"
+    o: $options.timeslots.length === 0,
+    r: $data.navBarHeight + "px"
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b07c5cf4"]]);

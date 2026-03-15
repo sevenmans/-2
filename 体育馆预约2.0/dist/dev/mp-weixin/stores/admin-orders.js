@@ -2,6 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const api_adminDashboard = require("../api/admin-dashboard.js");
 const utils_adminAdapter = require("../utils/admin-adapter.js");
+const utils_request = require("../utils/request.js");
 const useAdminOrdersStore = common_vendor.defineStore("adminOrders", {
   state: () => ({
     list: [],
@@ -83,7 +84,7 @@ const useAdminOrdersStore = common_vendor.defineStore("adminOrders", {
         this.pagination.total = total;
         this.pagination.hasMore = this.list.length < total;
       } catch (e) {
-        common_vendor.index.__f__("error", "at stores/admin-orders.js:95", "[AdminOrders] fetchOrders error:", e);
+        common_vendor.index.__f__("error", "at stores/admin-orders.js:96", "[AdminOrders] fetchOrders error:", e);
         throw e;
       } finally {
         this.loading = false;
@@ -97,11 +98,9 @@ const useAdminOrdersStore = common_vendor.defineStore("adminOrders", {
     },
     async cancelOrder(id) {
       const res = await api_adminDashboard.adminCancelBooking(id);
-      const idx = this.list.findIndex((o) => o.id === id);
-      if (idx > -1) {
-        this.list[idx].status = "CANCELLED";
-        this.list[idx].statusText = "已退款";
-      }
+      utils_request.clearCache("/admin/bookings");
+      this.needRefresh = true;
+      await this.fetchOrders(false, true);
       return res;
     }
   }

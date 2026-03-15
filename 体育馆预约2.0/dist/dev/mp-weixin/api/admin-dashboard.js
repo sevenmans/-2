@@ -7,7 +7,7 @@ function getAdminBookings(params, options = {}) {
   return utils_request.get("/admin/bookings", params, options);
 }
 function adminCancelBooking(id) {
-  return utils_request.post(`/bookings/${id}/admin-cancel`);
+  return utils_request.put(`/bookings/${id}/cancel`);
 }
 exports.adminCancelBooking = adminCancelBooking;
 exports.getAdminBookings = getAdminBookings;

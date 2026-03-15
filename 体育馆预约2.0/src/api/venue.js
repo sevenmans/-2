@@ -5,9 +5,9 @@ export function getVenueList(params) {
   return get('/venues', params, { cache: false })
 }
 
-// 获取场馆详情
+// 获取场馆详情（禁用缓存，确保每次都获取最新数据）
 export function getVenueDetail(id) {
-  return get(`/venues/${id}`)
+  return get(`/venues/${id}`, {}, { cache: false })
 }
 
 // 获取场馆时间段

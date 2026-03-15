@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { getAdminBookings, adminCancelBooking } from '@/api/admin-dashboard.js'
 import { adaptAdminOrder } from '@/utils/admin-adapter.js'
+import { clearCache } from '@/utils/request.js'
 
 export const useAdminOrdersStore = defineStore('adminOrders', {
   state: () => ({
@@ -107,11 +108,9 @@ export const useAdminOrdersStore = defineStore('adminOrders', {
 
     async cancelOrder(id) {
       const res = await adminCancelBooking(id)
-      const idx = this.list.findIndex(o => o.id === id)
-      if (idx > -1) {
-        this.list[idx].status = 'CANCELLED'
-        this.list[idx].statusText = '已退款'
-      }
+      clearCache('/admin/bookings')
+      this.needRefresh = true
+      await this.fetchOrders(false, true)
       return res
     }
   }
