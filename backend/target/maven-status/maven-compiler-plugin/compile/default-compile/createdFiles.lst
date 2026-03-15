@@ -2,16 +2,12 @@ com/example/gymbooking/controller/HealthController.class
 com/example/gymbooking/controller/BookingController.class
 com/example/gymbooking/model/TimeSlot$SlotStatus.class
 com/example/gymbooking/controller/VerificationController.class
-com/example/gymbooking/controller/AnnouncementController$1.class
-com/example/gymbooking/model/Announcement$AnnouncementType.class
 com/example/gymbooking/service/WechatAuthService$1.class
-com/example/gymbooking/controller/AnnouncementController.class
 com/example/gymbooking/controller/VerificationController$ResolvedOrder.class
 com/example/gymbooking/service/OrderStatusService.class
 com/example/gymbooking/controller/AuthController.class
 com/example/gymbooking/service/WebSocketNotificationService.class
 com/example/gymbooking/model/SharingOrder.class
-com/example/gymbooking/model/Announcement$AnnouncementStatus.class
 com/example/gymbooking/scheduler/TimeSlotStatusScheduler.class
 com/example/gymbooking/GymBookingApplication.class
 com/example/gymbooking/controller/AdminBookingController.class
@@ -37,7 +33,6 @@ com/example/gymbooking/service/SmsService.class
 com/example/gymbooking/repository/TimeSlotRepository.class
 com/example/gymbooking/security/services/UserDetailsImpl.class
 com/example/gymbooking/repository/SharingOrderRepository.class
-com/example/gymbooking/model/Announcement.class
 com/example/gymbooking/service/SharingOrderScheduleService.class
 com/example/gymbooking/controller/HealthCheckController.class
 com/example/gymbooking/repository/UserRepository.class
@@ -64,10 +59,8 @@ com/example/gymbooking/model/SharingOrder$SharingOrderStatus.class
 com/example/gymbooking/scheduler/OrderStatusScheduler.class
 com/example/gymbooking/config/WebSocketConfig.class
 com/example/gymbooking/service/OrderService.class
-com/example/gymbooking/model/Order$1.class
 com/example/gymbooking/service/FileUploadService.class
 com/example/gymbooking/service/VenueService.class
-com/example/gymbooking/repository/AnnouncementRepository.class
 com/example/gymbooking/service/SharingOrderService.class
 com/example/gymbooking/repository/VenueRepository.class
 com/example/gymbooking/payload/response/JwtResponse.class

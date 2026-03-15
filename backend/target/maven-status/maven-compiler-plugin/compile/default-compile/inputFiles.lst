@@ -6,7 +6,6 @@
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/config/WebSocketConfig.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AdminBookingController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AdminController.java
-/Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AnnouncementController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/AuthController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/BookingController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/HealthCheckController.java
@@ -20,7 +19,6 @@
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/UserController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/VenueController.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/controller/VerificationController.java
-/Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/model/Announcement.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/model/Order.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/model/Role.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/model/SharingOrder.java
@@ -32,7 +30,6 @@
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/payload/request/SignupRequest.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/payload/response/JwtResponse.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/payload/response/MessageResponse.java
-/Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/repository/AnnouncementRepository.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/repository/OrderRepository.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/repository/SharingOrderRepository.java
 /Users/lianghengpanchuanqihaodenanren/Desktop/体育馆预约 2/backend/src/main/java/com/example/gymbooking/repository/SharingRequestRepository.java

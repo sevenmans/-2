@@ -167,19 +167,6 @@
 - `GET /api/verification/code/{code}`（按核销码查询订单）
 - `POST /api/verification/code/verify`（按核销码核销）
 
-## 2.11 公告模块 AnnouncementController（`/api/announcements`）
-
-- `GET /api/announcements`（公告列表）
-  - Query：`page`、`size`、`type`、`status`
-- `GET /api/announcements/{id}`（公告详情）
-- `POST /api/announcements`（创建公告）
-- `PUT /api/announcements/{id}`（更新公告）
-- `DELETE /api/announcements/{id}`（删除公告）
-- `DELETE /api/announcements/batch`（批量删除）
-  - 入参：`List<Long>`
-- `PATCH /api/announcements/{id}/status`（更新公告状态）
-  - 入参：`Map<String, String>`
-
 ## 2.12 管理员模块 AdminController（`/api/admin`）
 
 - `GET /api/admin/dashboard/stats`（管理员工作台统计）
