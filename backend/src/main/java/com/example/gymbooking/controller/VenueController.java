@@ -273,11 +273,13 @@ public class VenueController {
         Map<String, Object> response = new HashMap<>();
         try {
             String imagePath = fileUploadService.uploadVenueImage(file);
+            response.put("code", 200);
             response.put("success", true);
             response.put("imageUrl", imagePath);
             response.put("message", "上传成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            response.put("code", 400);
             response.put("success", false);
             response.put("message", e.getMessage() != null ? e.getMessage() : "上传失败");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

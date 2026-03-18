@@ -266,6 +266,7 @@
 import { useVenueStore } from '@/stores/venue.js'
 import { useBookingStore } from '@/stores/booking.js'
 import { formatDate } from '@/utils/helpers.js'
+import { resolveFileUrl } from '@/utils/url.js'
 
 export default {
   name: 'VenueDetail',
@@ -314,18 +315,21 @@ export default {
 
     // 处理场馆图片
     venueImages() {
-      if (this.venueDetail.image) {
-        // 如果image是字符串，转换为数组
-        if (typeof this.venueDetail.image === 'string') {
-          return [this.venueDetail.image]
-        }
-        // 如果已经是数组，直接返回
-        if (Array.isArray(this.venueDetail.image)) {
-          return this.venueDetail.image
-        }
-      }
-      // 默认图片 - 使用网络图片或者移除默认图片
-      return ['https://via.placeholder.com/400x200?text=场馆图片']
+      const candidates = []
+      const v = this.venueDetail || {}
+
+      // 兼容后端/旧版本字段：images[] / image / coverImage
+      if (Array.isArray(v.images)) candidates.push(...v.images)
+      if (v.image) candidates.push(v.image)
+      if (v.coverImage) candidates.push(v.coverImage)
+
+      const resolved = candidates
+        .filter(Boolean)
+        .map(u => resolveFileUrl(u))
+        .filter(Boolean)
+
+      if (resolved.length > 0) return resolved
+      return [resolveFileUrl('/static/default-venue.jpg')]
     },
 
     // 处理设施列表

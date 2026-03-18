@@ -45,7 +45,13 @@ const _sfc_main = {
     chooseImage() {
       common_vendor.index.chooseImage({
         count: 1,
+        sizeType: ["compressed"],
         success: (res) => {
+          const file = res.tempFiles && res.tempFiles[0] || null;
+          if (file && file.size > 10 * 1024 * 1024) {
+            common_vendor.index.showToast({ title: "图片不能超过10MB", icon: "none" });
+            return;
+          }
           const tempPath = res.tempFilePaths[0];
           this.uploadCoverImage(tempPath);
         }

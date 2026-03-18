@@ -379,16 +379,35 @@ export function upload(url, filePath, formData = {}, options = {}) {
         'Authorization': token ? `Bearer ${token}` : ''
       },
       success: (response) => {
-        try {
-          const data = JSON.parse(response.data)
-          if (data.code === 200 || data.success === true) {
-            resolve(data)
-          } else {
-            reject(new Error(data.message || '上传失败'))
+        const statusCode = response.statusCode || 0
+        let data = response.data
+        if (typeof data === 'string') {
+          try {
+            data = JSON.parse(data)
+          } catch {
+            // 保留原始字符串，下面按状态码处理
           }
-        } catch (error) {
-          reject(new Error('上传响应解析失败'))
         }
+
+        if (statusCode === 413) {
+          reject(new Error('图片过大，请选择小于10MB的图片'))
+          return
+        }
+
+        if (statusCode < 200 || statusCode >= 300) {
+          const raw = typeof data === 'string' ? data.slice(0, 120) : ''
+          const message = (data && data.message) || raw || `上传失败(${statusCode || 'unknown'})`
+          reject(new Error(message))
+          return
+        }
+
+        if (data && (data.code === 200 || data.success === true)) {
+          resolve(data)
+          return
+        }
+
+        const message = (data && data.message) || `上传失败(${statusCode || 'unknown'})`
+        reject(new Error(message))
       },
       fail: (error) => {
         console.error('上传失败:', error)

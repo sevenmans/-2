@@ -13,6 +13,11 @@ server:
 spring:
   profiles:
     active: dev
+  servlet:
+    multipart:
+      # 场馆图片上传，默认 1MB 容易触发 413
+      max-file-size: 10MB
+      max-request-size: 20MB
   datasource:
     url: jdbc:mysql://localhost:3306/gym_booking?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: root
