@@ -13,7 +13,7 @@
         <view class="card info-card">
           <view class="avatar-area">
             <view class="avatar-circle">
-              <text class="avatar-icon">👤</text>
+              <image class="avatar-icon" src="/static/icons/admin/user-active.svg" mode="aspectFit" />
             </view>
             <view class="user-info">
               <text class="user-name">{{ nickname }}</text>
@@ -168,13 +168,19 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  overflow-x: hidden;
 }
 
 .scroll-content {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
 }
 
@@ -207,7 +213,8 @@ export default {
 }
 
 .avatar-icon {
-  font-size: 48rpx;
+  width: 52rpx;
+  height: 52rpx;
 }
 
 .user-info {

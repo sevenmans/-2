@@ -4,7 +4,7 @@
       <view class="content-wrapper">
     <!-- 场馆信息 -->
     <view class="venue-summary" v-if="venue">
-        <image :src="venue.image || 'https://via.placeholder.com/400x200?text=场馆图片'" class="venue-image" mode="aspectFill" />
+        <image :src="resolveFileUrl(venue.image) || 'https://via.placeholder.com/400x200?text=场馆图片'" class="venue-image" mode="aspectFill" />
         <view class="venue-info">
           <text class="venue-name">{{ venue.name }}</text>
           <text class="venue-location">{{ venue.location }}</text>
@@ -259,6 +259,7 @@
   </template>
 
 <script>
+import { resolveFileUrl } from '@/utils/url.js'
 import { useVenueStore } from '@/stores/venue.js'
 import { useBookingStore } from '@/stores/booking.js'
 import { useUserStore } from '@/stores/user.js'
@@ -470,6 +471,7 @@ export default {
   },
   
   methods: {
+    resolveFileUrl,
     // --- 日志和调试 --- 
     log(message, ...args) {
     },

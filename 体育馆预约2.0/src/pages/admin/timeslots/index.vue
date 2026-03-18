@@ -284,13 +284,19 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .scroll-content {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
   padding-bottom: 60rpx;
 }

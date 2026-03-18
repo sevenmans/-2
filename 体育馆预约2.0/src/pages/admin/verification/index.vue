@@ -12,7 +12,7 @@
         <!-- 核销码输入区 -->
         <view class="card verify-card">
           <view class="verify-icon-area">
-            <text class="verify-icon">📷</text>
+            <image class="verify-icon" src="/static/icons/admin/scan-active.svg" mode="aspectFit" />
           </view>
           <view class="input-group">
             <input
@@ -170,13 +170,19 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  overflow-x: hidden;
 }
 
 .scroll-content {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
 }
 
@@ -198,7 +204,8 @@ export default {
 }
 
 .verify-icon {
-  font-size: 100rpx;
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .input-group {

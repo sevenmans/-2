@@ -2,6 +2,7 @@ package com.example.gymbooking.controller;
 
 import com.example.gymbooking.model.Venue;
 import com.example.gymbooking.security.services.UserDetailsImpl;
+import com.example.gymbooking.service.FileUploadService;
 import com.example.gymbooking.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +26,9 @@ public class VenueController {
     
     @Autowired
     private VenueService venueService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
     
     /**
      * 获取场馆列表
@@ -257,6 +262,26 @@ public class VenueController {
         }
         Venue newVenue = venueService.createVenue(venue);
         return ResponseEntity.status(HttpStatus.CREATED).body(newVenue);
+    }
+
+    /**
+     * 上传场馆图片（管理员）
+     */
+    @PostMapping("/upload-image")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_VENUE_ADMIN')")
+    public ResponseEntity<Map<String, Object>> uploadVenueImage(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String imagePath = fileUploadService.uploadVenueImage(file);
+            response.put("success", true);
+            response.put("imageUrl", imagePath);
+            response.put("message", "上传成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage() != null ? e.getMessage() : "上传失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
     
     /**

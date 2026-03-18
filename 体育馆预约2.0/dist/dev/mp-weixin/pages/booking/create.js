@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_url = require("../../utils/url.js");
 const stores_venue = require("../../stores/venue.js");
 const stores_booking = require("../../stores/booking.js");
 const stores_user = require("../../stores/user.js");
@@ -152,7 +153,7 @@ const _sfc_main = {
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:452", "[BookingCreate] 解析时间段数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:453", "[BookingCreate] 解析时间段数据失败:", error);
       }
     }
   },
@@ -166,11 +167,12 @@ const _sfc_main = {
     this.removeEventListeners();
   },
   methods: {
+    resolveFileUrl: utils_url.resolveFileUrl,
     // --- 日志和调试 --- 
     log(message, ...args) {
     },
     logError(message, ...args) {
-      common_vendor.index.__f__("error", "at pages/booking/create.vue:477", `[BookingCreate] ❌ ${message}`, ...args);
+      common_vendor.index.__f__("error", "at pages/booking/create.vue:479", `[BookingCreate] ❌ ${message}`, ...args);
     },
     // --- UI 交互 ---
     showToast(title, icon = "none", duration = 2e3) {
@@ -214,7 +216,7 @@ const _sfc_main = {
         };
         common_vendor.index.setStorageSync(cacheKey, newCacheData);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:532", "[BookingCreate] ❌ 数据加载失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:534", "[BookingCreate] ❌ 数据加载失败:", error);
         common_vendor.index.showToast({
           title: "数据加载失败，请稍后重试",
           icon: "none",
@@ -333,7 +335,7 @@ const _sfc_main = {
           venueName: (_a = this.venue) == null ? void 0 : _a.name
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:694", "[BookingCreate] ❌ 加载场馆详情失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:696", "[BookingCreate] ❌ 加载场馆详情失败:", error);
         this.recordPerformanceMetric("venue-detail-error", {
           venueId: this.venueId,
           error: error.message
@@ -385,7 +387,7 @@ const _sfc_main = {
         } else {
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:765", "加载失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:767", "加载失败:", error);
         this.venueStore.setVenueDetail({
           id: this.venueId || 1,
           name: "测试体育馆",
@@ -457,13 +459,13 @@ const _sfc_main = {
         }
         return result || { data: timeSlots };
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:861", "[BookingCreate] 加载时间段失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:863", "[BookingCreate] 加载时间段失败:", error);
         common_vendor.index.showToast({
           title: "加载时间段失败，请重试",
           icon: "none",
           duration: 2e3
         });
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:871", "[BookingCreate] 时间段加载失败，请手动刷新或联系管理员");
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:873", "[BookingCreate] 时间段加载失败，请手动刷新或联系管理员");
         return { data: [] };
       } finally {
         common_vendor.index.hideLoading();
@@ -529,7 +531,7 @@ const _sfc_main = {
         const result = `${dateStr} ${timeStr} (${durationText}小时)`;
         return result;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:981", "formatDateTime 错误:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:983", "formatDateTime 错误:", error);
         return "时间格式错误";
       }
     },
@@ -544,7 +546,7 @@ const _sfc_main = {
         const hours = durationMinutes / 60;
         return Math.round(hours * 10) / 10;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1001", "计算时长错误:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1003", "计算时长错误:", error);
         return 1;
       }
     },
@@ -591,7 +593,7 @@ const _sfc_main = {
           return;
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1065", "[BookingCreate] ❌ 确认对话框异常:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1067", "[BookingCreate] ❌ 确认对话框异常:", error);
         return;
       }
       if (!this.validateForm()) {
@@ -732,7 +734,7 @@ const _sfc_main = {
               result = await this.bookingStore.createBooking(bookingData);
             }
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/booking/create.vue:1261", "预约创建失败:", error);
+            common_vendor.index.__f__("error", "at pages/booking/create.vue:1263", "预约创建失败:", error);
             throw error;
           }
         }
@@ -823,7 +825,7 @@ const _sfc_main = {
           this.selectedSlot = null;
           this.$forceUpdate();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/booking/create.vue:1380", "❌ 时间段同步修复失败:", error);
+          common_vendor.index.__f__("error", "at pages/booking/create.vue:1382", "❌ 时间段同步修复失败:", error);
           this.selectedSlots = [];
           this.selectedSlot = null;
           this.$forceUpdate();
@@ -850,7 +852,7 @@ const _sfc_main = {
         });
         let orderId = null;
         if (!result) {
-          common_vendor.index.__f__("error", "at pages/booking/create.vue:1422", "❌ 预约创建结果为空");
+          common_vendor.index.__f__("error", "at pages/booking/create.vue:1424", "❌ 预约创建结果为空");
         } else {
           if (result.id) {
             orderId = result.id;
@@ -870,15 +872,15 @@ const _sfc_main = {
             success: () => {
             },
             fail: (error) => {
-              common_vendor.index.__f__("error", "at pages/booking/create.vue:1448", "❌ 跳转支付页面失败:", error);
+              common_vendor.index.__f__("error", "at pages/booking/create.vue:1450", "❌ 跳转支付页面失败:", error);
               common_vendor.index.navigateTo({
                 url: `/pages/payment/index?orderId=${orderId}&type=booking&from=create`
               });
             }
           });
         } else {
-          common_vendor.index.__f__("error", "at pages/booking/create.vue:1456", "❌ 无法获取有效的订单ID，跳转到预约列表");
-          common_vendor.index.__f__("error", "at pages/booking/create.vue:1457", "❌ 原始结果:", result);
+          common_vendor.index.__f__("error", "at pages/booking/create.vue:1458", "❌ 无法获取有效的订单ID，跳转到预约列表");
+          common_vendor.index.__f__("error", "at pages/booking/create.vue:1459", "❌ 原始结果:", result);
           this.$showUserFeedback("confirm", '预约创建成功，但无法获取订单信息。请到"我的预约"中查看。', {
             confirmText: "查看预约",
             cancelText: "稍后查看",
@@ -891,7 +893,7 @@ const _sfc_main = {
         }
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1473", "创建预约失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1475", "创建预约失败:", error);
         const errorMessage = error.message || "创建预约失败，请稍后重试";
         this.showUserFeedback("error", errorMessage, {
           duration: 3e3,
@@ -1051,7 +1053,7 @@ const _sfc_main = {
         });
         return true;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1698", "[BookingCreate] ❌ 表单验证异常:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1700", "[BookingCreate] ❌ 表单验证异常:", error);
         this.recordPerformanceMetric("form-validation-exception", {
           error: error.message,
           stack: error.stack
@@ -1099,7 +1101,7 @@ const _sfc_main = {
         });
         return compressedData;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1757", "[BookingCreate] ❌ 数据压缩失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1759", "[BookingCreate] ❌ 数据压缩失败:", error);
         return {};
       }
     },
@@ -1112,7 +1114,7 @@ const _sfc_main = {
         return;
       }
       if (!latestSlots) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1775", "[BookingCreate] ❌ validateSelectedSlotsAfterUpdate 调用时未提供 latestSlots");
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1777", "[BookingCreate] ❌ validateSelectedSlotsAfterUpdate 调用时未提供 latestSlots");
         return;
       }
       const unavailableSlots = [];
@@ -1191,10 +1193,10 @@ const _sfc_main = {
               shouldBeExpired = false;
             }
           } catch (timeError) {
-            common_vendor.index.__f__("error", "at pages/booking/create.vue:1882", "[BookingCreate] ❌ 时间计算错误:", timeError);
+            common_vendor.index.__f__("error", "at pages/booking/create.vue:1884", "[BookingCreate] ❌ 时间计算错误:", timeError);
           }
           if (isFutureDate && latestSlot.status === "EXPIRED") {
-            common_vendor.index.__f__("error", "at pages/booking/create.vue:1887", "[BookingCreate] 🚨 强制修正未来日期的错误EXPIRED状态:", {
+            common_vendor.index.__f__("error", "at pages/booking/create.vue:1889", "[BookingCreate] 🚨 强制修正未来日期的错误EXPIRED状态:", {
               slotId: latestSlot.id,
               timeRange: `${latestSlot.startTime}-${latestSlot.endTime}`,
               selectedDate: this.selectedDate,
@@ -1216,13 +1218,13 @@ const _sfc_main = {
       }
       this.showUserFeedback("hide-loading");
       if (unavailableSlots.length > 0) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1920", "[BookingCreate] ❌ 发现不可用时间段:", unavailableSlots.map((slot) => ({
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1922", "[BookingCreate] ❌ 发现不可用时间段:", unavailableSlots.map((slot) => ({
           id: slot.id,
           timeRange: `${slot.startTime}-${slot.endTime}`,
           reason: slot.reason,
           status: slot.newStatus
         })));
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:1928", "[BookingCreate] 🚨 关键问题分析:", {
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:1930", "[BookingCreate] 🚨 关键问题分析:", {
           selectedDate: this.selectedDate,
           currentDate: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
           isToday: this.selectedDate === (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
@@ -1294,7 +1296,7 @@ const _sfc_main = {
           this.showUserFeedback("success", "时间段状态已更新", { duration: 2e3 });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2032", "[BookingCreate] ❌ 处理时间段状态更新失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2034", "[BookingCreate] ❌ 处理时间段状态更新失败:", error);
       }
     },
     // 🔄 处理时间段刷新事件
@@ -1307,7 +1309,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2050", "[BookingCreate] ❌ 处理时间段刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2052", "[BookingCreate] ❌ 处理时间段刷新失败:", error);
       }
     },
     // 🔄 处理预约状态变更事件
@@ -1326,7 +1328,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2074", "[BookingCreate] ❌ 处理预约状态变更失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2076", "[BookingCreate] ❌ 处理预约状态变更失败:", error);
       }
     },
     // 🔄 处理订单取消事件
@@ -1346,7 +1348,7 @@ const _sfc_main = {
           duration: 2500
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2106", "[BookingCreate] ❌ 处理订单取消事件失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2108", "[BookingCreate] ❌ 处理订单取消事件失败:", error);
       }
     },
     // 🔄 处理时间段更新事件
@@ -1388,7 +1390,7 @@ const _sfc_main = {
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2177", "[BookingCreate] ❌ 处理时间段更新事件失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2179", "[BookingCreate] ❌ 处理时间段更新事件失败:", error);
       }
     },
     // 🎯 使用统一时间段管理器立即释放时间段
@@ -1406,7 +1408,7 @@ const _sfc_main = {
         } else {
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2200", "[BookingCreate] 使用统一时间段管理器失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2202", "[BookingCreate] 使用统一时间段管理器失败:", error);
       }
     },
     // 🚨 处理强制刷新时间段事件
@@ -1431,7 +1433,7 @@ const _sfc_main = {
         } else {
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2238", "[BookingCreate] ❌ 处理强制刷新时间段事件失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2240", "[BookingCreate] ❌ 处理强制刷新时间段事件失败:", error);
       }
     },
     // ✅ 验证更新后的选中时间段
@@ -1484,7 +1486,7 @@ const _sfc_main = {
         } else {
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2309", "[BookingCreate] ❌ 验证选中时间段失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2311", "[BookingCreate] ❌ 验证选中时间段失败:", error);
       }
     },
     // 🎯 显示预约确认对话框
@@ -1501,7 +1503,7 @@ const _sfc_main = {
         });
         return result;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2335", "[BookingCreate] ❌ 显示确认对话框异常:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2337", "[BookingCreate] ❌ 显示确认对话框异常:", error);
         this.showConfirmDialog = false;
         this.confirmDialogData = null;
         this.confirmDialogResolve = null;
@@ -1553,7 +1555,7 @@ const _sfc_main = {
         };
         return result;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2405", "[BookingCreate] ❌ 构建确认信息失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2407", "[BookingCreate] ❌ 构建确认信息失败:", error);
         return {
           venueName: "未知场馆",
           timeInfo: "",
@@ -1575,7 +1577,7 @@ const _sfc_main = {
           this.confirmDialogResolve(false);
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2428", "[BookingCreate] ❌ 取消确认弹窗异常:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2430", "[BookingCreate] ❌ 取消确认弹窗异常:", error);
       } finally {
         this.showConfirmDialog = false;
         this.confirmDialogData = null;
@@ -1589,7 +1591,7 @@ const _sfc_main = {
           this.confirmDialogResolve(true);
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2444", "[BookingCreate] ❌ 确认弹窗操作异常:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2446", "[BookingCreate] ❌ 确认弹窗操作异常:", error);
       } finally {
         this.showConfirmDialog = false;
         this.confirmDialogData = null;
@@ -1608,7 +1610,7 @@ const _sfc_main = {
       try {
         await this.refreshTimeSlotStatus(force);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2470", "[BookingCreate] ❌ 刷新时间段状态失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2472", "[BookingCreate] ❌ 刷新时间段状态失败:", error);
       }
     },
     // 🎯 用户反馈方法
@@ -1686,7 +1688,7 @@ const _sfc_main = {
           common_vendor.index.vibrateShort();
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/booking/create.vue:2560", "[BookingCreate] ❌ 显示用户反馈失败:", error);
+        common_vendor.index.__f__("error", "at pages/booking/create.vue:2562", "[BookingCreate] ❌ 显示用户反馈失败:", error);
         try {
           common_vendor.index.showToast({
             title: message,
@@ -1694,7 +1696,7 @@ const _sfc_main = {
             duration: 2e3
           });
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/booking/create.vue:2569", "[BookingCreate] ❌ 降级提示也失败:", e);
+          common_vendor.index.__f__("error", "at pages/booking/create.vue:2571", "[BookingCreate] ❌ 降级提示也失败:", e);
         }
       }
     }
@@ -1714,7 +1716,7 @@ const _sfc_main = {
     const currentPage = pages[pages.length - 1];
     this.venueId = currentPage.options.id || currentPage.options.venueId;
     if (!this.venueId) {
-      common_vendor.index.__f__("error", "at pages/booking/create.vue:2597", "未获取到场馆ID");
+      common_vendor.index.__f__("error", "at pages/booking/create.vue:2599", "未获取到场馆ID");
       common_vendor.index.showToast({
         title: "参数错误",
         icon: "error"
@@ -1730,7 +1732,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $options.venue
   }, $options.venue ? {
-    b: $options.venue.image || "https://via.placeholder.com/400x200?text=场馆图片",
+    b: $options.resolveFileUrl($options.venue.image) || "https://via.placeholder.com/400x200?text=场馆图片",
     c: common_vendor.t($options.venue.name),
     d: common_vendor.t($options.venue.location),
     e: common_vendor.t($options.venue.price)

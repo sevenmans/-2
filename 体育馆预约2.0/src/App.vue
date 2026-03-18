@@ -6,6 +6,7 @@
 	import { useSharingStore } from '@/stores/sharing.js'
 	import { useBookingStore } from '@/stores/booking.js'
 	import { getToken, getUserInfo } from '@/utils/auth.js'
+	import { isAdmin } from '@/utils/router-guard-new.js'
 	// WebSocket功能已被移除
 
 	export default {
@@ -90,6 +91,14 @@
 						uni.reLaunch({
 							url: '/pages/user/login'
 						})
+						return
+					}
+
+					// 管理员账号在自动编译/热重载后经常会落到用户端 TabBar 首页，这里强制分流到管理员工作台
+					const pages = getCurrentPages()
+					const currentPage = pages && pages.length ? `/${pages[pages.length - 1].route}` : ''
+					if (isAdmin(userInfo) && (!currentPage || !currentPage.startsWith('/pages/admin/'))) {
+						uni.reLaunch({ url: '/pages/admin/dashboard' })
 						return
 					}
 					

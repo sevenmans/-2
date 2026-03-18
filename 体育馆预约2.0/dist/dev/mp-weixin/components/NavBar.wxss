@@ -34,8 +34,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30rpx;
   position: relative;
+  box-sizing: border-box;
 }
 .nav-left.data-v-c3ceb15a {
   display: flex;
@@ -59,11 +59,13 @@
   color: #333333;
 }
 .nav-center.data-v-c3ceb15a {
-  flex: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 20rpx;
+  margin: 0;
 }
 .nav-center .nav-title.data-v-c3ceb15a {
   font-size: 32rpx;

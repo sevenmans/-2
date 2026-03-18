@@ -1,6 +1,8 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const stores_adminVenues = require("../../../stores/admin-venues.js");
+const api_admin = require("../../../api/admin.js");
+const utils_url = require("../../../utils/url.js");
 const NavBar = () => "../../../components/NavBar.js";
 const _sfc_main = {
   components: { NavBar },
@@ -80,10 +82,27 @@ const _sfc_main = {
       common_vendor.index.chooseImage({
         count: 1,
         success: (res) => {
-          this.form.coverImage = res.tempFilePaths[0];
+          const tempPath = res.tempFilePaths[0];
+          this.uploadCoverImage(tempPath);
         }
       });
     },
+    async uploadCoverImage(filePath) {
+      try {
+        common_vendor.index.showLoading({ title: "上传中..." });
+        const res = await api_admin.uploadVenueImage(filePath);
+        const data = res.data || res;
+        const url = data.imageUrl || data.url || data.path;
+        if (!url)
+          throw new Error("未获取到图片地址");
+        this.form.coverImage = url;
+      } catch (e) {
+        common_vendor.index.showToast({ title: e.message || "图片上传失败", icon: "none" });
+      } finally {
+        common_vendor.index.hideLoading();
+      }
+    },
+    resolveFileUrl: utils_url.resolveFileUrl,
     validate() {
       if (!this.form.name.trim()) {
         common_vendor.index.showToast({ title: "请输入场馆名称", icon: "none" });
@@ -171,7 +190,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     s: common_vendor.o(($event) => $data.form.contactPhone = $event.detail.value),
     t: $data.form.coverImage
   }, $data.form.coverImage ? {
-    v: $data.form.coverImage
+    v: $options.resolveFileUrl($data.form.coverImage)
   } : {}, {
     w: common_vendor.o((...args) => $options.chooseImage && $options.chooseImage(...args)),
     x: $data.form.location,

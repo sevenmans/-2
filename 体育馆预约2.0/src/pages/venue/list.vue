@@ -48,7 +48,7 @@
         class="venue-card"
         @click="navigateToDetail(venue)"
       >
-        <image :src="(venue.image) || '/static/default-venue.jpg'" class="venue-image" mode="aspectFill" />
+        <image :src="resolveFileUrl(venue.image) || '/static/default-venue.jpg'" class="venue-image" mode="aspectFill" />
         <view class="venue-info">
           <view class="venue-header">
             <text class="venue-name">{{ venue.name || '未知场馆' }}</text>
@@ -168,6 +168,7 @@
 <script>
 import { useVenueStore } from '@/stores/venue.js'
 import { debounce } from '@/utils/helpers.js'
+import { resolveFileUrl } from '@/utils/url.js'
 
 export default {
   name: 'VenueList',
@@ -391,6 +392,7 @@ export default {
   },
   
   methods: {
+    resolveFileUrl,
     
     // 初始化数据
     async initData() {

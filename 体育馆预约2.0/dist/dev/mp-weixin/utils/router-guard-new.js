@@ -2,6 +2,15 @@
 const common_vendor = require("../common/vendor.js");
 const utils_auth = require("./auth.js");
 const stores_user = require("../stores/user.js");
+const ADMIN_ROLE = "ROLE_VENUE_ADMIN";
+const ADMIN_PATH_PREFIX = "/pages/admin/";
+const USER_TAB_PAGES = [
+  "/pages/index/index",
+  "/pages/venue/list",
+  "/pages/sharing/list",
+  "/pages/booking/list",
+  "/pages/user/profile"
+];
 const PUBLIC_PAGES = [
   "/pages/user/login"
 ];
@@ -13,6 +22,12 @@ const PAYMENT_PAGES = [
 let authCheckCache = null;
 let authCheckTime = 0;
 const AUTH_CACHE_DURATION = 3e4;
+let isRedirectingAdmin = false;
+function isAdmin(userInfo) {
+  if (!userInfo || !userInfo.roles)
+    return false;
+  return Array.isArray(userInfo.roles) ? userInfo.roles.includes(ADMIN_ROLE) : userInfo.roles === ADMIN_ROLE;
+}
 function setupRouterGuard() {
   const interceptMethods = ["navigateTo", "redirectTo", "reLaunch", "switchTab"];
   interceptMethods.forEach((method) => {
@@ -39,6 +54,31 @@ function checkPagePermission(url, method) {
   const isLoggedIn = checkLoginStatus();
   if (!isLoggedIn) {
     handleLoginRequired(url);
+    return false;
+  }
+  const userInfo = utils_auth.getUserInfo();
+  const admin = isAdmin(userInfo);
+  if (pagePath.startsWith(ADMIN_PATH_PREFIX) && !admin) {
+    common_vendor.index.showToast({ title: "无管理员权限", icon: "none", duration: 1500 });
+    setTimeout(() => {
+      common_vendor.index.reLaunch({ url: "/pages/index/index" });
+    }, 50);
+    return false;
+  }
+  if (admin && USER_TAB_PAGES.includes(pagePath)) {
+    if (isRedirectingAdmin)
+      return false;
+    isRedirectingAdmin = true;
+    setTimeout(() => {
+      common_vendor.index.reLaunch({
+        url: "/pages/admin/dashboard",
+        complete: () => {
+          setTimeout(() => {
+            isRedirectingAdmin = false;
+          }, 300);
+        }
+      });
+    }, 50);
     return false;
   }
   return true;
@@ -82,7 +122,7 @@ function handleLoginRequired(originalUrl) {
     common_vendor.index.reLaunch({
       url: `/pages/user/login?redirect=${redirectUrl}`,
       fail: (err) => {
-        common_vendor.index.__f__("error", "at utils/router-guard-new.js:166", "[RouterGuard] 跳转登录页失败:", err);
+        common_vendor.index.__f__("error", "at utils/router-guard-new.js:216", "[RouterGuard] 跳转登录页失败:", err);
       }
     });
   }, 100);
@@ -96,6 +136,7 @@ function updateAuthCache(isLoggedIn) {
   authCheckTime = Date.now();
 }
 exports.clearAuthCache = clearAuthCache;
+exports.isAdmin = isAdmin;
 exports.setupRouterGuard = setupRouterGuard;
 exports.updateAuthCache = updateAuthCache;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/router-guard-new.js.map

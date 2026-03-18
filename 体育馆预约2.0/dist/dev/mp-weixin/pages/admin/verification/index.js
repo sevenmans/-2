@@ -4,6 +4,7 @@ const stores_adminVerification = require("../../../stores/admin-verification.js"
 const stores_adminDashboard = require("../../../stores/admin-dashboard.js");
 const stores_adminOrders = require("../../../stores/admin-orders.js");
 const utils_request = require("../../../utils/request.js");
+const common_assets = require("../../../common/assets.js");
 const NavBar = () => "../../../components/NavBar.js";
 const AdminTabBar = () => "../../../components/admin/AdminTabBar.js";
 const _sfc_main = {
@@ -101,26 +102,27 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       titleColor: "#ffffff",
       showBorder: false
     }),
-    b: common_vendor.o((...args) => $options.handleVerify && $options.handleVerify(...args)),
-    c: $data.code,
-    d: common_vendor.o(($event) => $data.code = $event.detail.value),
-    e: common_vendor.t($options.verifying ? "核销中..." : "查询并核销"),
-    f: !$data.code.trim() || $options.verifying ? 1 : "",
-    g: common_vendor.o((...args) => $options.handleVerify && $options.handleVerify(...args)),
-    h: $options.verifyResult
+    b: common_assets._imports_0$4,
+    c: common_vendor.o((...args) => $options.handleVerify && $options.handleVerify(...args)),
+    d: $data.code,
+    e: common_vendor.o(($event) => $data.code = $event.detail.value),
+    f: common_vendor.t($options.verifying ? "核销中..." : "查询并核销"),
+    g: !$data.code.trim() || $options.verifying ? 1 : "",
+    h: common_vendor.o((...args) => $options.handleVerify && $options.handleVerify(...args)),
+    i: $options.verifyResult
   }, $options.verifyResult ? {
-    i: common_vendor.t($options.verifyResult.statusText),
-    j: $options.verifyResult.statusColor,
-    k: common_vendor.t($options.verifyResult.orderNo),
-    l: common_vendor.t($options.verifyResult.venueName),
-    m: common_vendor.t($options.verifyResult.date),
-    n: common_vendor.t($options.verifyResult.startTime),
-    o: common_vendor.t($options.verifyResult.endTime),
-    p: common_vendor.t($options.verifyResult.userName)
+    j: common_vendor.t($options.verifyResult.statusText),
+    k: $options.verifyResult.statusColor,
+    l: common_vendor.t($options.verifyResult.orderNo),
+    m: common_vendor.t($options.verifyResult.venueName),
+    n: common_vendor.t($options.verifyResult.date),
+    o: common_vendor.t($options.verifyResult.startTime),
+    p: common_vendor.t($options.verifyResult.endTime),
+    q: common_vendor.t($options.verifyResult.userName)
   } : {}, {
-    q: $options.history.length === 0
+    r: $options.history.length === 0
   }, $options.history.length === 0 ? {} : {}, {
-    r: common_vendor.f($options.history, (h, idx, i0) => {
+    s: common_vendor.f($options.history, (h, idx, i0) => {
       return {
         a: common_vendor.t(h.code),
         b: common_vendor.t(h.venueName),
@@ -129,8 +131,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: idx
       };
     }),
-    s: $data.navBarHeight + "px",
-    t: common_vendor.p({
+    t: $data.navBarHeight + "px",
+    v: common_vendor.p({
       current: "verification"
     })
   });

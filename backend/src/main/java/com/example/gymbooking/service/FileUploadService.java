@@ -3,7 +3,6 @@ package com.example.gymbooking.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +13,8 @@ import java.util.UUID;
 public class FileUploadService {
     
     // 上传目录
-    private static final String UPLOAD_DIR = "uploads/avatars/";
+    private static final String AVATAR_UPLOAD_DIR = "uploads/avatars/";
+    private static final String VENUE_UPLOAD_DIR = "uploads/venues/";
     
     // 允许的文件类型
     private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"};
@@ -30,7 +30,7 @@ public class FileUploadService {
         validateFile(file);
         
         // 创建上传目录
-        createUploadDirectory();
+        createUploadDirectory(AVATAR_UPLOAD_DIR);
         
         // 生成唯一文件名
         String originalFilename = file.getOriginalFilename();
@@ -38,11 +38,28 @@ public class FileUploadService {
         String filename = UUID.randomUUID().toString() + extension;
         
         // 保存文件
-        Path filePath = Paths.get(UPLOAD_DIR + filename);
+        Path filePath = Paths.get(AVATAR_UPLOAD_DIR + filename);
         Files.copy(file.getInputStream(), filePath);
         
         // 返回文件访问路径
         return "/uploads/avatars/" + filename;
+    }
+
+    /**
+     * 上传场馆图片
+     */
+    public String uploadVenueImage(MultipartFile file) throws IOException {
+        validateFile(file);
+        createUploadDirectory(VENUE_UPLOAD_DIR);
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = getFileExtension(originalFilename);
+        String filename = UUID.randomUUID().toString() + extension;
+
+        Path filePath = Paths.get(VENUE_UPLOAD_DIR + filename);
+        Files.copy(file.getInputStream(), filePath);
+
+        return "/uploads/venues/" + filename;
     }
     
     /**
@@ -89,8 +106,8 @@ public class FileUploadService {
     /**
      * 创建上传目录
      */
-    private void createUploadDirectory() throws IOException {
-        Path uploadPath = Paths.get(UPLOAD_DIR);
+    private void createUploadDirectory(String dir) throws IOException {
+        Path uploadPath = Paths.get(dir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -103,7 +120,12 @@ public class FileUploadService {
         try {
             if (filePath != null && filePath.startsWith("/uploads/avatars/")) {
                 String filename = filePath.substring("/uploads/avatars/".length());
-                Path path = Paths.get(UPLOAD_DIR + filename);
+                Path path = Paths.get(AVATAR_UPLOAD_DIR + filename);
+                return Files.deleteIfExists(path);
+            }
+            if (filePath != null && filePath.startsWith("/uploads/venues/")) {
+                String filename = filePath.substring("/uploads/venues/".length());
+                Path path = Paths.get(VENUE_UPLOAD_DIR + filename);
                 return Files.deleteIfExists(path);
             }
             return false;

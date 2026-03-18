@@ -50,7 +50,7 @@
               <text class="form-label">场馆图片</text>
               <view class="image-upload-row">
                 <view class="upload-btn" @click="chooseImage">
-                  <image v-if="form.coverImage" :src="form.coverImage" class="preview-image" mode="aspectFill" />
+                  <image v-if="form.coverImage" :src="resolveFileUrl(form.coverImage)" class="preview-image" mode="aspectFill" />
                   <text v-else class="upload-icon">+</text>
                 </view>
               </view>
@@ -89,6 +89,8 @@
 <script>
 import NavBar from '@/components/NavBar.vue'
 import { useAdminVenuesStore } from '@/stores/admin-venues.js'
+import { uploadVenueImage } from '@/api/admin.js'
+import { resolveFileUrl } from '@/utils/url.js'
 
 export default {
   components: { NavBar },
@@ -175,10 +177,28 @@ export default {
       uni.chooseImage({
         count: 1,
         success: (res) => {
-          this.form.coverImage = res.tempFilePaths[0]
+          const tempPath = res.tempFilePaths[0]
+          this.uploadCoverImage(tempPath)
         }
       })
     },
+
+    async uploadCoverImage(filePath) {
+      try {
+        uni.showLoading({ title: '上传中...' })
+        const res = await uploadVenueImage(filePath)
+        const data = res.data || res
+        const url = data.imageUrl || data.url || data.path
+        if (!url) throw new Error('未获取到图片地址')
+        this.form.coverImage = url
+      } catch (e) {
+        uni.showToast({ title: e.message || '图片上传失败', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+
+    resolveFileUrl,
 
     validate() {
       if (!this.form.name.trim()) { uni.showToast({ title: '请输入场馆名称', icon: 'none' }); return false }
@@ -235,13 +255,19 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .scroll-content {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
   padding-bottom: 60rpx;
 }

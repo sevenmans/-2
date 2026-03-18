@@ -1,6 +1,18 @@
 import { getToken, getUserInfo } from './auth.js'
 import { useUserStore } from '@/stores/user.js'
 
+const ADMIN_ROLE = 'ROLE_VENUE_ADMIN'
+const ADMIN_PATH_PREFIX = '/pages/admin/'
+
+// 用户端 TabBar 页面（微信开发者工具热重载/自动编译时常会落到第一个 Tab）
+const USER_TAB_PAGES = [
+  '/pages/index/index',
+  '/pages/venue/list',
+  '/pages/sharing/list',
+  '/pages/booking/list',
+  '/pages/user/profile'
+]
+
 // 无需登录即可访问的页面
 const PUBLIC_PAGES = [
   '/pages/user/login'
@@ -21,6 +33,16 @@ let isCheckingAuth = false
 let authCheckCache = null
 let authCheckTime = 0
 const AUTH_CACHE_DURATION = 30000 // 30秒缓存
+
+let isRedirectingAdmin = false
+
+// 判断用户是否拥有管理员角色
+export function isAdmin(userInfo) {
+  if (!userInfo || !userInfo.roles) return false
+  return Array.isArray(userInfo.roles)
+    ? userInfo.roles.includes(ADMIN_ROLE)
+    : userInfo.roles === ADMIN_ROLE
+}
 
 /**
  * 设置新的路由守卫
@@ -69,6 +91,34 @@ function checkPagePermission(url, method) {
   // 4. 其他所有页面都需要登录
   if (!isLoggedIn) {
     handleLoginRequired(url)
+    return false
+  }
+
+  // 5. 登录后做角色分流/权限控制
+  const userInfo = getUserInfo()
+  const admin = isAdmin(userInfo)
+
+  // 5.1 非管理员禁止进入管理员页面
+  if (pagePath.startsWith(ADMIN_PATH_PREFIX) && !admin) {
+    uni.showToast({ title: '无管理员权限', icon: 'none', duration: 1500 })
+    setTimeout(() => {
+      uni.reLaunch({ url: '/pages/index/index' })
+    }, 50)
+    return false
+  }
+
+  // 5.2 管理员避免误入用户端 TabBar（常见于自动编译/热重载后默认落地）
+  if (admin && USER_TAB_PAGES.includes(pagePath)) {
+    if (isRedirectingAdmin) return false
+    isRedirectingAdmin = true
+    setTimeout(() => {
+      uni.reLaunch({
+        url: '/pages/admin/dashboard',
+        complete: () => {
+          setTimeout(() => { isRedirectingAdmin = false }, 300)
+        }
+      })
+    }, 50)
     return false
   }
 
@@ -196,8 +246,9 @@ export function checkCurrentPageAuth() {
   
   const currentPage = pages[pages.length - 1]
   const pagePath = `/${currentPage.route}`
-  
-  return isAuthRequiredPage(pagePath)
+
+  // 登录页不需要登录，其余默认都需要
+  return !isPublicPage(pagePath)
 }
 
 export default {

@@ -6,8 +6,6 @@
       backgroundColor="#ff6b35"
       titleColor="#ffffff"
       :showBorder="false"
-      rightText="新增"
-      @right-click="goCreate"
     />
     <view class="page-body" :style="{ paddingTop: navBarHeight + 'px' }">
       <scroll-view scroll-y class="scroll-content">
@@ -152,13 +150,19 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  overflow-x: hidden;
 }
 
 .scroll-content {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
 }
 

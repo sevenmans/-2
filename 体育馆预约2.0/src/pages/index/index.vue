@@ -71,7 +71,7 @@
           @click="handleVenueClick(venue)"
         >
           <image 
-            :src="(venue.images && venue.images[0]) || '/static/default-venue.jpg'" 
+            :src="resolveFileUrl((venue.images && venue.images[0]) || venue.image) || '/static/default-venue.jpg'" 
             class="venue-image" 
             mode="aspectFill"
             lazy-load
@@ -132,6 +132,7 @@ import { smartNavigate } from '@/utils/navigation.js'
 import { formatDate } from '@/utils/helpers.js'
 import { CacheManager, SimplePerformanceMonitor, debounce } from '@/utils/performance.js'
 import SkeletonScreen from '@/components/SkeletonScreen.vue'
+import { resolveFileUrl } from '@/utils/url.js'
 // WebSocket功能已被移除
 
 export default {
@@ -217,6 +218,7 @@ export default {
   },
   
   methods: {
+    resolveFileUrl,
     
     // WebSocket初始化方法已被移除
     

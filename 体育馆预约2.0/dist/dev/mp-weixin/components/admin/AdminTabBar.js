@@ -1,11 +1,41 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const TAB_CONFIG = [
-  { key: "dashboard", icon: "📊", label: "工作台", path: "/pages/admin/dashboard" },
-  { key: "orders", icon: "📋", label: "订单", path: "/pages/admin/orders/list" },
-  { key: "verification", icon: "📷", label: "核销", path: "/pages/admin/verification/index", highlight: true },
-  { key: "venues", icon: "🏟️", label: "场馆", path: "/pages/admin/venues/list" },
-  { key: "security", icon: "👤", label: "我的", path: "/pages/admin/security/password" }
+  {
+    key: "dashboard",
+    label: "工作台",
+    path: "/pages/admin/dashboard",
+    iconPath: "/static/icons/admin/dashboard.svg",
+    selectedIconPath: "/static/icons/admin/dashboard-active.svg"
+  },
+  {
+    key: "orders",
+    label: "订单",
+    path: "/pages/admin/orders/list",
+    iconPath: "/static/icons/admin/orders.svg",
+    selectedIconPath: "/static/icons/admin/orders-active.svg"
+  },
+  {
+    key: "verification",
+    label: "核销",
+    path: "/pages/admin/verification/index",
+    iconPath: "/static/icons/admin/scan.svg",
+    selectedIconPath: "/static/icons/admin/scan-active.svg"
+  },
+  {
+    key: "venues",
+    label: "场馆",
+    path: "/pages/admin/venues/list",
+    iconPath: "/static/icons/admin/venue.svg",
+    selectedIconPath: "/static/icons/admin/venue-active.svg"
+  },
+  {
+    key: "security",
+    label: "我的",
+    path: "/pages/admin/security/password",
+    iconPath: "/static/icons/admin/user.svg",
+    selectedIconPath: "/static/icons/admin/user-active.svg"
+  }
 ];
 const _sfc_main = {
   name: "AdminTabBar",
@@ -30,21 +60,14 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.f($data.tabs, (tab, idx, i0) => {
-      return common_vendor.e({
-        a: tab.highlight
-      }, tab.highlight ? {
-        b: common_vendor.t(tab.icon)
-      } : {
-        c: common_vendor.t(tab.icon)
-      }, {
-        d: common_vendor.t(tab.label),
-        e: tab.highlight ? 1 : "",
-        f: tab.key,
-        g: $props.current === tab.key ? 1 : "",
-        h: tab.highlight ? 1 : "",
-        i: common_vendor.o(($event) => $options.switchTab(tab), tab.key)
-      });
+    a: common_vendor.f($data.tabs, (tab, k0, i0) => {
+      return {
+        a: $props.current === tab.key ? tab.selectedIconPath : tab.iconPath,
+        b: common_vendor.t(tab.label),
+        c: tab.key,
+        d: $props.current === tab.key ? 1 : "",
+        e: common_vendor.o(($event) => $options.switchTab(tab), tab.key)
+      };
     })
   };
 }

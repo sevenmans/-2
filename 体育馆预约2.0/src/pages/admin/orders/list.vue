@@ -11,7 +11,7 @@
       <!-- 搜索框 -->
       <view class="search-bar">
         <view class="search-input-wrap">
-          <text class="search-icon">🔍</text>
+          <image class="search-icon" src="/static/icons/admin/search.svg" mode="aspectFit" />
           <input
             class="search-input"
             v-model="keyword"
@@ -20,7 +20,7 @@
             @confirm="onSearch"
             @input="onSearchInput"
           />
-          <text v-if="keyword" class="clear-icon" @click="clearSearch">✕</text>
+          <image v-if="keyword" class="clear-icon" src="/static/icons/admin/close.svg" mode="aspectFit" @click="clearSearch" />
         </view>
       </view>
 
@@ -249,13 +249,17 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  overflow-x: hidden;
 }
 
 .search-bar {
@@ -273,7 +277,8 @@ export default {
 }
 
 .search-icon {
-  font-size: 28rpx;
+  width: 32rpx;
+  height: 32rpx;
   margin-right: 12rpx;
 }
 
@@ -284,8 +289,8 @@ export default {
 }
 
 .clear-icon {
-  font-size: 28rpx;
-  color: #909399;
+  width: 32rpx;
+  height: 32rpx;
   padding: 8rpx;
 }
 
@@ -294,6 +299,7 @@ export default {
   background: #ffffff;
   padding: 16rpx 24rpx;
   border-bottom: 1rpx solid #f0f0f0;
+  box-sizing: border-box;
 }
 
 .filter-chip {
@@ -314,6 +320,8 @@ export default {
 
 .order-list {
   flex: 1;
+  width: 100%;
+  box-sizing: border-box;
   padding: 20rpx 24rpx;
 }
 

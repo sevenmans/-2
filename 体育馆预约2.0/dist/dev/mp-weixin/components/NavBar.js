@@ -67,7 +67,9 @@ const _sfc_main = {
   data() {
     return {
       statusBarHeight: 0,
-      navBarHeight: 44
+      navBarHeight: 44,
+      menuButtonRect: null,
+      screenWidth: 0
     };
   },
   computed: {
@@ -101,6 +103,27 @@ const _sfc_main = {
     // 总高度
     totalHeight() {
       return this.statusBarHeight + this.navBarHeight;
+    },
+    navContentStyle() {
+      return {
+        height: this.navBarHeight + "px",
+        paddingLeft: "30rpx",
+        paddingRight: "30rpx"
+      };
+    },
+    // 标题绝对居中，并为右上角胶囊按钮预留，避免遮挡和“整体偏移”
+    navCenterStyle() {
+      const basePaddingPx = 12;
+      let sideSafePx = basePaddingPx;
+      if (this.menuButtonRect && this.screenWidth) {
+        const rightReserve = Math.max(this.screenWidth - this.menuButtonRect.left, 0);
+        sideSafePx = Math.max(basePaddingPx, rightReserve + 8);
+      }
+      return {
+        left: "50%",
+        transform: "translateX(-50%)",
+        maxWidth: `calc(100% - ${sideSafePx * 2}px)`
+      };
     }
   },
   mounted() {
@@ -111,6 +134,14 @@ const _sfc_main = {
     getSystemInfo() {
       const systemInfo = common_vendor.index.getSystemInfoSync();
       this.statusBarHeight = systemInfo.statusBarHeight || 0;
+      this.screenWidth = systemInfo.screenWidth || 0;
+      if (typeof common_vendor.index.getMenuButtonBoundingClientRect === "function") {
+        try {
+          this.menuButtonRect = common_vendor.index.getMenuButtonBoundingClientRect();
+        } catch {
+          this.menuButtonRect = null;
+        }
+      }
       if (systemInfo.platform === "ios") {
         this.navBarHeight = 44;
       } else {
@@ -161,16 +192,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.o((...args) => $options.handleLeftClick && $options.handleLeftClick(...args)),
     f: common_vendor.t($props.title),
     g: common_vendor.s($options.titleStyle),
-    h: $props.rightText
+    h: common_vendor.s($options.navCenterStyle),
+    i: $props.rightText
   }, $props.rightText ? {
-    i: common_vendor.t($props.rightText),
-    j: common_vendor.s($options.rightTextStyle)
+    j: common_vendor.t($props.rightText),
+    k: common_vendor.s($options.rightTextStyle)
   } : {}, {
-    k: common_vendor.o((...args) => $options.handleRightClick && $options.handleRightClick(...args)),
-    l: $data.navBarHeight + "px",
-    m: $props.showBorder
+    l: common_vendor.o((...args) => $options.handleRightClick && $options.handleRightClick(...args)),
+    m: common_vendor.s($options.navContentStyle),
+    n: $props.showBorder
   }, $props.showBorder ? {} : {}, {
-    n: common_vendor.s($options.navBarStyle)
+    o: common_vendor.s($options.navBarStyle)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c3ceb15a"]]);

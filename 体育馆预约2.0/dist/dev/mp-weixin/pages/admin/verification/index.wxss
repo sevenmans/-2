@@ -26,11 +26,17 @@
 .page-container.data-v-0ffa561d {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 .page-body.data-v-0ffa561d {
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  overflow-x: hidden;
 }
 .scroll-content.data-v-0ffa561d {
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
 }
 .card.data-v-0ffa561d {
@@ -48,7 +54,8 @@
   margin-bottom: 40rpx;
 }
 .verify-icon.data-v-0ffa561d {
-  font-size: 100rpx;
+  width: 120rpx;
+  height: 120rpx;
 }
 .input-group.data-v-0ffa561d {
   margin-bottom: 32rpx;

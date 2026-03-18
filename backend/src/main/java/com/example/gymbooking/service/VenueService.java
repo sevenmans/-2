@@ -24,6 +24,15 @@ public class VenueService {
     
     @Autowired
     private TimeSlotService timeSlotService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
+
+    private String normalizeImagePath(String path) {
+        if (path == null) return null;
+        String trimmed = path.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
     
     /**
      * 获取所有场馆
@@ -83,6 +92,7 @@ public class VenueService {
                     LocalTime oldOpenTime = venue.getOpenTime();
                     LocalTime oldCloseTime = venue.getCloseTime();
                     Double oldPrice = venue.getPrice();
+                    String oldImage = normalizeImagePath(venue.getImage());
 
                     venue.setName(venueDetails.getName());
                     venue.setType(venueDetails.getType());
@@ -90,6 +100,9 @@ public class VenueService {
                     venue.setDescription(venueDetails.getDescription());
                     venue.setFacilities(venueDetails.getFacilities());
                     venue.setPhotos(venueDetails.getPhotos());
+                    // 更新封面图（image / coverImage）
+                    String newImage = normalizeImagePath(venueDetails.getImage());
+                    venue.setImage(newImage);
                     venue.setPrice(venueDetails.getPrice());
                     venue.setStatus(venueDetails.getStatus());
                     venue.setOpenTime(venueDetails.getOpenTime());
@@ -101,6 +114,15 @@ public class VenueService {
                             : false);
 
                     Venue savedVenue = venueRepository.save(venue);
+
+                    // 如果更换了场馆图片，删除旧图片文件（仅处理本地 uploads/venues 下的文件）
+                    if (oldImage != null && !oldImage.equals(newImage) && oldImage.startsWith("/uploads/venues/")) {
+                        try {
+                            fileUploadService.deleteFile(oldImage);
+                        } catch (Exception e) {
+                            System.err.println("[VenueService] 删除旧场馆图片失败: " + e.getMessage());
+                        }
+                    }
 
                     // 检查营业时间或价格是否发生变化
                     boolean timeChanged = !java.util.Objects.equals(oldOpenTime, venueDetails.getOpenTime())
@@ -160,13 +182,27 @@ public class VenueService {
      */
     @Transactional
     public void deleteVenue(Long id) {
+        // 先查场馆（用于清理图片文件）
+        Venue venue = venueRepository.findById(id).orElse(null);
+        String imagePath = venue != null ? normalizeImagePath(venue.getImage()) : null;
+
         // 先删除关联的所有时间段
         System.out.println("[VenueService] 删除场馆 ID: " + id + "，开始清理关联时间段...");
         timeSlotService.deleteAllByVenueId(id);
         System.out.println("[VenueService] 关联时间段清理完成，删除场馆...");
-        // 再删除场馆
+
+        // 删除场馆
         venueRepository.deleteById(id);
         System.out.println("[VenueService] 场馆删除完成");
+
+        // 删除场馆图片文件（仅处理本地 uploads/venues 下的文件）
+        if (imagePath != null && imagePath.startsWith("/uploads/venues/")) {
+            try {
+                fileUploadService.deleteFile(imagePath);
+            } catch (Exception e) {
+                System.err.println("[VenueService] 删除场馆图片失败: " + e.getMessage());
+            }
+        }
     }
     
     /**

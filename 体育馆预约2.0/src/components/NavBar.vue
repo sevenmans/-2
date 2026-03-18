@@ -4,7 +4,7 @@
     <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
     
     <!-- 导航栏内容 -->
-    <view class="nav-content" :style="{ height: navBarHeight + 'px' }">
+    <view class="nav-content" :style="navContentStyle">
       <!-- 左侧区域 -->
       <view class="nav-left" @click="handleLeftClick">
         <slot name="left">
@@ -16,7 +16,7 @@
       </view>
       
       <!-- 中间标题区域 -->
-      <view class="nav-center">
+      <view class="nav-center" :style="navCenterStyle">
         <slot name="center">
           <text class="nav-title" :style="titleStyle">{{ title }}</text>
         </slot>
@@ -116,7 +116,9 @@ export default {
   data() {
     return {
       statusBarHeight: 0,
-      navBarHeight: 44
+      navBarHeight: 44,
+      menuButtonRect: null,
+      screenWidth: 0
     }
   },
   
@@ -156,6 +158,30 @@ export default {
     // 总高度
     totalHeight() {
       return this.statusBarHeight + this.navBarHeight
+    },
+
+    navContentStyle() {
+      return {
+        height: this.navBarHeight + 'px',
+        paddingLeft: '30rpx',
+        paddingRight: '30rpx'
+      }
+    },
+
+    // 标题绝对居中，并为右上角胶囊按钮预留，避免遮挡和“整体偏移”
+    navCenterStyle() {
+      const basePaddingPx = 12
+      let sideSafePx = basePaddingPx
+      if (this.menuButtonRect && this.screenWidth) {
+        const rightReserve = Math.max(this.screenWidth - this.menuButtonRect.left, 0)
+        sideSafePx = Math.max(basePaddingPx, rightReserve + 8)
+      }
+
+      return {
+        left: '50%',
+        transform: 'translateX(-50%)',
+        maxWidth: `calc(100% - ${sideSafePx * 2}px)`
+      }
     }
   },
   
@@ -170,6 +196,16 @@ export default {
       
       // 状态栏高度
       this.statusBarHeight = systemInfo.statusBarHeight || 0
+      this.screenWidth = systemInfo.screenWidth || 0
+
+      // 微信小程序右上角胶囊按钮
+      if (typeof uni.getMenuButtonBoundingClientRect === 'function') {
+        try {
+          this.menuButtonRect = uni.getMenuButtonBoundingClientRect()
+        } catch {
+          this.menuButtonRect = null
+        }
+      }
       
       // 导航栏高度适配
       if (systemInfo.platform === 'ios') {
@@ -236,8 +272,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30rpx;
   position: relative;
+  box-sizing: border-box;
 }
 
 .nav-left {
@@ -266,11 +302,13 @@ export default {
 }
 
 .nav-center {
-  flex: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 20rpx;
+  margin: 0;
   
   .nav-title {
     font-size: 32rpx;

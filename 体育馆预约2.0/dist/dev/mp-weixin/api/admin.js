@@ -27,6 +27,9 @@ function updateTimeslotStatus(id, data) {
 function getGeneratedDates(venueId) {
   return utils_request.get(`/timeslots/venue/${venueId}/generated-dates`);
 }
+function uploadVenueImage(filePath) {
+  return utils_request.upload("/venues/upload-image", filePath);
+}
 exports.createVenue = createVenue;
 exports.deleteVenue = deleteVenue;
 exports.getGeneratedDates = getGeneratedDates;
@@ -36,4 +39,5 @@ exports.getVenueTimeslots = getVenueTimeslots;
 exports.updateTimeslotStatus = updateTimeslotStatus;
 exports.updateVenue = updateVenue;
 exports.updateVenueStatus = updateVenueStatus;
+exports.uploadVenueImage = uploadVenueImage;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/admin.js.map

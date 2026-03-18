@@ -1,4 +1,5 @@
 import { get, post, put, patch, del } from '@/utils/request.js'
+import { upload } from '@/utils/request.js'
 
 // 获取当前管理员管理的场馆
 export function getMyManagedVenues() {
@@ -43,4 +44,9 @@ export function updateTimeslotStatus(id, data) {
 // 获取场馆已生成时间段的日期列表（用于排期管理日期选择限制）
 export function getGeneratedDates(venueId) {
   return get(`/timeslots/venue/${venueId}/generated-dates`)
+}
+
+// 上传场馆图片（管理员）
+export function uploadVenueImage(filePath) {
+  return upload('/venues/upload-image', filePath)
 }

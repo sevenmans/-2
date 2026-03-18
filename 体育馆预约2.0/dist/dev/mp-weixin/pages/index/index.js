@@ -5,6 +5,7 @@ const stores_booking = require("../../stores/booking.js");
 const utils_navigation = require("../../utils/navigation.js");
 const utils_helpers = require("../../utils/helpers.js");
 const utils_performance = require("../../utils/performance.js");
+const utils_url = require("../../utils/url.js");
 const SkeletonScreen = () => "../../components/SkeletonScreen.js";
 const _sfc_main = {
   name: "IndexPage",
@@ -72,6 +73,7 @@ const _sfc_main = {
     }
   },
   methods: {
+    resolveFileUrl: utils_url.resolveFileUrl,
     // WebSocket初始化方法已被移除
     // WebSocket测试方法已被移除
     // 优化的首页数据加载（带缓存和超时处理）
@@ -83,12 +85,12 @@ const _sfc_main = {
         if (cached) {
           this.venueStore.setPopularVenues(cached.popularVenues || []);
           this.bookingStore.setSharingOrders(cached.latestSharingOrders || []);
-          common_vendor.index.__f__("log", "at pages/index/index.vue:239", "使用缓存数据");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:241", "使用缓存数据");
           utils_performance.SimplePerformanceMonitor.measure("homeDataLoad");
           return;
         }
         this.loading = true;
-        common_vendor.index.__f__("log", "at pages/index/index.vue:248", "加载首页数据，无需登录验证");
+        common_vendor.index.__f__("log", "at pages/index/index.vue:250", "加载首页数据，无需登录验证");
         const timeout = new Promise((_, reject) => {
           setTimeout(() => reject(new Error("请求超时")), 5e3);
         });
@@ -99,7 +101,7 @@ const _sfc_main = {
         const results = await Promise.race([
           dataPromise,
           timeout.then(() => {
-            common_vendor.index.__f__("warn", "at pages/index/index.vue:266", "请求超时，使用备用数据");
+            common_vendor.index.__f__("warn", "at pages/index/index.vue:268", "请求超时，使用备用数据");
             return [
               { status: "rejected", reason: "请求超时" },
               { status: "rejected", reason: "请求超时" }
@@ -108,11 +110,11 @@ const _sfc_main = {
         ]);
         const [venuesResult, sharingsResult] = results;
         if (venuesResult.status === "rejected") {
-          common_vendor.index.__f__("warn", "at pages/index/index.vue:278", "获取场馆数据失败:", venuesResult.reason);
+          common_vendor.index.__f__("warn", "at pages/index/index.vue:280", "获取场馆数据失败:", venuesResult.reason);
           this.venueStore.setPopularVenues([]);
         }
         if (sharingsResult.status === "rejected") {
-          common_vendor.index.__f__("warn", "at pages/index/index.vue:284", "获取拼场数据失败:", sharingsResult.reason);
+          common_vendor.index.__f__("warn", "at pages/index/index.vue:286", "获取拼场数据失败:", sharingsResult.reason);
           this.bookingStore.setSharingOrders([]);
         }
         if (this.popularVenues.length > 0 || this.latestSharingOrders.length > 0) {
@@ -124,9 +126,9 @@ const _sfc_main = {
         }
         utils_performance.SimplePerformanceMonitor.measure("homeDataLoad");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:301", "加载首页数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:303", "加载首页数据失败:", error);
         if (error.code === "LOGIN_EXPIRED") {
-          common_vendor.index.__f__("log", "at pages/index/index.vue:304", "登录已过期，但允许继续浏览首页");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:306", "登录已过期，但允许继续浏览首页");
           this.venueStore.setPopularVenues([]);
           this.bookingStore.setSharingOrders([]);
         } else {
@@ -141,11 +143,11 @@ const _sfc_main = {
     },
     // 图片加载成功处理
     onImageLoad(e) {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:321", "图片加载成功");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:323", "图片加载成功");
     },
     // 图片加载失败处理
     onImageError(e) {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:326", "图片加载失败:", e);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:328", "图片加载失败:", e);
     },
     // 下拉刷新（清除缓存）
     async refreshData() {
@@ -153,7 +155,7 @@ const _sfc_main = {
         utils_performance.CacheManager.remove("homePageData");
         await this.loadHomeDataWithCache();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:338", "刷新数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:340", "刷新数据失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "none"
@@ -170,7 +172,7 @@ const _sfc_main = {
           this.bookingStore.getSharingOrdersList({ page: 1, pageSize: 3 })
         ]);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:356", "初始化数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:358", "初始化数据失败:", error);
       }
     },
     // 页面跳转
@@ -249,7 +251,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: common_vendor.o(($event) => $options.navigateTo("/pages/venue/list")),
     i: common_vendor.f($options.safePopularVenues, (venue, k0, i0) => {
       return {
-        a: venue.images && venue.images[0] || "/static/default-venue.jpg",
+        a: $options.resolveFileUrl(venue.images && venue.images[0] || venue.image) || "/static/default-venue.jpg",
         b: common_vendor.o((...args) => $options.onImageLoad && $options.onImageLoad(...args), venue.id),
         c: common_vendor.o((...args) => $options.onImageError && $options.onImageError(...args), venue.id),
         d: common_vendor.t(venue.name || "未知场馆"),

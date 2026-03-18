@@ -2,6 +2,7 @@
 const common_vendor = require("../../../common/vendor.js");
 const stores_user = require("../../../stores/user.js");
 const stores_adminSecurity = require("../../../stores/admin-security.js");
+const common_assets = require("../../../common/assets.js");
 const NavBar = () => "../../../components/NavBar.js";
 const AdminTabBar = () => "../../../components/admin/AdminTabBar.js";
 const _sfc_main = {
@@ -104,19 +105,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       titleColor: "#ffffff",
       showBorder: false
     }),
-    b: common_vendor.t($options.nickname),
-    c: $data.form.oldPassword,
-    d: common_vendor.o(($event) => $data.form.oldPassword = $event.detail.value),
-    e: $data.form.newPassword,
-    f: common_vendor.o(($event) => $data.form.newPassword = $event.detail.value),
-    g: $data.form.confirmPassword,
-    h: common_vendor.o(($event) => $data.form.confirmPassword = $event.detail.value),
-    i: common_vendor.t($options.submitting ? "提交中..." : "确认修改"),
-    j: $options.submitting ? 1 : "",
-    k: common_vendor.o((...args) => $options.handleChangePassword && $options.handleChangePassword(...args)),
-    l: common_vendor.o((...args) => $options.handleLogout && $options.handleLogout(...args)),
-    m: $data.navBarHeight + "px",
-    n: common_vendor.p({
+    b: common_assets._imports_0$5,
+    c: common_vendor.t($options.nickname),
+    d: $data.form.oldPassword,
+    e: common_vendor.o(($event) => $data.form.oldPassword = $event.detail.value),
+    f: $data.form.newPassword,
+    g: common_vendor.o(($event) => $data.form.newPassword = $event.detail.value),
+    h: $data.form.confirmPassword,
+    i: common_vendor.o(($event) => $data.form.confirmPassword = $event.detail.value),
+    j: common_vendor.t($options.submitting ? "提交中..." : "确认修改"),
+    k: $options.submitting ? 1 : "",
+    l: common_vendor.o((...args) => $options.handleChangePassword && $options.handleChangePassword(...args)),
+    m: common_vendor.o((...args) => $options.handleLogout && $options.handleLogout(...args)),
+    n: $data.navBarHeight + "px",
+    o: common_vendor.p({
       current: "security"
     })
   };

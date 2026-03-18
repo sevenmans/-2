@@ -87,22 +87,20 @@ if (!Array) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o($options.goCreate),
-    b: common_vendor.p({
+    a: common_vendor.p({
       title: "场馆管理",
       showBack: false,
       backgroundColor: "#ff6b35",
       titleColor: "#ffffff",
-      showBorder: false,
-      rightText: "新增"
+      showBorder: false
     }),
-    c: $options.loading
+    b: $options.loading
   }, $options.loading ? {} : {}, {
-    d: !$options.loading && $options.venues.length === 0
+    c: !$options.loading && $options.venues.length === 0
   }, !$options.loading && $options.venues.length === 0 ? {
-    e: common_vendor.o((...args) => $options.goCreate && $options.goCreate(...args))
+    d: common_vendor.o((...args) => $options.goCreate && $options.goCreate(...args))
   } : {}, {
-    f: common_vendor.f($options.venues, (venue, k0, i0) => {
+    e: common_vendor.f($options.venues, (venue, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(venue.name),
         b: common_vendor.t($options.getStatusText(venue.status)),
@@ -121,9 +119,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: venue.id
       });
     }),
-    g: $data.navBarHeight + "px",
-    h: common_vendor.o((...args) => $options.goCreate && $options.goCreate(...args)),
-    i: common_vendor.p({
+    f: $data.navBarHeight + "px",
+    g: common_vendor.o((...args) => $options.goCreate && $options.goCreate(...args)),
+    h: common_vendor.p({
       current: "venues"
     })
   });

@@ -3,7 +3,7 @@
     <!-- 场馆图片 -->
     <view class="venue-image-container">
       <image 
-        :src="venue.image || '/static/images/default-venue.png'" 
+        :src="resolveFileUrl(venue.image) || '/static/images/default-venue.png'" 
         class="venue-image"
         mode="aspectFill"
         @error="handleImageError"
@@ -109,6 +109,8 @@
 </template>
 
 <script>
+import { resolveFileUrl } from '@/utils/url.js'
+
 export default {
   name: 'VenueCard',
   
@@ -145,6 +147,7 @@ export default {
   },
   
   methods: {
+    resolveFileUrl,
     // 卡片点击
     handleCardClick() {
       this.$emit('click', this.venue)

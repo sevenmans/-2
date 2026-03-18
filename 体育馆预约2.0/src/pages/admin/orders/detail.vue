@@ -268,16 +268,22 @@ export default {
 .page-container {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
 }
 
 .page-body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .detail-scroll {
   flex: 1;
+  width: 100%;
+  box-sizing: border-box;
   padding: 24rpx;
   padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
@@ -392,6 +398,7 @@ export default {
   bottom: 0;
   left: 0;
   width: 100%;
+  box-sizing: border-box;
   background: #ffffff;
   padding: 20rpx 24rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
