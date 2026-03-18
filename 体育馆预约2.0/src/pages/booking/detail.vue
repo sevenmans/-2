@@ -120,20 +120,20 @@
     <view class="contact-section">
       <view class="section-title">联系信息</view>
       
-      <view class="contact-item" @click="callVenue">
+      <view class="contact-item" @click="contactVenue">
         <view class="contact-icon">
           <text>📞</text>
         </view>
         <view class="contact-info">
           <text class="contact-label">场馆电话</text>
-          <text class="contact-value">{{ (bookingDetail && bookingDetail.venuePhone) || '暂无' }}</text>
+          <text class="contact-value">{{ (bookingDetail && bookingDetail.venuePhone) || '暂无点此复制' }}</text>
         </view>
-        <view class="contact-arrow">
-          <text>›</text>
+        <view class="copy-location-btn">
+          <text class="copy-text">复制</text>
         </view>
       </view>
 
-      <view class="contact-item" @click="openMap">
+      <view class="contact-item" @click="copyLocation">
         <view class="contact-icon">
           <text>📍</text>
         </view>
@@ -141,8 +141,8 @@
           <text class="contact-label">导航到场馆</text>
           <text class="contact-value">{{ (bookingDetail && bookingDetail.venueLocation) || '暂无' }}</text>
         </view>
-        <view class="contact-arrow">
-          <text>›</text>
+        <view class="copy-location-btn" @click.stop="copyLocation">
+          <text class="copy-text">复制</text>
         </view>
       </view>
     </view>
@@ -234,6 +234,25 @@
         </view>
       </view>
     </view>
+    
+    <!-- 优化后的联系场馆弹窗 -->
+    <view v-if="showContactModal" class="contact-modal-overlay" @click="hideContactModal">
+      <view class="contact-modal" @click.stop>
+        <view class="modal-header">
+          <text class="modal-title">联系场馆</text>
+        </view>
+        <view class="modal-content">
+          <text class="phone-text">{{ bookingDetail && bookingDetail.venuePhone }}</text>
+          <text class="phone-desc">场馆服务热线，建议在工作时间拨打</text>
+        </view>
+        <view class="modal-actions">
+          <button class="action-btn copy-btn" @click="copyPhone">复制号码</button>
+        </view>
+        <view class="modal-close-row">
+           <button class="action-btn cancel-btn" @click="hideContactModal">取消</button>
+        </view>
+      </view>
+    </view>
     </view>
   </view>
 </template>
@@ -261,7 +280,8 @@ export default {
       bookingId: '',
       showCancelPopup: false,
       showVerifyCodePopup: false,
-      activeVerifyCode: ''
+      activeVerifyCode: '',
+      showContactModal: false
     }
   },
 
@@ -739,12 +759,12 @@ export default {
       }
     },
     
-    // 拨打电话
-    callVenue() {
-      if (this.bookingDetail.venuePhone) {
-        uni.makePhoneCall({
-          phoneNumber: this.bookingDetail.venuePhone
-        })
+    // 显示联系场馆弹窗
+    contactVenue() {
+      // 后端字段名是 venuePhone
+      const phone = this.bookingDetail.venuePhone
+      if (phone) {
+        this.showContactModal = true
       } else {
         uni.showToast({
           title: '暂无联系方式',
@@ -752,8 +772,46 @@ export default {
         })
       }
     },
+
+    // 隐藏联系场馆弹窗
+    hideContactModal() {
+      this.showContactModal = false
+    },
     
-    // 打开地图
+    // 复制电话号码
+    copyPhone() {
+      const phone = this.bookingDetail.venuePhone
+      if (phone) {
+        uni.setClipboardData({
+          data: phone,
+          success: () => {
+            uni.showToast({
+              title: '号码已复制',
+              icon: 'success'
+            })
+            this.hideContactModal()
+          }
+        })
+      }
+    },
+
+    // 复制场馆地址
+    copyLocation() {
+      const location = this.bookingDetail.venueLocation
+      if (location) {
+        uni.setClipboardData({
+          data: location,
+          success: () => {
+            uni.showToast({
+              title: '地址已复制',
+              icon: 'success'
+            })
+          }
+        })
+      }
+    },
+    
+    // 打开地图 (如果此后不再需要可以去掉，这里先保留防止被别处调用)
     openMap() {
       if (this.bookingDetail.venueLatitude && this.bookingDetail.venueLongitude) {
         uni.openLocation({
@@ -1200,9 +1258,128 @@ export default {
       }
     }
     
-    .contact-arrow {
-      font-size: 24rpx;
-      color: #cccccc;
+    .copy-location-btn {
+      display: flex;
+      align-items: center;
+      padding: 6rpx 20rpx;
+      background-color: #f5f5f5;
+      border-radius: 8rpx;
+      margin-left: 10rpx;
+      
+      .copy-text {
+        font-size: 24rpx;
+        color: #666666;
+      }
+      
+      &:active {
+        background-color: #e8e8e8;
+      }
+    }
+  }
+}
+
+// 联系场馆弹窗
+.contact-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.contact-modal {
+  width: 600rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  
+  .modal-header {
+    padding: 30rpx;
+    text-align: center;
+    border-bottom: 1rpx solid #f0f0f0;
+    
+    .modal-title {
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #333333;
+    }
+  }
+  
+  .modal-content {
+    padding: 50rpx 40rpx;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .phone-text {
+      font-size: 48rpx;
+      font-weight: bold;
+      color: #ff6b35;
+      margin-bottom: 20rpx;
+      letter-spacing: 2rpx;
+    }
+    
+    .phone-desc {
+      font-size: 26rpx;
+      color: #888888;
+    }
+  }
+  
+  .modal-actions {
+    display: flex;
+    padding: 0 40rpx;
+    justify-content: space-between;
+    gap: 30rpx;
+    margin-bottom: 30rpx;
+    
+    .action-btn {
+      flex: 1;
+      height: 80rpx;
+      border-radius: 40rpx;
+      font-size: 28rpx;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      
+      &::after {
+        border: none;
+      }
+    }
+    
+    .copy-btn {
+      background-color: #ff6b35;
+      color: #ffffff;
+    }
+  }
+
+  .modal-close-row {
+    padding: 0 40rpx 30rpx;
+    
+    .cancel-btn {
+      width: 100%;
+      height: 80rpx;
+      background-color: #f5f5f5;
+      color: #666666;
+      border-radius: 40rpx;
+      font-size: 28rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      
+      &::after {
+        border: none;
+      }
     }
   }
 }

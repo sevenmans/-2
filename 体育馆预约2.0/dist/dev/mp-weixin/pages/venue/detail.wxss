@@ -72,40 +72,50 @@
   color: #333333;
   margin-right: 20rpx;
 }
-.info-section .venue-header .venue-rating.data-v-91798fc9 {
-  display: flex;
-  align-items: center;
-}
-.info-section .venue-header .venue-rating .rating-score.data-v-91798fc9 {
-  font-size: 28rpx;
-  color: #ff6b35;
-  margin-right: 8rpx;
-}
-.info-section .venue-header .venue-rating .rating-star.data-v-91798fc9 {
-  font-size: 24rpx;
-  margin-right: 8rpx;
-}
-.info-section .venue-header .venue-rating .rating-count.data-v-91798fc9 {
-  font-size: 24rpx;
-  color: #999999;
-}
 .info-section .venue-location.data-v-91798fc9 {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20rpx;
 }
 .info-section .venue-location .location-icon.data-v-91798fc9 {
-  font-size: 24rpx;
-  margin-right: 8rpx;
-}
-.info-section .venue-location .location-text.data-v-91798fc9 {
-  flex: 1;
   font-size: 28rpx;
+  margin-right: 8rpx;
+  margin-top: 4rpx;
+}
+.info-section .venue-location .location-text-wrap.data-v-91798fc9 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.info-section .venue-location .location-text-wrap .location-text-row.data-v-91798fc9 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.info-section .venue-location .location-text-wrap .location-text-row .location-text.data-v-91798fc9 {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+.info-section .venue-location .location-text-wrap .location-text-row .copy-location-btn.data-v-91798fc9 {
+  display: flex;
+  align-items: center;
+  padding: 4rpx 16rpx;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+}
+.info-section .venue-location .location-text-wrap .location-text-row .copy-location-btn .copy-text.data-v-91798fc9 {
+  font-size: 22rpx;
   color: #666666;
 }
-.info-section .venue-location .distance-text.data-v-91798fc9 {
+.info-section .venue-location .location-text-wrap .location-text-row .copy-location-btn.data-v-91798fc9:active {
+  background-color: #e8e8e8;
+}
+.info-section .venue-location .location-text-wrap .distance-text.data-v-91798fc9 {
   font-size: 24rpx;
   color: #999999;
+  margin-top: 8rpx;
 }
 .info-section .venue-price.data-v-91798fc9 {
   display: flex;
@@ -162,21 +172,23 @@
 .facilities-grid.data-v-91798fc9 {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 .facilities-grid .facility-item.data-v-91798fc9 {
-  width: 25%;
+  min-width: 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 30rpx;
 }
 .facilities-grid .facility-item .facility-icon.data-v-91798fc9 {
-  font-size: 40rpx;
-  margin-bottom: 12rpx;
+  width: 60rpx;
+  height: 60rpx;
+  margin-bottom: 16rpx;
 }
 .facilities-grid .facility-item .facility-name.data-v-91798fc9 {
-  font-size: 24rpx;
-  color: #666666;
+  font-size: 26rpx;
+  color: #444444;
   text-align: center;
 }
 .hours-info .hours-text.data-v-91798fc9 {
@@ -332,17 +344,25 @@
   font-size: 24rpx;
   color: #666666;
 }
-.timeslot-section .booking-type-section.data-v-91798fc9 {
-  margin-bottom: 32rpx;
+.booking-type-section.data-v-91798fc9 {
+  background-color: #ffffff;
+  padding: 30rpx 30rpx 50rpx;
+  margin-bottom: 20rpx;
 }
-.timeslot-section .booking-type-section .booking-type-options.data-v-91798fc9 {
+.booking-type-section .section-title.data-v-91798fc9 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 30rpx;
+}
+.booking-type-section .booking-type-options.data-v-91798fc9 {
   margin-top: 24rpx;
 }
-.timeslot-section .booking-type-section .radio-item.data-v-91798fc9 {
+.booking-type-section .radio-item.data-v-91798fc9 {
   display: block;
   margin-bottom: 24rpx;
 }
-.timeslot-section .booking-type-section .radio-item .radio-wrapper.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-wrapper.data-v-91798fc9 {
   display: flex;
   align-items: flex-start;
   padding: 24rpx;
@@ -351,10 +371,10 @@
   border: 2rpx solid transparent;
   transition: all 0.3s ease;
 }
-.timeslot-section .booking-type-section .radio-item .radio-wrapper.data-v-91798fc9:active {
+.booking-type-section .radio-item .radio-wrapper.data-v-91798fc9:active {
   background-color: #f0f0f0;
 }
-.timeslot-section .booking-type-section .radio-item .radio-circle.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-circle.data-v-91798fc9 {
   width: 40rpx;
   height: 40rpx;
   border: 2rpx solid #ddd;
@@ -366,52 +386,52 @@
   flex-shrink: 0;
   margin-top: 4rpx;
 }
-.timeslot-section .booking-type-section .radio-item .radio-circle.active.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-circle.active.data-v-91798fc9 {
   border-color: #ff6b35;
   background-color: #ff6b35;
 }
-.timeslot-section .booking-type-section .radio-item .radio-circle .radio-dot.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-circle .radio-dot.data-v-91798fc9 {
   width: 16rpx;
   height: 16rpx;
   background-color: white;
   border-radius: 50%;
 }
-.timeslot-section .booking-type-section .radio-item .radio-content.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-content.data-v-91798fc9 {
   flex: 1;
 }
-.timeslot-section .booking-type-section .radio-item .radio-content .radio-title.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-content .radio-title.data-v-91798fc9 {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
   margin-bottom: 8rpx;
 }
-.timeslot-section .booking-type-section .radio-item .radio-content .radio-desc.data-v-91798fc9 {
+.booking-type-section .radio-item .radio-content .radio-desc.data-v-91798fc9 {
   display: block;
   font-size: 26rpx;
   color: #666;
   line-height: 1.4;
 }
-.timeslot-section .booking-type-section .shared-form.data-v-91798fc9 {
+.booking-type-section .shared-form.data-v-91798fc9 {
   margin-top: 32rpx;
   padding: 32rpx;
   background-color: #f8f9fa;
   border-radius: 16rpx;
 }
-.timeslot-section .booking-type-section .shared-form .form-item.data-v-91798fc9 {
+.booking-type-section .shared-form .form-item.data-v-91798fc9 {
   margin-bottom: 32rpx;
 }
-.timeslot-section .booking-type-section .shared-form .form-item.data-v-91798fc9:last-child {
+.booking-type-section .shared-form .form-item.data-v-91798fc9:last-child {
   margin-bottom: 0;
 }
-.timeslot-section .booking-type-section .shared-form .form-item .item-label.data-v-91798fc9 {
+.booking-type-section .shared-form .form-item .item-label.data-v-91798fc9 {
   display: block;
   font-size: 28rpx;
   color: #333;
   margin-bottom: 16rpx;
   font-weight: 500;
 }
-.timeslot-section .booking-type-section .shared-form .form-item .form-input.data-v-91798fc9 {
+.booking-type-section .shared-form .form-item .form-input.data-v-91798fc9 {
   width: 100%;
   padding: 24rpx;
   background-color: white;
@@ -420,10 +440,10 @@
   font-size: 28rpx;
   color: #333;
 }
-.timeslot-section .booking-type-section .shared-form .form-item .form-input.data-v-91798fc9:focus {
+.booking-type-section .shared-form .form-item .form-input.data-v-91798fc9:focus {
   border-color: #ff6b35;
 }
-.timeslot-section .booking-type-section .shared-form .form-item .picker-text.data-v-91798fc9 {
+.booking-type-section .shared-form .form-item .picker-text.data-v-91798fc9 {
   padding: 24rpx;
   background-color: white;
   border: 2rpx solid #e0e0e0;
@@ -434,42 +454,42 @@
   align-items: center;
   justify-content: space-between;
 }
-.timeslot-section .booking-type-section .shared-form .form-item .picker-text.data-v-91798fc9::after {
+.booking-type-section .shared-form .form-item .picker-text.data-v-91798fc9::after {
   content: "›";
   color: #999;
   font-size: 24rpx;
 }
-.timeslot-section .booking-type-section .shared-form .sharing-notice.data-v-91798fc9 {
+.booking-type-section .shared-form .sharing-notice.data-v-91798fc9 {
   background-color: #fff3e0;
   border: 2rpx solid #ffcc80;
   border-radius: 12rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
 }
-.timeslot-section .booking-type-section .shared-form .sharing-notice .notice-title.data-v-91798fc9 {
+.booking-type-section .shared-form .sharing-notice .notice-title.data-v-91798fc9 {
   display: block;
   font-size: 28rpx;
   font-weight: 600;
   color: #e65100;
   margin-bottom: 16rpx;
 }
-.timeslot-section .booking-type-section .shared-form .sharing-notice .notice-text.data-v-91798fc9 {
+.booking-type-section .shared-form .sharing-notice .notice-text.data-v-91798fc9 {
   display: block;
   font-size: 26rpx;
   color: #bf360c;
   line-height: 1.5;
   margin-bottom: 8rpx;
 }
-.timeslot-section .booking-type-section .shared-form .sharing-notice .notice-text.data-v-91798fc9:last-child {
+.booking-type-section .shared-form .sharing-notice .notice-text.data-v-91798fc9:last-child {
   margin-bottom: 0;
 }
-.timeslot-section .booking-type-section .shared-form .time-notice.data-v-91798fc9 {
+.booking-type-section .shared-form .time-notice.data-v-91798fc9 {
   background-color: #e3f2fd;
   border: 2rpx solid #90caf9;
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
 }
-.timeslot-section .booking-type-section .shared-form .time-notice .notice-text.data-v-91798fc9 {
+.booking-type-section .shared-form .time-notice .notice-text.data-v-91798fc9 {
   font-size: 26rpx;
   color: #1565c0;
   line-height: 1.4;
@@ -645,6 +665,97 @@
   font-size: 28rpx;
   color: #999999;
 }
+.contact-modal-overlay.data-v-91798fc9 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.contact-modal.data-v-91798fc9 {
+  width: 600rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.contact-modal .modal-header.data-v-91798fc9 {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.contact-modal .modal-header .modal-title.data-v-91798fc9 {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333333;
+}
+.contact-modal .modal-content.data-v-91798fc9 {
+  padding: 50rpx 40rpx;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.contact-modal .modal-content .phone-text.data-v-91798fc9 {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #ff6b35;
+  margin-bottom: 20rpx;
+  letter-spacing: 2rpx;
+}
+.contact-modal .modal-content .phone-desc.data-v-91798fc9 {
+  font-size: 26rpx;
+  color: #888888;
+}
+.contact-modal .modal-actions.data-v-91798fc9 {
+  display: flex;
+  padding: 0 40rpx;
+  justify-content: space-between;
+  gap: 30rpx;
+  margin-bottom: 30rpx;
+}
+.contact-modal .modal-actions .action-btn.data-v-91798fc9 {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.contact-modal .modal-actions .action-btn.data-v-91798fc9::after {
+  border: none;
+}
+.contact-modal .modal-actions .copy-btn.data-v-91798fc9 {
+  background-color: #ff6b35;
+  color: #ffffff;
+}
+.contact-modal .modal-close-row.data-v-91798fc9 {
+  padding: 0 40rpx 30rpx;
+}
+.contact-modal .modal-close-row .cancel-btn.data-v-91798fc9 {
+  width: 100%;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  color: #666666;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.contact-modal .modal-close-row .cancel-btn.data-v-91798fc9::after {
+  border: none;
+}
 
 /* 错误状态样式 */
 .error-container.data-v-91798fc9 {
@@ -667,8 +778,7 @@
 /* 预约类型按钮样式 */
 .booking-type-buttons.data-v-91798fc9 {
   display: flex;
-  gap: 20rpx;
-  margin-top: 20rpx;
+  gap: 60rpx;
   justify-content: center;
 }
 .booking-type-buttons .booking-type-btn-wrapper.data-v-91798fc9 {

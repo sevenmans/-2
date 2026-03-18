@@ -71,10 +71,6 @@
           <text class="stat-value">{{ user.sharingCount }}</text>
           <text class="stat-label">拼场</text>
         </view>
-        <view class="stat-item" v-if="user.rating !== undefined">
-          <text class="stat-value">{{ user.rating.toFixed(1) }}</text>
-          <text class="stat-label">评分</text>
-        </view>
       </view>
     </view>
     

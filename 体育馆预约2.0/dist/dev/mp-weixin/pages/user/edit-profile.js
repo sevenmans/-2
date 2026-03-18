@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
+const config_index = require("../../config/index.js");
 const _sfc_main = {
   name: "EditProfile",
   components: {},
@@ -34,6 +35,17 @@ const _sfc_main = {
     };
   },
   computed: {
+    avatarUrl() {
+      const url = this.formData.avatar;
+      if (!url)
+        return "/static/images/default-avatar.svg";
+      if (url.startsWith("http"))
+        return url;
+      if (url.startsWith("//"))
+        return "https:" + url;
+      const host = config_index.config.baseURL.replace(/\/api\/?$/, "");
+      return url.startsWith("/") ? host + url : host + "/" + url;
+    },
     userInfo() {
       var _a;
       return ((_a = this.userStore) == null ? void 0 : _a.userInfoGetter) || {};
@@ -84,7 +96,7 @@ const _sfc_main = {
         try {
           const result = await this.userStore.getUserInfo();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:286", "[EditProfile] 获取用户信息失败:", error);
+          common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:296", "[EditProfile] 获取用户信息失败:", error);
           common_vendor.index.showToast({
             title: "获取用户信息失败",
             icon: "error"
@@ -146,7 +158,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:357", "[EditProfile] 上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:367", "[EditProfile] 上传头像失败:", error);
         common_vendor.index.showToast({
           title: error.message || "上传失败",
           icon: "error"
@@ -209,7 +221,7 @@ const _sfc_main = {
           common_vendor.index.hideLoading();
           loadingShown = false;
         }
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:437", "[EditProfile] 保存失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:447", "[EditProfile] 保存失败:", error);
         common_vendor.index.showToast({
           title: error.message || "保存失败",
           icon: "error"
@@ -291,7 +303,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:534", "[EditProfile] 修改密码失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/edit-profile.vue:544", "[EditProfile] 修改密码失败:", error);
         common_vendor.index.showToast({
           title: error.message || "修改失败",
           icon: "error"
@@ -307,7 +319,7 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _a, _b;
   return common_vendor.e({
-    a: $data.formData.avatar || "/static/images/default-avatar.svg",
+    a: $options.avatarUrl,
     b: common_vendor.o((...args) => $options.changeAvatar && $options.changeAvatar(...args)),
     c: $data.formData.nickname,
     d: common_vendor.o(($event) => $data.formData.nickname = $event.detail.value),

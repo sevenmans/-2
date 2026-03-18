@@ -26,17 +26,19 @@
     <view class="info-section">
       <view class="venue-header">
         <text class="venue-name">{{ venueDetail.name }}</text>
-        <view class="venue-rating">
-          <text class="rating-score">{{ venueDetail.rating || '暂无评分' }}</text>
-          <text class="rating-star" v-if="venueDetail.rating">⭐</text>
-          <text class="rating-count" v-if="venueDetail.reviewCount">({{ venueDetail.reviewCount }}条评价)</text>
-        </view>
       </view>
 
       <view class="venue-location">
         <text class="location-icon">📍</text>
-        <text class="location-text">{{ venueDetail.location }}</text>
-        <text class="distance-text" v-if="venueDetail.distance">距离{{ venueDetail.distance }}km</text>
+        <view class="location-text-wrap">
+          <view class="location-text-row">
+            <text class="location-text">{{ venueDetail.location }}</text>
+            <view class="copy-location-btn" @click.stop="copyLocation">
+              <text class="copy-text">复制</text>
+            </view>
+          </view>
+          <text class="distance-text" v-if="venueDetail.distance">距离{{ venueDetail.distance }}km</text>
+        </view>
       </view>
       
       <view class="venue-price">
@@ -67,7 +69,7 @@
           :key="facility"
           class="facility-item"
         >
-          <text class="facility-icon">🏃</text>
+          <image class="facility-icon" src="/static/images/facility-logo.png" mode="aspectFit" />
           <text class="facility-name">{{ facility }}</text>
         </view>
       </view>
@@ -238,6 +240,25 @@
         </view>
       </view>
     </view>
+
+    <!-- 优化后的联系场馆弹窗 -->
+    <view v-if="showContactModal" class="contact-modal-overlay" @click="hideContactModal">
+      <view class="contact-modal" @click.stop>
+        <view class="modal-header">
+          <text class="modal-title">联系场馆</text>
+        </view>
+        <view class="modal-content">
+          <text class="phone-text">{{ venueDetail.contactPhone }}</text>
+          <text class="phone-desc">场馆服务热线，建议在工作时间拨打</text>
+        </view>
+        <view class="modal-actions">
+          <button class="action-btn copy-btn" @click="copyPhone">复制号码</button>
+        </view>
+        <view class="modal-close-row">
+           <button class="action-btn cancel-btn" @click="hideContactModal">取消</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -267,7 +288,9 @@ export default {
       helpContent: {
         title: '',
         description: ''
-      }
+      },
+      // 联系场馆弹窗相关
+      showContactModal: false
     }
   },
   
@@ -1189,18 +1212,54 @@ export default {
     
     // 弹窗相关方法已移除，统一使用跳转到booking/create页面的预约流程
     
-    // 联系场馆
+    // 显示联系场馆弹窗
     contactVenue() {
       // 后端字段名是 contactPhone
       const phone = this.venueDetail.contactPhone
       if (phone) {
-        uni.makePhoneCall({
-          phoneNumber: phone
-        })
+        this.showContactModal = true
       } else {
         uni.showToast({
           title: '暂无联系方式',
           icon: 'none'
+        })
+      }
+    },
+
+    // 隐藏联系场馆弹窗
+    hideContactModal() {
+      this.showContactModal = false
+    },
+    
+    // 复制电话号码
+    copyPhone() {
+      const phone = this.venueDetail.contactPhone
+      if (phone) {
+        uni.setClipboardData({
+          data: phone,
+          success: () => {
+            uni.showToast({
+              title: '号码已复制',
+              icon: 'success'
+            })
+            this.hideContactModal()
+          }
+        })
+      }
+    },
+    
+    // 复制场馆地址
+    copyLocation() {
+      const location = this.venueDetail.location
+      if (location) {
+        uni.setClipboardData({
+          data: location,
+          success: () => {
+            uni.showToast({
+              title: '地址已复制',
+              icon: 'success'
+            })
+          }
         })
       }
     },
@@ -1710,48 +1769,59 @@ export default {
       color: #333333;
       margin-right: 20rpx;
     }
-    
-    .venue-rating {
-      display: flex;
-      align-items: center;
-      
-      .rating-score {
-        font-size: 28rpx;
-        color: #ff6b35;
-        margin-right: 8rpx;
-      }
-      
-      .rating-star {
-        font-size: 24rpx;
-        margin-right: 8rpx;
-      }
-      
-      .rating-count {
-        font-size: 24rpx;
-        color: #999999;
-      }
-    }
   }
   
   .venue-location {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 20rpx;
     
     .location-icon {
-      font-size: 24rpx;
-      margin-right: 8rpx;
-    }
-    
-    .location-text {
-      flex: 1;
       font-size: 28rpx;
-      color: #666666;
+      margin-right: 8rpx;
+      margin-top: 4rpx;
     }
     
-    .distance-text {
-      font-size: 24rpx;
-      color: #999999;
+    .location-text-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      
+      .location-text-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12rpx;
+        
+        .location-text {
+          font-size: 28rpx;
+          color: #333333;
+          font-weight: 500;
+        }
+        
+        .copy-location-btn {
+          display: flex;
+          align-items: center;
+          padding: 4rpx 16rpx;
+          background-color: #f5f5f5;
+          border-radius: 8rpx;
+          
+          .copy-text {
+            font-size: 22rpx;
+            color: #666666;
+          }
+          
+          &:active {
+            background-color: #e8e8e8;
+          }
+        }
+      }
+      
+      .distance-text {
+        font-size: 24rpx;
+        color: #999999;
+        margin-top: 8rpx;
+      }
     }
   }
   
@@ -1821,22 +1891,24 @@ export default {
 .facilities-grid {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-evenly;
   
   .facility-item {
-    width: 25%;
+    min-width: 25%;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 30rpx;
     
     .facility-icon {
-      font-size: 40rpx;
-      margin-bottom: 12rpx;
+      width: 60rpx;
+      height: 60rpx;
+      margin-bottom: 16rpx;
     }
     
     .facility-name {
-      font-size: 24rpx;
-      color: #666666;
+      font-size: 26rpx;
+      color: #444444;
       text-align: center;
     }
   }
@@ -2032,14 +2104,24 @@ export default {
       }
     }
   }
+} // timeslot-section closed here
+
+// 预约类型选择
+.booking-type-section {
+  background-color: #ffffff;
+  padding: 30rpx 30rpx 50rpx; // 留出足够底部高度，防止被文字或边框截断
+  margin-bottom: 20rpx;
+
+  .section-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 30rpx;
+  }
   
-  // 预约类型选择
-  .booking-type-section {
-    margin-bottom: 32rpx;
-    
-    .booking-type-options {
-      margin-top: 24rpx;
-    }
+  .booking-type-options {
+    margin-top: 24rpx;
+  }
     
     .radio-item {
       display: block;
@@ -2203,7 +2285,6 @@ export default {
       }
     }
   }
-}
 
 // 底部操作栏
 .bottom-actions {
@@ -2408,6 +2489,112 @@ export default {
   }
 }
 
+// 联系场馆弹窗
+.contact-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.contact-modal {
+  width: 600rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  
+  .modal-header {
+    padding: 30rpx;
+    text-align: center;
+    border-bottom: 1rpx solid #f0f0f0;
+    
+    .modal-title {
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #333333;
+    }
+  }
+  
+  .modal-content {
+    padding: 50rpx 40rpx;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .phone-text {
+      font-size: 48rpx;
+      font-weight: bold;
+      color: #ff6b35;
+      margin-bottom: 20rpx;
+      letter-spacing: 2rpx;
+    }
+    
+    .phone-desc {
+      font-size: 26rpx;
+      color: #888888;
+    }
+  }
+  
+  .modal-actions {
+    display: flex;
+    padding: 0 40rpx;
+    justify-content: space-between;
+    gap: 30rpx;
+    margin-bottom: 30rpx;
+    
+    .action-btn {
+      flex: 1;
+      height: 80rpx;
+      border-radius: 40rpx;
+      font-size: 28rpx;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      
+      &::after {
+        border: none;
+      }
+    }
+    
+    .copy-btn {
+      background-color: #ff6b35;
+      color: #ffffff;
+    }
+  }
+
+  .modal-close-row {
+    padding: 0 40rpx 30rpx;
+    
+    .cancel-btn {
+      width: 100%;
+      height: 80rpx;
+      background-color: #f5f5f5;
+      color: #666666;
+      border-radius: 40rpx;
+      font-size: 28rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      
+      &::after {
+        border: none;
+      }
+    }
+  }
+}
+
 /* 错误状态样式 */
 .error-container {
   display: flex;
@@ -2430,8 +2617,7 @@ export default {
 /* 预约类型按钮样式 */
 .booking-type-buttons {
   display: flex;
-  gap: 20rpx;
-  margin-top: 20rpx;
+  gap: 60rpx;
   justify-content: center;
   
   .booking-type-btn-wrapper {

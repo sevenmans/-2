@@ -133,18 +133,6 @@
   color: #333333;
   margin-right: 20rpx;
 }
-.venue-list .venue-card .venue-info .venue-header .venue-rating.data-v-17cb4dd5 {
-  display: flex;
-  align-items: center;
-}
-.venue-list .venue-card .venue-info .venue-header .venue-rating .rating-score.data-v-17cb4dd5 {
-  font-size: 24rpx;
-  color: #ff6b35;
-  margin-right: 4rpx;
-}
-.venue-list .venue-card .venue-info .venue-header .venue-rating .rating-star.data-v-17cb4dd5 {
-  font-size: 20rpx;
-}
 .venue-list .venue-card .venue-info .venue-location.data-v-17cb4dd5 {
   font-size: 24rpx;
   color: #666666;

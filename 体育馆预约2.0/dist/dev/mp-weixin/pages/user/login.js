@@ -197,7 +197,7 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_assets._imports_0,
+    a: common_assets._imports_0$2,
     b: common_vendor.o((...args) => $options.wechatLogin && $options.wechatLogin(...args)),
     c: common_vendor.t($data.showAccountLogin ? "收起其他登录方式" : "使用手机号/账号登录"),
     d: common_vendor.o((...args) => $options.toggleAccountLogin && $options.toggleAccountLogin(...args)),

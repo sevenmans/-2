@@ -3,6 +3,8 @@ const common_vendor = require("../../common/vendor.js");
 const stores_user = require("../../stores/user.js");
 const stores_booking = require("../../stores/booking.js");
 const stores_sharing = require("../../stores/sharing.js");
+const config_index = require("../../config/index.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   name: "UserProfile",
   data() {
@@ -37,6 +39,18 @@ const _sfc_main = {
     };
   },
   computed: {
+    avatarUrl() {
+      var _a;
+      const url = (_a = this.userInfo) == null ? void 0 : _a.avatar;
+      if (!url)
+        return "/static/images/default-avatar.svg";
+      if (url.startsWith("http"))
+        return url;
+      if (url.startsWith("//"))
+        return "https:" + url;
+      const host = config_index.config.baseURL.replace(/\/api\/?$/, "");
+      return url.startsWith("/") ? host + url : host + "/" + url;
+    },
     userInfo() {
       var _a;
       return ((_a = this.userStore) == null ? void 0 : _a.userInfoGetter) || {};
@@ -65,13 +79,13 @@ const _sfc_main = {
     // 缓存优化的数据加载方法
     async loadUserDataWithCache() {
       if (this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:199", "[Profile] 正在刷新中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:209", "[Profile] 正在刷新中，跳过重复请求");
         return;
       }
       const now = Date.now();
       const hasData = this.userInfo && Object.keys(this.userInfo).length > 0;
       if (hasData && this.lastRefreshTime && now - this.lastRefreshTime < this.cacheTimeout) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:209", "[Profile] 使用缓存数据，跳过请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:219", "[Profile] 使用缓存数据，跳过请求");
         return;
       }
       await this.loadUserData();
@@ -84,9 +98,9 @@ const _sfc_main = {
     },
     // 加载用户数据
     async loadUserData() {
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:226", "[Profile] 开始加载用户数据");
+      common_vendor.index.__f__("log", "at pages/user/profile.vue:236", "[Profile] 开始加载用户数据");
       if (this.isLoading || this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:230", "[Profile] 正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:240", "[Profile] 正在加载中，跳过重复请求");
         return;
       }
       this.isLoading = true;
@@ -100,13 +114,13 @@ const _sfc_main = {
           ]),
           // 第二组：角标数量，失败只静默降级，不影响页面渲染
           this.loadPendingCounts().catch((error) => {
-            common_vendor.index.__f__("warn", "at pages/user/profile.vue:247", "[Profile] 加载待处理数量失败:", error.message);
+            common_vendor.index.__f__("warn", "at pages/user/profile.vue:257", "[Profile] 加载待处理数量失败:", error.message);
           })
         ]);
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:251", "[Profile] 用户数据加载完成");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:261", "[Profile] 用户数据加载完成");
         this.lastRefreshTime = Date.now();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:257", "[Profile] 加载用户数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:267", "[Profile] 加载用户数据失败:", error);
         common_vendor.index.showToast({
           title: "加载用户信息失败",
           icon: "none",
@@ -120,21 +134,21 @@ const _sfc_main = {
     // 加载用户信息
     async loadUserInfo() {
       if (this.loadingFlags.userInfo) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:273", "[Profile] 用户信息正在加载中，跳过");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:283", "[Profile] 用户信息正在加载中，跳过");
         return;
       }
       if (this.isCacheValid("userInfo") && this.userInfo && Object.keys(this.userInfo).length > 0) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:278", "[Profile] 使用缓存的用户信息");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:288", "[Profile] 使用缓存的用户信息");
         return;
       }
       this.loadingFlags.userInfo = true;
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:285", "[Profile] 开始加载用户信息");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:295", "[Profile] 开始加载用户信息");
         await this.userStore.getUserInfo();
         this.lastLoadTime.userInfo = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:288", "[Profile] 用户信息加载成功");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:298", "[Profile] 用户信息加载成功");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:290", "[Profile] 用户信息加载失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:300", "[Profile] 用户信息加载失败:", error);
         throw error;
       } finally {
         this.loadingFlags.userInfo = false;
@@ -143,21 +157,21 @@ const _sfc_main = {
     // 加载用户统计
     async loadUserStats() {
       if (this.loadingFlags.userStats) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:301", "[Profile] 用户统计正在加载中，跳过");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:311", "[Profile] 用户统计正在加载中，跳过");
         return;
       }
       if (this.isCacheValid("userStats") && this.userStats && Object.keys(this.userStats).length > 0) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:306", "[Profile] 使用缓存的用户统计");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:316", "[Profile] 使用缓存的用户统计");
         return;
       }
       this.loadingFlags.userStats = true;
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:313", "[Profile] 开始加载用户统计");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:323", "[Profile] 开始加载用户统计");
         await this.userStore.getUserStats();
         this.lastLoadTime.userStats = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:316", "[Profile] 用户统计加载成功");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:326", "[Profile] 用户统计加载成功");
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:318", "[Profile] 用户统计加载失败，使用默认值:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:328", "[Profile] 用户统计加载失败，使用默认值:", error.message);
         this.userStats = {
           totalBookings: 0,
           pendingBookings: 0,
@@ -171,14 +185,14 @@ const _sfc_main = {
     // 加载待处理数量
     async loadPendingCounts() {
       if (this.loadingFlags.pendingCounts) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:335", "[Profile] 待处理数量正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:345", "[Profile] 待处理数量正在加载中，跳过重复请求");
         return;
       }
       if (this.isCacheValid("pendingCounts")) {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:340", "[Profile] 使用缓存的待处理数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:350", "[Profile] 使用缓存的待处理数量");
         return;
       }
-      common_vendor.index.__f__("log", "at pages/user/profile.vue:344", "[Profile] 开始加载待处理数量");
+      common_vendor.index.__f__("log", "at pages/user/profile.vue:354", "[Profile] 开始加载待处理数量");
       this.loadingFlags.pendingCounts = true;
       this.pendingBookings = 0;
       this.pendingSharings = 0;
@@ -192,14 +206,14 @@ const _sfc_main = {
           this.loadReceivedRequests()
         ]);
         this.lastLoadTime.pendingCounts = Date.now();
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:364", "[Profile] 所有待处理数量加载完成:", {
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:374", "[Profile] 所有待处理数量加载完成:", {
           pendingBookings: this.pendingBookings,
           pendingSharings: this.pendingSharings,
           pendingRequests: this.pendingRequests,
           receivedRequests: this.receivedRequests
         });
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:372", "[Profile] 加载待处理数量失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:382", "[Profile] 加载待处理数量失败:", error);
       } finally {
         this.loadingFlags.pendingCounts = false;
       }
@@ -217,7 +231,7 @@ const _sfc_main = {
     // 加载待确认预约数量
     async loadPendingBookings() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:393", "[Profile] 加载待确认预约数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:403", "[Profile] 加载待确认预约数量");
         const result = await Promise.race([
           this.bookingStore.getUserBookings({
             status: "pending",
@@ -228,16 +242,16 @@ const _sfc_main = {
           this.createTimeoutPromise(5e3)
         ]);
         this.pendingBookings = result.total || 0;
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:404", "[Profile] 待确认预约数量:", this.pendingBookings);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:414", "[Profile] 待确认预约数量:", this.pendingBookings);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:406", "[Profile] 加载待确认预约数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:416", "[Profile] 加载待确认预约数量失败:", error.message);
         this.pendingBookings = 0;
       }
     },
     // 加载待处理拼场数量
     async loadPendingSharings() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:414", "[Profile] 加载待处理拼场数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:424", "[Profile] 加载待处理拼场数量");
         const result = await Promise.race([
           this.bookingStore.getUserSharingOrders({
             status: "PENDING",
@@ -252,16 +266,16 @@ const _sfc_main = {
         } else {
           this.pendingSharings = result.total || 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:430", "[Profile] 待处理拼场数量:", this.pendingSharings);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:440", "[Profile] 待处理拼场数量:", this.pendingSharings);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:432", "[Profile] 加载待处理拼场数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:442", "[Profile] 加载待处理拼场数量失败:", error.message);
         this.pendingSharings = 0;
       }
     },
     // 加载我发出的待处理申请数量
     async loadPendingRequests() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:440", "[Profile] 加载我发出的待处理申请数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:450", "[Profile] 加载我发出的待处理申请数量");
         const result = await Promise.race([
           this.sharingStore.getSentRequestsList({
             status: "PENDING",
@@ -277,16 +291,16 @@ const _sfc_main = {
         } else {
           this.pendingRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:457", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:467", "[Profile] 我发出的待处理申请数量:", this.pendingRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:459", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:469", "[Profile] 加载我发出的待处理申请数量失败:", error.message);
         this.pendingRequests = 0;
       }
     },
     // 加载收到的待处理申请数量
     async loadReceivedRequests() {
       try {
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:467", "[Profile] 加载收到的待处理申请数量");
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:477", "[Profile] 加载收到的待处理申请数量");
         const result = await Promise.race([
           this.sharingStore.getReceivedRequestsList({
             status: "PENDING",
@@ -302,9 +316,9 @@ const _sfc_main = {
         } else {
           this.receivedRequests = 0;
         }
-        common_vendor.index.__f__("log", "at pages/user/profile.vue:483", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
+        common_vendor.index.__f__("log", "at pages/user/profile.vue:493", "[Profile] 收到的待处理申请数量:", this.receivedRequests);
       } catch (error) {
-        common_vendor.index.__f__("warn", "at pages/user/profile.vue:485", "[Profile] 加载收到的待处理申请数量失败:", error.message);
+        common_vendor.index.__f__("warn", "at pages/user/profile.vue:495", "[Profile] 加载收到的待处理申请数量失败:", error.message);
         this.receivedRequests = 0;
       }
     },
@@ -338,7 +352,7 @@ const _sfc_main = {
         });
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:525", "[Profile] 上传头像失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:535", "[Profile] 上传头像失败:", error);
         common_vendor.index.showToast({
           title: error.message || "上传失败",
           icon: "error"
@@ -404,7 +418,7 @@ const _sfc_main = {
           });
         }, 500);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/user/profile.vue:605", "[Profile] 退出登录失败:", error);
+        common_vendor.index.__f__("error", "at pages/user/profile.vue:615", "[Profile] 退出登录失败:", error);
         common_vendor.index.showToast({
           title: "退出失败",
           icon: "error"
@@ -416,39 +430,44 @@ const _sfc_main = {
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _a, _b, _c, _d, _e;
+  var _a, _b, _c, _d;
   return common_vendor.e({
-    a: ((_a = $options.userInfo) == null ? void 0 : _a.avatar) || "/static/images/default-avatar.svg",
+    a: $options.avatarUrl,
     b: common_vendor.o((...args) => $options.changeAvatar && $options.changeAvatar(...args)),
-    c: common_vendor.t(((_b = $options.userInfo) == null ? void 0 : _b.nickname) || ((_c = $options.userInfo) == null ? void 0 : _c.username) || "未设置昵称"),
-    d: common_vendor.t(((_d = $options.userInfo) == null ? void 0 : _d.username) || "未设置用户名"),
-    e: common_vendor.t($options.formatPhone(((_e = $options.userInfo) == null ? void 0 : _e.phone) || "")),
+    c: common_vendor.t(((_a = $options.userInfo) == null ? void 0 : _a.nickname) || ((_b = $options.userInfo) == null ? void 0 : _b.username) || "未设置昵称"),
+    d: common_vendor.t(((_c = $options.userInfo) == null ? void 0 : _c.username) || "未设置用户名"),
+    e: common_vendor.t($options.formatPhone(((_d = $options.userInfo) == null ? void 0 : _d.phone) || "")),
     f: common_vendor.o((...args) => $options.editProfile && $options.editProfile(...args)),
     g: common_vendor.t($options.userStats.totalBookings || 0),
     h: common_vendor.o(($event) => $options.navigateTo("/pages/booking/list")),
     i: common_vendor.t($options.userStats.totalSharings || 0),
     j: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/list?tab=my")),
-    k: $data.pendingBookings > 0
+    k: common_assets._imports_0$1,
+    l: $data.pendingBookings > 0
   }, $data.pendingBookings > 0 ? {
-    l: common_vendor.t($data.pendingBookings)
+    m: common_vendor.t($data.pendingBookings)
   } : {}, {
-    m: common_vendor.o(($event) => $options.navigateTo("/pages/booking/list")),
-    n: $data.pendingSharings > 0
+    n: common_vendor.o(($event) => $options.navigateTo("/pages/booking/list")),
+    o: common_assets._imports_1,
+    p: $data.pendingSharings > 0
   }, $data.pendingSharings > 0 ? {
-    o: common_vendor.t($data.pendingSharings)
+    q: common_vendor.t($data.pendingSharings)
   } : {}, {
-    p: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/list?tab=my")),
-    q: $data.pendingRequests > 0
+    r: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/list?tab=my")),
+    s: common_assets._imports_0$1,
+    t: $data.pendingRequests > 0
   }, $data.pendingRequests > 0 ? {
-    r: common_vendor.t($data.pendingRequests)
+    v: common_vendor.t($data.pendingRequests)
   } : {}, {
-    s: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/requests")),
-    t: $data.receivedRequests > 0
+    w: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/requests")),
+    x: common_assets._imports_1,
+    y: $data.receivedRequests > 0
   }, $data.receivedRequests > 0 ? {
-    v: common_vendor.t($data.receivedRequests)
+    z: common_vendor.t($data.receivedRequests)
   } : {}, {
-    w: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/received")),
-    x: common_vendor.o((...args) => $options.showLogoutConfirm && $options.showLogoutConfirm(...args))
+    A: common_vendor.o(($event) => $options.navigateTo("/pages/sharing/received")),
+    B: common_assets._imports_2,
+    C: common_vendor.o((...args) => $options.showLogoutConfirm && $options.showLogoutConfirm(...args))
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-f6b4f04d"]]);

@@ -4,7 +4,7 @@
     <view class="avatar-section">
       <view class="avatar-wrapper" @click="changeAvatar">
         <image 
-          :src="formData.avatar || '/static/images/default-avatar.svg'" 
+          :src="avatarUrl" 
           class="avatar"
           mode="aspectFill"
         />
@@ -171,6 +171,7 @@
 
 <script>
 import { useUserStore } from '@/stores/user.js'
+import config from '@/config/index.js'
 
 
 export default {
@@ -214,6 +215,15 @@ export default {
   },
   
   computed: {
+    avatarUrl() {
+      const url = this.formData.avatar;
+      if (!url) return '/static/images/default-avatar.svg';
+      if (url.startsWith('http')) return url;
+      if (url.startsWith('//')) return 'https:' + url;
+      const host = config.baseURL.replace(/\/api\/?$/, '');
+      return url.startsWith('/') ? host + url : host + '/' + url;
+    },
+
     userInfo() {
       return this.userStore?.userInfoGetter || {}
     },

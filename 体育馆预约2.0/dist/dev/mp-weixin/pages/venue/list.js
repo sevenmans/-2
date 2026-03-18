@@ -95,7 +95,7 @@ const _sfc_main = {
   onLoad() {
     this.venueStore = stores_venue.useVenueStore();
     if (!this.venueStore) {
-      common_vendor.index.__f__("error", "at pages/venue/list.vue:288", "VenueStore初始化失败");
+      common_vendor.index.__f__("error", "at pages/venue/list.vue:284", "VenueStore初始化失败");
       common_vendor.index.showToast({
         title: "Store初始化失败",
         icon: "error"
@@ -188,7 +188,7 @@ const _sfc_main = {
         ]);
         this.updatePagination();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:412", "初始化数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:408", "初始化数据失败:", error);
         common_vendor.index.showToast({
           title: "数据加载失败",
           icon: "none"
@@ -203,7 +203,7 @@ const _sfc_main = {
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
         common_vendor.index.stopPullDownRefresh();
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:429", "刷新数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:425", "刷新数据失败:", error);
       }
     },
     // 加载更多
@@ -237,7 +237,7 @@ const _sfc_main = {
         await this.venueStore.getVenueList(params);
         this.updatePagination();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:470", "加载更多失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:466", "加载更多失败:", error);
         common_vendor.index.showToast({
           title: "加载更多失败",
           icon: "error"
@@ -262,7 +262,7 @@ const _sfc_main = {
           }
           this.handleSearch();
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/venue/list.vue:504", "[VenueList] 搜索输入处理失败:", error);
+          common_vendor.index.__f__("error", "at pages/venue/list.vue:500", "[VenueList] 搜索输入处理失败:", error);
         }
       }, 800);
     },
@@ -298,7 +298,7 @@ const _sfc_main = {
         }
         const searchResult = await this.venueStore.searchVenues(searchParams);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:549", "搜索失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:545", "搜索失败:", error);
         common_vendor.index.showToast({
           title: "搜索失败，请重试",
           icon: "error"
@@ -326,7 +326,7 @@ const _sfc_main = {
         await this.venueStore.getVenueList(params);
         this.updatePagination();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:586", "筛选失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:582", "筛选失败:", error);
       }
     },
     // 跳转到详情页
@@ -412,13 +412,13 @@ const _sfc_main = {
               return true;
             } catch (e) {
               if (debugEnabled) {
-                common_vendor.index.__f__("error", "at pages/venue/list.vue:713", "打开弹窗时发生错误:", e);
+                common_vendor.index.__f__("error", "at pages/venue/list.vue:709", "打开弹窗时发生错误:", e);
               }
               return false;
             }
           } else {
             if (debugEnabled) {
-              common_vendor.index.__f__("error", "at pages/venue/list.vue:719", "组件实例没有open方法，尝试备选方案");
+              common_vendor.index.__f__("error", "at pages/venue/list.vue:715", "组件实例没有open方法，尝试备选方案");
             }
             this.internalPopupOpened = true;
             this.$forceUpdate();
@@ -434,7 +434,7 @@ const _sfc_main = {
           }
         } else {
           if (debugEnabled) {
-            common_vendor.index.__f__("error", "at pages/venue/list.vue:741", "filterPopup ref未找到或open未就绪(env: " + sysInfo.platform + "," + sysInfo.uniPlatform + "," + sysInfo.SDKVersion + ")");
+            common_vendor.index.__f__("error", "at pages/venue/list.vue:737", "filterPopup ref未找到或open未就绪(env: " + sysInfo.platform + "," + sysInfo.uniPlatform + "," + sysInfo.SDKVersion + ")");
           }
           return false;
         }
@@ -443,7 +443,7 @@ const _sfc_main = {
         setTimeout(() => {
           if (!openPopup()) {
             if (debugEnabled) {
-              common_vendor.index.__f__("error", "at pages/venue/list.vue:753", "弹窗打开失败，请检查组件是否正确渲染");
+              common_vendor.index.__f__("error", "at pages/venue/list.vue:749", "弹窗打开失败，请检查组件是否正确渲染");
               common_vendor.index.showToast({
                 title: "弹窗打开失败",
                 icon: "none"
@@ -532,14 +532,14 @@ const _sfc_main = {
                   `;
                 } catch (styleError) {
                   if (debugEnabled) {
-                    common_vendor.index.__f__("error", "at pages/venue/list.vue:887", "应用强制样式失败:", styleError);
+                    common_vendor.index.__f__("error", "at pages/venue/list.vue:883", "应用强制样式失败:", styleError);
                   }
                 }
               }
             }, 100);
           } catch (e) {
             if (debugEnabled) {
-              common_vendor.index.__f__("error", "at pages/venue/list.vue:894", "forceCreatePopup: 打开弹窗时发生错误:", e);
+              common_vendor.index.__f__("error", "at pages/venue/list.vue:890", "forceCreatePopup: 打开弹窗时发生错误:", e);
             }
             this.fallbackToRefsMethod();
           }
@@ -639,7 +639,7 @@ const _sfc_main = {
             return true;
           } catch (e) {
             if (debugEnabled) {
-              common_vendor.index.__f__("error", "at pages/venue/list.vue:1050", "关闭弹窗失败:", e);
+              common_vendor.index.__f__("error", "at pages/venue/list.vue:1046", "关闭弹窗失败:", e);
             }
             return false;
           }
@@ -655,7 +655,7 @@ const _sfc_main = {
           return true;
         } else {
           if (debugEnabled) {
-            common_vendor.index.__f__("error", "at pages/venue/list.vue:1077", `关闭弹窗失败: ref未找到或close方法未就绪 (尝试${retryCount + 1}次)(env: ${sysInfo.platform},${sysInfo.uniPlatform},${sysInfo.SDKVersion})`);
+            common_vendor.index.__f__("error", "at pages/venue/list.vue:1073", `关闭弹窗失败: ref未找到或close方法未就绪 (尝试${retryCount + 1}次)(env: ${sysInfo.platform},${sysInfo.uniPlatform},${sysInfo.SDKVersion})`);
           }
           return false;
         }
@@ -664,7 +664,7 @@ const _sfc_main = {
         setTimeout(() => {
           if (!tryClosePopup(1)) {
             if (debugEnabled) {
-              common_vendor.index.__f__("error", "at pages/venue/list.vue:1089", "多次尝试关闭弹窗失败，强制更新内部状态");
+              common_vendor.index.__f__("error", "at pages/venue/list.vue:1085", "多次尝试关闭弹窗失败，强制更新内部状态");
             }
             this.internalPopupOpened = false;
             if (sysInfo.platform === "mp-weixin" || sysInfo.platform === "devtools") {
@@ -710,7 +710,7 @@ const _sfc_main = {
           }).exec();
         }, 100);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:1150", "应用弹窗样式失败:", e);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:1146", "应用弹窗样式失败:", e);
       }
     },
     // 处理弹窗状态变化
@@ -741,7 +741,7 @@ const _sfc_main = {
             }
           }, 50);
         } else {
-          common_vendor.index.__f__("error", "at pages/venue/list.vue:1197", "弹窗打开但无法获取引用");
+          common_vendor.index.__f__("error", "at pages/venue/list.vue:1193", "弹窗打开但无法获取引用");
           setTimeout(() => {
             const delayedPopup = this.$refs.filterPopup;
             if (delayedPopup) {
@@ -792,7 +792,7 @@ const _sfc_main = {
           }).exec();
         }, 100);
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:1269", "应用弹窗样式失败:", e);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:1265", "应用弹窗样式失败:", e);
       }
     },
     // 选择距离
@@ -869,7 +869,7 @@ const _sfc_main = {
           this.updatePagination();
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:1366", "应用筛选失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:1362", "应用筛选失败:", error);
         common_vendor.index.showToast({
           title: "筛选失败，请重试",
           icon: "error"
@@ -947,7 +947,7 @@ const _sfc_main = {
         }
         this.updatePagination();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/list.vue:1474", "缓存刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/list.vue:1470", "缓存刷新失败:", error);
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({
           title: "数据刷新失败",
@@ -984,16 +984,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       return common_vendor.e({
         a: venue.image || "/static/default-venue.jpg",
         b: common_vendor.t(venue.name || "未知场馆"),
-        c: common_vendor.t(venue.rating || "4.5"),
-        d: common_vendor.t(venue.location || "位置未知"),
-        e: common_vendor.t(venue.type || "运动场馆"),
-        f: venue.supportSharing
+        c: common_vendor.t(venue.location || "位置未知"),
+        d: common_vendor.t(venue.type || "运动场馆"),
+        e: venue.supportSharing
       }, venue.supportSharing ? {} : {}, {
-        g: common_vendor.t(venue.price || 0),
-        h: common_vendor.t($options.getStatusText(venue.status)),
-        i: common_vendor.n($options.getStatusClass(venue.status)),
-        j: venue.id,
-        k: common_vendor.o(($event) => $options.navigateToDetail(venue), venue.id)
+        f: common_vendor.t(venue.price || 0),
+        g: common_vendor.t($options.getStatusText(venue.status)),
+        h: common_vendor.n($options.getStatusClass(venue.status)),
+        i: venue.id,
+        j: common_vendor.o(($event) => $options.navigateToDetail(venue), venue.id)
       });
     }),
     j: (!$options.filteredVenues || !Array.isArray($options.filteredVenues) || $options.filteredVenues.length === 0) && !$options.loading

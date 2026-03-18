@@ -52,10 +52,6 @@
         <view class="venue-info">
           <view class="venue-header">
             <text class="venue-name">{{ venue.name || '未知场馆' }}</text>
-            <view class="venue-rating">
-              <text class="rating-score">{{ venue.rating || '4.5' }}</text>
-              <text class="rating-star">⭐</text>
-            </view>
           </view>
           <text class="venue-location">📍 {{ venue.location || '位置未知' }}</text>
           <view class="venue-tags">
@@ -1612,21 +1608,6 @@ export default {
           font-weight: 600;
           color: #333333;
           margin-right: 20rpx;
-        }
-        
-        .venue-rating {
-          display: flex;
-          align-items: center;
-          
-          .rating-score {
-            font-size: 24rpx;
-            color: #ff6b35;
-            margin-right: 4rpx;
-          }
-          
-          .rating-star {
-            font-size: 20rpx;
-          }
         }
       }
       

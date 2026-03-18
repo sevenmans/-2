@@ -145,9 +145,11 @@
   display: flex;
   align-items: center;
 }
-.menu-section .menu-group .menu-item .item-left .item-icon.data-v-f6b4f04d {
-  font-size: 32rpx;
+.menu-section .menu-group .menu-item .item-left .item-icon-img.data-v-f6b4f04d {
+  width: 40rpx;
+  height: 40rpx;
   margin-right: 20rpx;
+  opacity: 0.8;
 }
 .menu-section .menu-group .menu-item .item-left .item-text.data-v-f6b4f04d {
   font-size: 28rpx;

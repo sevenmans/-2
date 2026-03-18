@@ -55,10 +55,6 @@
           </view>
           <view class="venue-info">
             <text class="venue-location">📍 {{ sharingOrderDetail.venueLocation || '位置未知' }}</text>
-            <view class="venue-rating">
-              <text class="rating-text">⭐ {{ sharingOrderDetail.venueRating || '暂无评分' }}</text>
-              <text class="review-count">({{ sharingOrderDetail.venueReviewCount || 0 }}条评价)</text>
-            </view>
           </view>
         </view>
       </view>
@@ -1753,22 +1749,6 @@ export default {
       color: #666666;
       display: block;
       margin-bottom: 8rpx;
-    }
-    
-    .venue-rating {
-      display: flex;
-      align-items: center;
-      
-      .rating-text {
-        font-size: 24rpx;
-        color: #fa8c16;
-        margin-right: 8rpx;
-      }
-      
-      .review-count {
-        font-size: 24rpx;
-        color: #999999;
-      }
     }
   }
 }

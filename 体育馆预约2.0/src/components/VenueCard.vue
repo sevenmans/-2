@@ -30,18 +30,6 @@
       <!-- 基本信息 -->
       <view class="basic-info">
         <text class="venue-name">{{ venue.name }}</text>
-        <view class="rating-container" v-if="venue.rating">
-          <view class="stars">
-            <text 
-              class="star"
-              :class="{ active: index < Math.floor(venue.rating) }"
-              v-for="index in 5"
-              :key="index"
-            >★</text>
-          </view>
-          <text class="rating-text">{{ venue.rating.toFixed(1) }}</text>
-          <text class="review-count" v-if="venue.reviewCount">({{ venue.reviewCount }})</text>
-        </view>
       </view>
       
       <!-- 位置信息 -->
@@ -367,36 +355,6 @@ export default {
       font-weight: 600;
       color: #333333;
       margin-right: 20rpx;
-    }
-    
-    .rating-container {
-      display: flex;
-      align-items: center;
-      
-      .stars {
-        display: flex;
-        margin-right: 8rpx;
-        
-        .star {
-          font-size: 20rpx;
-          color: #cccccc;
-          
-          &.active {
-            color: #fadb14;
-          }
-        }
-      }
-      
-      .rating-text {
-        font-size: 24rpx;
-        color: #333333;
-        margin-right: 4rpx;
-      }
-      
-      .review-count {
-        font-size: 20rpx;
-        color: #999999;
-      }
     }
   }
   

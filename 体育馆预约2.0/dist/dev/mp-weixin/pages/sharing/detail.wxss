@@ -181,19 +181,6 @@
   display: block;
   margin-bottom: 8rpx;
 }
-.venue-card .venue-info .venue-rating.data-v-1cab9fb2 {
-  display: flex;
-  align-items: center;
-}
-.venue-card .venue-info .venue-rating .rating-text.data-v-1cab9fb2 {
-  font-size: 24rpx;
-  color: #fa8c16;
-  margin-right: 8rpx;
-}
-.venue-card .venue-info .venue-rating .review-count.data-v-1cab9fb2 {
-  font-size: 24rpx;
-  color: #999999;
-}
 .activity-card.data-v-1cab9fb2 {
   background-color: #ffffff;
   border-radius: 16rpx;

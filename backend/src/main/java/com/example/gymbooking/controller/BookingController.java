@@ -678,7 +678,8 @@ public class BookingController {
             logger.info("🏟️ 查找场馆信息, venueId: {}", order.getVenueId());
             venueRepository.findById(order.getVenueId()).ifPresent(venue -> {
                 response.put("venueLocation", venue.getLocation());
-                logger.info("🏟️ 找到场馆位置: {}", venue.getLocation());
+                response.put("venuePhone", venue.getContactPhone());
+                logger.info("🏟️ 找到场馆位置: {}, 电话: {}", venue.getLocation(), venue.getContactPhone());
             });
 
             // 🔧 修复：如果是拼场订单，获取SharingOrder表中完整的拼场信息

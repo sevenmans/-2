@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const stores_venue = require("../../stores/venue.js");
 const stores_booking = require("../../stores/booking.js");
 const utils_helpers = require("../../utils/helpers.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   name: "VenueDetail",
   data() {
@@ -26,7 +27,9 @@ const _sfc_main = {
       helpContent: {
         title: "",
         description: ""
-      }
+      },
+      // 联系场馆弹窗相关
+      showContactModal: false
     };
   },
   computed: {
@@ -37,9 +40,9 @@ const _sfc_main = {
     timeSlots() {
       var _a, _b;
       const slots = ((_a = this.venueStore) == null ? void 0 : _a.timeSlots) || [];
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:282", "timeSlots computed - venueStore:", this.venueStore);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:283", "timeSlots computed - timeSlots:", (_b = this.venueStore) == null ? void 0 : _b.timeSlots);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:284", "timeSlots computed - 返回值:", slots);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:305", "timeSlots computed - venueStore:", this.venueStore);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:306", "timeSlots computed - timeSlots:", (_b = this.venueStore) == null ? void 0 : _b.timeSlots);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:307", "timeSlots computed - 返回值:", slots);
       return slots;
     },
     // 处理场馆图片
@@ -78,11 +81,11 @@ const _sfc_main = {
     },
     // 过滤掉已过期的时间段
     filteredTimeSlots() {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:336", "[DEBUG] filteredTimeSlots 计算开始");
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:337", "[DEBUG] 原始时间段数据:", this.timeSlots);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:338", "[DEBUG] 当前选择的日期:", this.selectedDate);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:359", "[DEBUG] filteredTimeSlots 计算开始");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:360", "[DEBUG] 原始时间段数据:", this.timeSlots);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:361", "[DEBUG] 当前选择的日期:", this.selectedDate);
       if (!Array.isArray(this.timeSlots)) {
-        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:342", "[DEBUG] timeSlots不是数组:", this.timeSlots);
+        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:365", "[DEBUG] timeSlots不是数组:", this.timeSlots);
         return [];
       }
       const now = /* @__PURE__ */ new Date();
@@ -128,10 +131,10 @@ const _sfc_main = {
       if (flag && String(flag.venueId) === String(this.venueId)) {
         if (!this.selectedDate && flag.date) {
           this.selectedDate = flag.date;
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:405", "[VenueDetail] onShow: 根据最近一次取消记录设置 selectedDate =", this.selectedDate);
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:428", "[VenueDetail] onShow: 根据最近一次取消记录设置 selectedDate =", this.selectedDate);
         }
         if (this.selectedDate === flag.date) {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:409", "[VenueDetail] onShow: 检测到最近一次取消匹配当前页面，强制刷新时间段");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:432", "[VenueDetail] onShow: 检测到最近一次取消匹配当前页面，强制刷新时间段");
           await this.loadTimeSlots(true);
           if (this.bookingStore)
             this.bookingStore.lastCancelled = null;
@@ -143,17 +146,17 @@ const _sfc_main = {
         }
       }
       if (this.venueId && this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:420", "[VenueDetail] onShow: 常规重新加载时间段数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:443", "[VenueDetail] onShow: 常规重新加载时间段数据");
         this.loadTimeSlots(false);
       } else {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:423", "[VenueDetail] onShow: 缺少 venueId 或 selectedDate，跳过加载");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:446", "[VenueDetail] onShow: 缺少 venueId 或 selectedDate，跳过加载");
       }
     } catch (e) {
-      common_vendor.index.__f__("warn", "at pages/venue/detail.vue:426", "[VenueDetail] onShow 处理异常:", e);
+      common_vendor.index.__f__("warn", "at pages/venue/detail.vue:449", "[VenueDetail] onShow 处理异常:", e);
     }
   },
   onHide() {
-    common_vendor.index.__f__("log", "at pages/venue/detail.vue:431", "[VenueDetail] 页面隐藏");
+    common_vendor.index.__f__("log", "at pages/venue/detail.vue:454", "[VenueDetail] 页面隐藏");
     this.removeGlobalEventListeners();
   },
   onPullDownRefresh() {
@@ -171,7 +174,7 @@ const _sfc_main = {
           networkType: networkInfo.networkType
         };
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:453", "[VenueDetail] 网络状态检查失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:476", "[VenueDetail] 网络状态检查失败:", error);
         return {
           isConnected: false,
           networkType: "unknown"
@@ -182,17 +185,17 @@ const _sfc_main = {
     // 简化的时间段刷新
     async refreshTimeSlotsWithCache() {
       if (this.loading) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:466", "[VenueDetail] 正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:489", "[VenueDetail] 正在加载中，跳过重复请求");
         return;
       }
       try {
         this.loading = true;
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:472", "[VenueDetail] 开始刷新时间段");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:495", "[VenueDetail] 开始刷新时间段");
         await this.loadTimeSlots();
         this.lastRefreshTime = Date.now();
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:480", "[VenueDetail] 时间段刷新完成");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:503", "[VenueDetail] 时间段刷新完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:482", "[VenueDetail] 刷新时间段失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:505", "[VenueDetail] 刷新时间段失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "error"
@@ -204,18 +207,18 @@ const _sfc_main = {
     // 将时间字符串转换为分钟数（用于比较）
     getMinutesFromTimeString(timeStr) {
       if (!timeStr || typeof timeStr !== "string") {
-        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:495", "getMinutesFromTimeString: 无效的时间字符串:", timeStr);
+        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:518", "getMinutesFromTimeString: 无效的时间字符串:", timeStr);
         return 0;
       }
       try {
         const [hours, minutes] = timeStr.split(":").map(Number);
         if (isNaN(hours) || isNaN(minutes)) {
-          common_vendor.index.__f__("warn", "at pages/venue/detail.vue:502", "getMinutesFromTimeString: 时间格式错误:", timeStr);
+          common_vendor.index.__f__("warn", "at pages/venue/detail.vue:525", "getMinutesFromTimeString: 时间格式错误:", timeStr);
           return 0;
         }
         return hours * 60 + minutes;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:507", "getMinutesFromTimeString: 解析时间失败:", timeStr, error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:530", "getMinutesFromTimeString: 解析时间失败:", timeStr, error);
         return 0;
       }
     },
@@ -231,9 +234,9 @@ const _sfc_main = {
     // 简化的初始化数据方法
     async initData() {
       try {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:524", `[VenueDetail] 开始初始化数据，场馆ID: ${this.venueId}`);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:547", `[VenueDetail] 开始初始化数据，场馆ID: ${this.venueId}`);
         if (!this.venueId) {
-          common_vendor.index.__f__("error", "at pages/venue/detail.vue:527", "[VenueDetail] 场馆ID为空");
+          common_vendor.index.__f__("error", "at pages/venue/detail.vue:550", "[VenueDetail] 场馆ID为空");
           common_vendor.index.showToast({
             title: "参数错误",
             icon: "error"
@@ -243,11 +246,11 @@ const _sfc_main = {
         this.loading = true;
         this.initDates();
         const requests = [
-          this.venueStore.getVenueDetail(this.venueId).then(() => common_vendor.index.__f__("log", "at pages/venue/detail.vue:542", "[VenueDetail] 获取场馆详情成功")).catch((e) => common_vendor.index.__f__("error", "at pages/venue/detail.vue:543", "[VenueDetail] 获取详情失败:", e))
+          this.venueStore.getVenueDetail(this.venueId).then(() => common_vendor.index.__f__("log", "at pages/venue/detail.vue:565", "[VenueDetail] 获取场馆详情成功")).catch((e) => common_vendor.index.__f__("error", "at pages/venue/detail.vue:566", "[VenueDetail] 获取详情失败:", e))
         ];
         if (this.selectedDate) {
           requests.push(
-            this.loadTimeSlots().catch((e) => common_vendor.index.__f__("error", "at pages/venue/detail.vue:548", "[VenueDetail] 获取时间段失败:", e))
+            this.loadTimeSlots().catch((e) => common_vendor.index.__f__("error", "at pages/venue/detail.vue:571", "[VenueDetail] 获取时间段失败:", e))
           );
         }
         await Promise.all(requests);
@@ -269,9 +272,9 @@ const _sfc_main = {
           }, 300);
           return;
         }
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:572", "[VenueDetail] 数据初始化完成");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:595", "[VenueDetail] 数据初始化完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:575", "[VenueDetail] 初始化数据失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:598", "[VenueDetail] 初始化数据失败:", error);
         common_vendor.index.showToast({
           title: "加载失败",
           icon: "error"
@@ -283,7 +286,7 @@ const _sfc_main = {
     // 简化的数据刷新方法
     async refreshData() {
       try {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:594", "[VenueDetail] 🔄 开始刷新数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:617", "[VenueDetail] 🔄 开始刷新数据");
         this.loading = true;
         await this.initData();
         common_vendor.index.showToast({
@@ -292,7 +295,7 @@ const _sfc_main = {
         });
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:608", "[VenueDetail] ❌ 数据刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:631", "[VenueDetail] ❌ 数据刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败",
           icon: "error"
@@ -323,7 +326,7 @@ const _sfc_main = {
     // 简化的日期选择方法
     async selectDate(date) {
       try {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:647", "[VenueDetail] 🗓️ 选择日期:", date);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:670", "[VenueDetail] 🗓️ 选择日期:", date);
         this.selectedDate = date;
         this.selectedTimeSlots = [];
         this.loading = true;
@@ -332,9 +335,9 @@ const _sfc_main = {
           date,
           forceRefresh: false
         });
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:660", "[VenueDetail] ✅ 日期选择完成");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:683", "[VenueDetail] ✅ 日期选择完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:663", "[VenueDetail] ❌ 日期选择失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:686", "[VenueDetail] ❌ 日期选择失败:", error);
         common_vendor.index.showToast({
           title: "加载失败",
           icon: "error"
@@ -357,48 +360,48 @@ const _sfc_main = {
     },
     // 加载时间段
     async loadTimeSlots(forceRefresh = false) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:695", "[VenueDetail] 🚨🚨🚨 开始加载时间段 🚨🚨🚨", {
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:718", "[VenueDetail] 🚨🚨🚨 开始加载时间段 🚨🚨🚨", {
         venueId: this.venueId,
         date: this.selectedDate,
         forceRefresh
       });
       if (this.isRefreshing) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:702", "[VenueDetail] 正在刷新中，跳过重复加载");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:725", "[VenueDetail] 正在刷新中，跳过重复加载");
         return;
       }
       this.isRefreshing = true;
       try {
         common_vendor.index.showLoading({ title: "加载时间段..." });
         if (forceRefresh) {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:713", "[VenueDetail] 🗑️ 强制刷新，清除所有缓存");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:736", "[VenueDetail] 🗑️ 强制刷新，清除所有缓存");
           if (this.venueStore && this.venueStore.cache && this.venueStore.cache.timeSlots) {
             const cacheKey = `${this.venueId}_${this.selectedDate}`;
             this.venueStore.cache.timeSlots.delete(cacheKey);
             this.venueStore.cache.timeSlots.clear();
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:720", "[VenueDetail] ✅ 已清除 venue store 缓存");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:743", "[VenueDetail] ✅ 已清除 venue store 缓存");
           }
           try {
             const { default: cacheManager } = await "../../utils/cache-manager.js";
             if (cacheManager) {
               cacheManager.clearTimeSlotCache(this.venueId, this.selectedDate);
               cacheManager.clear();
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:729", "[VenueDetail] ✅ 已清除缓存管理器缓存");
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:752", "[VenueDetail] ✅ 已清除缓存管理器缓存");
             }
           } catch (importError) {
-            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:732", "[VenueDetail] 导入缓存管理器失败:", importError);
+            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:755", "[VenueDetail] 导入缓存管理器失败:", importError);
           }
           try {
             const { default: unifiedTimeSlotManager } = await "../../utils/unified-timeslot-manager.js";
             if (unifiedTimeSlotManager) {
               unifiedTimeSlotManager.clearCache(this.venueId, this.selectedDate);
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:740", "[VenueDetail] ✅ 已清除统一时间段管理器缓存");
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:763", "[VenueDetail] ✅ 已清除统一时间段管理器缓存");
             }
           } catch (importError) {
-            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:743", "[VenueDetail] 导入统一时间段管理器失败:", importError);
+            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:766", "[VenueDetail] 导入统一时间段管理器失败:", importError);
           }
         }
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:747", "[VenueDetail] 🔄 从后端获取时间段数据");
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:748", "[VenueDetail] 🔥 调用getVenueTimeSlots，参数:", {
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:770", "[VenueDetail] 🔄 从后端获取时间段数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:771", "[VenueDetail] 🔥 调用getVenueTimeSlots，参数:", {
           venueId: this.venueId,
           date: this.selectedDate,
           forceRefresh,
@@ -412,13 +415,13 @@ const _sfc_main = {
           false
         );
         let timeSlots = this.timeSlots || [];
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:764", `[VenueDetail] 🎉 获取到 ${timeSlots.length} 个时间段`);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:787", `[VenueDetail] 🎉 获取到 ${timeSlots.length} 个时间段`);
         if (timeSlots.length > 0) {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:768", "[VenueDetail] 🔧 开始修正时间段状态");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:791", "[VenueDetail] 🔧 开始修正时间段状态");
           timeSlots = timeSlots.map((slot) => {
             const originalStatus = slot.status;
             if (originalStatus === "AVAILABLE") {
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:774", `[VenueDetail] 🔧 修正时间段 ${slot.id} (${slot.startTime}-${slot.endTime}) 状态: ${originalStatus} -> AVAILABLE`);
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:797", `[VenueDetail] 🔧 修正时间段 ${slot.id} (${slot.startTime}-${slot.endTime}) 状态: ${originalStatus} -> AVAILABLE`);
               return {
                 ...slot,
                 status: "AVAILABLE",
@@ -429,9 +432,9 @@ const _sfc_main = {
             return slot;
           });
           this.venueStore.setTimeSlots(timeSlots);
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:788", "[VenueDetail] 🎉 时间段状态修正完成");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:811", "[VenueDetail] 🎉 时间段状态修正完成");
         }
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:791", "[VenueDetail] 修正后时间段数量:", timeSlots.length);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:814", "[VenueDetail] 修正后时间段数量:", timeSlots.length);
         if (forceRefresh) {
           common_vendor.index.showToast({
             title: `刷新成功，获取到${timeSlots.length}个时间段`,
@@ -439,9 +442,9 @@ const _sfc_main = {
             duration: 2e3
           });
         }
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:801", "[VenueDetail] 🎉 时间段加载完成");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:824", "[VenueDetail] 🎉 时间段加载完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:804", "[VenueDetail] 加载时间段失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:827", "[VenueDetail] 加载时间段失败:", error);
         common_vendor.index.showToast({
           title: "加载时间段失败，请重试",
           icon: "error",
@@ -466,10 +469,10 @@ const _sfc_main = {
     // 时间段选择方法
     selectTimeSlot(slot) {
       try {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:831", "[VenueDetail] 点击时间段:", slot);
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:832", "[VenueDetail] 时间段状态:", slot.status);
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:833", "[VenueDetail] 当前预约类型:", this.bookingType);
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:834", "[VenueDetail] 当前已选时间段:", this.selectedTimeSlots);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:854", "[VenueDetail] 点击时间段:", slot);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:855", "[VenueDetail] 时间段状态:", slot.status);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:856", "[VenueDetail] 当前预约类型:", this.bookingType);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:857", "[VenueDetail] 当前已选时间段:", this.selectedTimeSlots);
         if (slot.status === "OCCUPIED" || slot.status === "RESERVED") {
           common_vendor.index.showToast({
             title: "该时间段已被预约",
@@ -495,7 +498,7 @@ const _sfc_main = {
             });
             return;
           } else {
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:866", "[VenueDetail] 未来日期EXPIRED状态允许选择:", {
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:889", "[VenueDetail] 未来日期EXPIRED状态允许选择:", {
               selectedDate,
               today,
               isFutureDate: selectedDate > today
@@ -518,7 +521,7 @@ const _sfc_main = {
           );
           if (existingIndex !== -1) {
             this.selectedTimeSlots.splice(existingIndex, 1);
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:897", "取消选择时间段:", slot);
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:920", "取消选择时间段:", slot);
             common_vendor.index.showToast({
               title: "已取消选择",
               icon: "success",
@@ -540,7 +543,7 @@ const _sfc_main = {
             }
           }
           this.selectedTimeSlots.push(slot);
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:926", "已选择时间段:", this.selectedTimeSlots);
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:949", "已选择时间段:", this.selectedTimeSlots);
           common_vendor.index.showToast({
             title: "已选择时间段",
             icon: "success",
@@ -554,7 +557,7 @@ const _sfc_main = {
           });
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:943", "[VenueDetail] 时间段选择失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:966", "[VenueDetail] 时间段选择失败:", error);
         common_vendor.index.showToast({
           title: "选择时间段时出现问题，请重试",
           icon: "none",
@@ -588,13 +591,13 @@ const _sfc_main = {
         if (selectedDate <= today) {
           classes.push("expired");
           classes.push("disabled");
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:987", "[VenueDetail] 🔧 今日EXPIRED状态添加expired和disabled样式:", {
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1010", "[VenueDetail] 🔧 今日EXPIRED状态添加expired和disabled样式:", {
             selectedDate,
             today,
             isPastOrToday: selectedDate <= today
           });
         } else {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:993", "[VenueDetail] 🔧 未来日期EXPIRED状态不添加expired和disabled样式:", {
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1016", "[VenueDetail] 🔧 未来日期EXPIRED状态不添加expired和disabled样式:", {
             selectedDate,
             today,
             isFutureDate: selectedDate > today
@@ -606,7 +609,7 @@ const _sfc_main = {
       );
       if (isSelected) {
         classes.push("selected");
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1009", "添加选中样式:", slot);
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1032", "添加选中样式:", slot);
       }
       return classes.join(" ");
     },
@@ -638,12 +641,12 @@ const _sfc_main = {
         const timeStr = slot.startTime + ":00";
         const selectedDateTime = /* @__PURE__ */ new Date(`${dateStr} ${timeStr}`);
         if (isNaN(selectedDateTime.getTime())) {
-          common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1051", "[VenueDetail] 无效的日期时间:", `${dateStr} ${timeStr}`);
+          common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1074", "[VenueDetail] 无效的日期时间:", `${dateStr} ${timeStr}`);
           return false;
         }
         const timeDiff = selectedDateTime.getTime() - now.getTime();
         const hoursDiff = timeDiff / (1e3 * 60 * 60);
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1061", "[VenueDetail] 拼场时间检查:", {
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1084", "[VenueDetail] 拼场时间检查:", {
           now: now.toISOString(),
           selectedDateTime: selectedDateTime.toISOString(),
           hoursDiff: hoursDiff.toFixed(2),
@@ -651,7 +654,7 @@ const _sfc_main = {
         });
         return hoursDiff >= 3;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:1071", "[VenueDetail] 拼场时间检查失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:1094", "[VenueDetail] 拼场时间检查失败:", error);
         return false;
       }
     },
@@ -676,7 +679,7 @@ const _sfc_main = {
         const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
         const selectedDate = this.selectedDate;
         if (selectedDate > today) {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1102", "[VenueDetail] 🔧 未来日期EXPIRED状态修正为可预约:", {
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1125", "[VenueDetail] 🔧 未来日期EXPIRED状态修正为可预约:", {
             selectedDate,
             today,
             isFutureDate: selectedDate > today
@@ -695,10 +698,10 @@ const _sfc_main = {
     },
     // 预约场馆
     bookVenue() {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1125", "[VenueDetail] 🎯 预约按钮被点击");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1148", "[VenueDetail] 🎯 预约按钮被点击");
       const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
       const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1e3).toISOString().split("T")[0];
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1131", "[VenueDetail] 🚨 关键日期调试:", {
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1154", "[VenueDetail] 🚨 关键日期调试:", {
         selectedDate: this.selectedDate,
         today,
         tomorrow,
@@ -706,7 +709,7 @@ const _sfc_main = {
         isTomorrow: this.selectedDate === tomorrow,
         availableDates: this.availableDates.map((d) => ({ value: d.value, day: d.day }))
       });
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1140", "[VenueDetail] 📊 当前状态:", {
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1163", "[VenueDetail] 📊 当前状态:", {
         selectedTimeSlots: this.selectedTimeSlots,
         selectedTimeSlotsLength: this.selectedTimeSlots.length,
         bookingType: this.bookingType,
@@ -714,7 +717,7 @@ const _sfc_main = {
         selectedDate: this.selectedDate
       });
       if (this.selectedTimeSlots.length === 0) {
-        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1149", "[VenueDetail] ❌ 未选择时间段");
+        common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1172", "[VenueDetail] ❌ 未选择时间段");
         common_vendor.index.showToast({
           title: "请选择时间段",
           icon: "none"
@@ -723,23 +726,23 @@ const _sfc_main = {
       }
       const selectedSlotsData = JSON.stringify(this.selectedTimeSlots);
       const targetUrl = `/pages/booking/create?venueId=${this.venueDetail.id}&date=${this.selectedDate}&bookingType=${this.bookingType}&selectedSlots=${encodeURIComponent(selectedSlotsData)}`;
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1162", "[VenueDetail] 📋 跳转参数:", {
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1185", "[VenueDetail] 📋 跳转参数:", {
         venueId: this.venueDetail.id,
         selectedDate: this.selectedDate,
         bookingType: this.bookingType,
         selectedTimeSlots: this.selectedTimeSlots,
         targetUrl
       });
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1170", "[VenueDetail] 🚀 准备跳转到预约页面");
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1171", "[VenueDetail] 📋 跳转URL:", targetUrl);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1172", "[VenueDetail] 📦 传递的时间段数据:", this.selectedTimeSlots);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1193", "[VenueDetail] 🚀 准备跳转到预约页面");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1194", "[VenueDetail] 📋 跳转URL:", targetUrl);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1195", "[VenueDetail] 📦 传递的时间段数据:", this.selectedTimeSlots);
       common_vendor.index.navigateTo({
         url: targetUrl,
         success: () => {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1178", "[VenueDetail] ✅ 成功跳转到预约页面");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1201", "[VenueDetail] ✅ 成功跳转到预约页面");
         },
         fail: (error) => {
-          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1181", "[VenueDetail] ❌ 跳转预约页面失败:", error);
+          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1204", "[VenueDetail] ❌ 跳转预约页面失败:", error);
           common_vendor.index.showToast({
             title: "跳转失败，请重试",
             icon: "none"
@@ -748,17 +751,50 @@ const _sfc_main = {
       });
     },
     // 弹窗相关方法已移除，统一使用跳转到booking/create页面的预约流程
-    // 联系场馆
+    // 显示联系场馆弹窗
     contactVenue() {
       const phone = this.venueDetail.contactPhone;
       if (phone) {
-        common_vendor.index.makePhoneCall({
-          phoneNumber: phone
-        });
+        this.showContactModal = true;
       } else {
         common_vendor.index.showToast({
           title: "暂无联系方式",
           icon: "none"
+        });
+      }
+    },
+    // 隐藏联系场馆弹窗
+    hideContactModal() {
+      this.showContactModal = false;
+    },
+    // 复制电话号码
+    copyPhone() {
+      const phone = this.venueDetail.contactPhone;
+      if (phone) {
+        common_vendor.index.setClipboardData({
+          data: phone,
+          success: () => {
+            common_vendor.index.showToast({
+              title: "号码已复制",
+              icon: "success"
+            });
+            this.hideContactModal();
+          }
+        });
+      }
+    },
+    // 复制场馆地址
+    copyLocation() {
+      const location = this.venueDetail.location;
+      if (location) {
+        common_vendor.index.setClipboardData({
+          data: location,
+          success: () => {
+            common_vendor.index.showToast({
+              title: "地址已复制",
+              icon: "success"
+            });
+          }
         });
       }
     },
@@ -809,7 +845,7 @@ const _sfc_main = {
     // 强制刷新时间段数据
     async forceRefreshTimeSlots() {
       try {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1264", "[VenueDetail] 🔄 用户手动触发强制刷新时间段");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1323", "[VenueDetail] 🔄 用户手动触发强制刷新时间段");
         this.selectedTimeSlots = [];
         await this.loadTimeSlots(true);
         common_vendor.index.showToast({
@@ -817,9 +853,9 @@ const _sfc_main = {
           icon: "success",
           duration: 1500
         });
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1278", "[VenueDetail] ✅ 手动刷新完成");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1337", "[VenueDetail] ✅ 手动刷新完成");
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/venue/detail.vue:1281", "[VenueDetail] ❌ 手动刷新失败:", error);
+        common_vendor.index.__f__("error", "at pages/venue/detail.vue:1340", "[VenueDetail] ❌ 手动刷新失败:", error);
         common_vendor.index.showToast({
           title: "刷新失败，请重试",
           icon: "none",
@@ -829,82 +865,82 @@ const _sfc_main = {
     },
     // 设置全局事件监听
     setupGlobalEventListeners() {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1293", "[VenueDetail] 🚨🚨🚨 设置全局事件监听 🚨🚨🚨");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1352", "[VenueDetail] 🚨🚨🚨 设置全局事件监听 🚨🚨🚨");
       common_vendor.index.$on("order-expired", this.onOrderExpiredEvent);
       common_vendor.index.$on("booking-success", this.onBookingSuccessEvent);
       common_vendor.index.$on("timeslot-status-updated", this.onTimeSlotStatusUpdated);
       common_vendor.index.$on("timeslot-updated", this.onTimeSlotUpdated);
       common_vendor.index.$on("force-refresh-timeslots", this.onForceRefreshTimeslots);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1310", "[VenueDetail] ✅ 全局事件监听设置完成");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1369", "[VenueDetail] ✅ 全局事件监听设置完成");
     },
     // 移除全局事件监听
     removeGlobalEventListeners() {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1315", "[VenueDetail] 移除全局事件监听");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1374", "[VenueDetail] 移除全局事件监听");
       common_vendor.index.$off("order-expired", this.onOrderExpiredEvent);
       common_vendor.index.$off("booking-success", this.onBookingSuccessEvent);
       common_vendor.index.$off("timeslot-status-updated", this.onTimeSlotStatusUpdated);
       common_vendor.index.$off("timeslot-updated", this.onTimeSlotUpdated);
       common_vendor.index.$off("force-refresh-timeslots", this.onForceRefreshTimeslots);
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1324", "[VenueDetail] 全局事件监听移除完成");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1383", "[VenueDetail] 全局事件监听移除完成");
     },
     // 🔥 处理订单过期事件
     async onOrderExpiredEvent(eventData) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1329", "[VenueDetail] 🚨🚨🚨 收到订单过期事件 🚨🚨🚨");
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1330", "[VenueDetail] 订单过期事件数据:", eventData);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1388", "[VenueDetail] 🚨🚨🚨 收到订单过期事件 🚨🚨🚨");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1389", "[VenueDetail] 订单过期事件数据:", eventData);
       if (eventData && eventData.venueId == this.venueId && eventData.date === this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1337", "[VenueDetail] 🎯 订单过期事件匹配当前页面，立即释放时间段并刷新");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1396", "[VenueDetail] 🎯 订单过期事件匹配当前页面，立即释放时间段并刷新");
         try {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1341", "[VenueDetail] 🗑️ 清除相关缓存");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1400", "[VenueDetail] 🗑️ 清除相关缓存");
           if (this.venueStore && this.venueStore.cache && this.venueStore.cache.timeSlots) {
             const cacheKey = `${this.venueId}_${this.selectedDate}`;
             this.venueStore.cache.timeSlots.delete(cacheKey);
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1347", "[VenueDetail] ✅ 已清除 venue store 缓存");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1406", "[VenueDetail] ✅ 已清除 venue store 缓存");
           }
           try {
             const { default: cacheManager } = await "../../utils/cache-manager.js";
             if (cacheManager) {
               cacheManager.clearTimeSlotCache(this.venueId, this.selectedDate);
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1355", "[VenueDetail] ✅ 已清除缓存管理器缓存");
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1414", "[VenueDetail] ✅ 已清除缓存管理器缓存");
             }
           } catch (importError) {
-            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1358", "[VenueDetail] 导入缓存管理器失败:", importError);
+            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1417", "[VenueDetail] 导入缓存管理器失败:", importError);
           }
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1362", "[VenueDetail] 🔄 立即刷新时间段数据");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1421", "[VenueDetail] 🔄 立即刷新时间段数据");
           await this.loadTimeSlots(true);
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1364", "[VenueDetail] 🎉 订单过期后时间段刷新完成");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1423", "[VenueDetail] 🎉 订单过期后时间段刷新完成");
           common_vendor.index.showToast({
             title: "订单已过期，时间段已释放",
             icon: "none",
             duration: 3e3
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1374", "[VenueDetail] ❌ 处理订单过期事件失败:", error);
+          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1433", "[VenueDetail] ❌ 处理订单过期事件失败:", error);
         }
       } else {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1378", "[VenueDetail] 🔍 订单过期事件不匹配当前页面，忽略");
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1379", "[VenueDetail] 当前页面:", { venueId: this.venueId, date: this.selectedDate });
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1380", "[VenueDetail] 事件数据:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1437", "[VenueDetail] 🔍 订单过期事件不匹配当前页面，忽略");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1438", "[VenueDetail] 当前页面:", { venueId: this.venueId, date: this.selectedDate });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1439", "[VenueDetail] 事件数据:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
       }
     },
     // 处理预约成功事件
     async onBookingSuccessEvent(eventData) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1386", "[VenueDetail] 收到预约成功事件:", eventData);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1445", "[VenueDetail] 收到预约成功事件:", eventData);
       if (eventData && eventData.venueId === this.venueId && eventData.date === this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1393", "[VenueDetail] 预约成功事件匹配当前页面，刷新时间段数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1452", "[VenueDetail] 预约成功事件匹配当前页面，刷新时间段数据");
         setTimeout(async () => {
           try {
             await this.loadTimeSlots(true);
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/venue/detail.vue:1400", "[VenueDetail] 刷新时间段数据失败:", error);
+            common_vendor.index.__f__("error", "at pages/venue/detail.vue:1459", "[VenueDetail] 刷新时间段数据失败:", error);
           }
         }, 1e3);
       } else {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1405", "[VenueDetail] 预约成功事件不匹配当前页面，忽略");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1464", "[VenueDetail] 预约成功事件不匹配当前页面，忽略");
       }
     },
     // 显示预约类型帮助说明
     showBookingTypeHelp(type) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1411", "[VenueDetail] 显示预约类型帮助:", type);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1470", "[VenueDetail] 显示预约类型帮助:", type);
       if (type === "EXCLUSIVE") {
         this.helpContent = {
           title: "包场预约",
@@ -928,73 +964,73 @@ const _sfc_main = {
     },
     // 处理时间段状态更新事件
     async onTimeSlotStatusUpdated(eventData) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1439", "[VenueDetail] 收到时间段状态更新事件:", eventData);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1498", "[VenueDetail] 收到时间段状态更新事件:", eventData);
       if (eventData && eventData.venueId === this.venueId && eventData.date === this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1446", "[VenueDetail] 时间段状态更新事件匹配当前页面，刷新数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1505", "[VenueDetail] 时间段状态更新事件匹配当前页面，刷新数据");
         setTimeout(async () => {
           try {
             await this.loadTimeSlots(true);
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1452", "[VenueDetail] 时间段状态更新后刷新完成");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1511", "[VenueDetail] 时间段状态更新后刷新完成");
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/venue/detail.vue:1454", "[VenueDetail] 时间段状态更新后刷新失败:", error);
+            common_vendor.index.__f__("error", "at pages/venue/detail.vue:1513", "[VenueDetail] 时间段状态更新后刷新失败:", error);
           }
         }, 500);
       }
     },
     // 🎯 处理时间段更新事件（预约取消后）
     async onTimeSlotUpdated(eventData) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1462", "[VenueDetail] 🚨🚨🚨 收到时间段更新事件（预约取消后）🚨🚨🚨");
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1463", "[VenueDetail] 事件数据:", eventData);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1521", "[VenueDetail] 🚨🚨🚨 收到时间段更新事件（预约取消后）🚨🚨🚨");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1522", "[VenueDetail] 事件数据:", eventData);
       if (eventData && eventData.venueId == this.venueId && eventData.date === this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1470", "[VenueDetail] 🎯 时间段更新事件匹配当前页面，清除缓存并立即刷新数据");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1529", "[VenueDetail] 🎯 时间段更新事件匹配当前页面，清除缓存并立即刷新数据");
         try {
           if (eventData.action === "booking-cancelled" || eventData.immediate) {
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1475", "[VenueDetail] 🗑️ 检测到立即更新事件，立即清除缓存");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1534", "[VenueDetail] 🗑️ 检测到立即更新事件，立即清除缓存");
             if (this.venueStore && this.venueStore.cache && this.venueStore.cache.timeSlots) {
               const cacheKey = `${this.venueId}_${this.selectedDate}`;
               this.venueStore.cache.timeSlots.delete(cacheKey);
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1481", "[VenueDetail] ✅ 已清除 venue store 缓存:", cacheKey);
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1540", "[VenueDetail] ✅ 已清除 venue store 缓存:", cacheKey);
             }
             try {
               const { default: cacheManager } = await "../../utils/cache-manager.js";
               if (cacheManager) {
                 cacheManager.clearTimeSlotCache(this.venueId, this.selectedDate);
-                common_vendor.index.__f__("log", "at pages/venue/detail.vue:1489", "[VenueDetail] ✅ 已清除缓存管理器缓存");
+                common_vendor.index.__f__("log", "at pages/venue/detail.vue:1548", "[VenueDetail] ✅ 已清除缓存管理器缓存");
               }
             } catch (importError) {
-              common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1492", "[VenueDetail] 导入缓存管理器失败:", importError);
+              common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1551", "[VenueDetail] 导入缓存管理器失败:", importError);
             }
           }
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1497", "[VenueDetail] 🔄 立即从后端重新获取时间段数据");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1556", "[VenueDetail] 🔄 立即从后端重新获取时间段数据");
           await this.loadTimeSlots(true);
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1499", "[VenueDetail] 🎉 时间段立即刷新完成");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1558", "[VenueDetail] 🎉 时间段立即刷新完成");
           common_vendor.index.showToast({
             title: "时间段状态已更新",
             icon: "success",
             duration: 2e3
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1509", "[VenueDetail] ❌ 时间段立即刷新失败:", error);
+          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1568", "[VenueDetail] ❌ 时间段立即刷新失败:", error);
         }
       } else {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1512", "[VenueDetail] 🔍 时间段更新事件不匹配当前页面，忽略");
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1513", "[VenueDetail] 当前页面:", { venueId: this.venueId, date: this.selectedDate });
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1514", "[VenueDetail] 事件数据:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1571", "[VenueDetail] 🔍 时间段更新事件不匹配当前页面，忽略");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1572", "[VenueDetail] 当前页面:", { venueId: this.venueId, date: this.selectedDate });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1573", "[VenueDetail] 事件数据:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
       }
     },
     // 🎯 处理强制刷新时间段事件
     async onForceRefreshTimeslots(eventData) {
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1520", "[VenueDetail] 🚨🚨🚨 收到强制刷新时间段事件 🚨🚨🚨");
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1521", "[VenueDetail] 强制刷新事件数据:", eventData);
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1579", "[VenueDetail] 🚨🚨🚨 收到强制刷新时间段事件 🚨🚨🚨");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1580", "[VenueDetail] 强制刷新事件数据:", eventData);
       if (eventData && eventData.venueId == this.venueId && eventData.date === this.selectedDate) {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1528", "[VenueDetail] 🎯 强制刷新事件匹配当前页面，执行强制清除缓存并刷新");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1587", "[VenueDetail] 🎯 强制刷新事件匹配当前页面，执行强制清除缓存并刷新");
         try {
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1532", "[VenueDetail] 🗑️ 强制清除所有缓存");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1591", "[VenueDetail] 🗑️ 强制清除所有缓存");
           if (this.venueStore && this.venueStore.cache && this.venueStore.cache.timeSlots) {
             const cacheKey = `${this.venueId}_${this.selectedDate}`;
             this.venueStore.cache.timeSlots.delete(cacheKey);
             this.venueStore.cache.timeSlots.clear();
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1539", "[VenueDetail] ✅ 已清除 venue store 缓存");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1598", "[VenueDetail] ✅ 已清除 venue store 缓存");
           }
           try {
             const { default: cacheManager } = await "../../utils/cache-manager.js";
@@ -1003,10 +1039,10 @@ const _sfc_main = {
               const timeSlotKey = cacheManager.generateTimeSlotKey ? cacheManager.generateTimeSlotKey(this.venueId, this.selectedDate) : `timeslots_${this.venueId}_${this.selectedDate}`;
               cacheManager.delete(timeSlotKey);
               cacheManager.clear();
-              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1554", "[VenueDetail] ✅ 已清除缓存管理器缓存");
+              common_vendor.index.__f__("log", "at pages/venue/detail.vue:1613", "[VenueDetail] ✅ 已清除缓存管理器缓存");
             }
           } catch (importError) {
-            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1557", "[VenueDetail] 导入缓存管理器失败:", importError);
+            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1616", "[VenueDetail] 导入缓存管理器失败:", importError);
           }
           try {
             const storageKeys = [
@@ -1021,21 +1057,21 @@ const _sfc_main = {
               } catch (e) {
               }
             });
-            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1576", "[VenueDetail] ✅ 已清除本地存储缓存");
+            common_vendor.index.__f__("log", "at pages/venue/detail.vue:1635", "[VenueDetail] ✅ 已清除本地存储缓存");
           } catch (storageError) {
-            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1578", "[VenueDetail] 清除本地存储缓存失败:", storageError);
+            common_vendor.index.__f__("warn", "at pages/venue/detail.vue:1637", "[VenueDetail] 清除本地存储缓存失败:", storageError);
           }
           this.selectedTimeSlots = [];
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1585", "[VenueDetail] 🔄 强制从后端重新获取时间段数据");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1644", "[VenueDetail] 🔄 强制从后端重新获取时间段数据");
           await this.loadTimeSlots(true);
-          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1588", "[VenueDetail] 🎉 强制清除缓存并刷新完成");
+          common_vendor.index.__f__("log", "at pages/venue/detail.vue:1647", "[VenueDetail] 🎉 强制清除缓存并刷新完成");
           common_vendor.index.showToast({
             title: "时间段已强制刷新",
             icon: "success",
             duration: 2e3
           });
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1598", "[VenueDetail] ❌ 强制清除缓存并刷新失败:", error);
+          common_vendor.index.__f__("error", "at pages/venue/detail.vue:1657", "[VenueDetail] ❌ 强制清除缓存并刷新失败:", error);
           common_vendor.index.showToast({
             title: "刷新失败，请重试",
             icon: "error",
@@ -1043,9 +1079,9 @@ const _sfc_main = {
           });
         }
       } else {
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1608", "[VenueDetail] 🔍 强制刷新事件不匹配当前页面，忽略");
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1609", "[VenueDetail] 当前:", { venueId: this.venueId, date: this.selectedDate });
-        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1610", "[VenueDetail] 事件:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1667", "[VenueDetail] 🔍 强制刷新事件不匹配当前页面，忽略");
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1668", "[VenueDetail] 当前:", { venueId: this.venueId, date: this.selectedDate });
+        common_vendor.index.__f__("log", "at pages/venue/detail.vue:1669", "[VenueDetail] 事件:", { venueId: eventData == null ? void 0 : eventData.venueId, date: eventData == null ? void 0 : eventData.date });
       }
     }
   },
@@ -1066,16 +1102,16 @@ const _sfc_main = {
   },
   // 页面销毁时清理资源
   onUnload() {
-    common_vendor.index.__f__("log", "at pages/venue/detail.vue:1635", "[VenueDetail] 📱 页面即将销毁，开始清理资源");
+    common_vendor.index.__f__("log", "at pages/venue/detail.vue:1694", "[VenueDetail] 📱 页面即将销毁，开始清理资源");
     try {
       this.removeGlobalEventListeners();
       if (this.refreshTimer) {
         clearInterval(this.refreshTimer);
         this.refreshTimer = null;
       }
-      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1647", "[VenueDetail] ✅ 页面资源清理完成");
+      common_vendor.index.__f__("log", "at pages/venue/detail.vue:1706", "[VenueDetail] ✅ 页面资源清理完成");
     } catch (error) {
-      common_vendor.index.__f__("error", "at pages/venue/detail.vue:1650", "[VenueDetail] 页面资源清理失败:", error);
+      common_vendor.index.__f__("error", "at pages/venue/detail.vue:1709", "[VenueDetail] 页面资源清理失败:", error);
     }
   }
 };
@@ -1091,43 +1127,38 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     d: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     e: common_vendor.t($options.venueDetail.name),
-    f: common_vendor.t($options.venueDetail.rating || "暂无评分"),
-    g: $options.venueDetail.rating
-  }, $options.venueDetail.rating ? {} : {}, {
-    h: $options.venueDetail.reviewCount
-  }, $options.venueDetail.reviewCount ? {
-    i: common_vendor.t($options.venueDetail.reviewCount)
-  } : {}, {
-    j: common_vendor.t($options.venueDetail.location),
-    k: $options.venueDetail.distance
+    f: common_vendor.t($options.venueDetail.location),
+    g: common_vendor.o((...args) => $options.copyLocation && $options.copyLocation(...args)),
+    h: $options.venueDetail.distance
   }, $options.venueDetail.distance ? {
-    l: common_vendor.t($options.venueDetail.distance)
+    i: common_vendor.t($options.venueDetail.distance)
   } : {}, {
-    m: common_vendor.t($options.venueDetail.price),
-    n: common_vendor.t($options.venueDetail.type),
-    o: $options.venueDetail.supportSharing
+    j: common_vendor.t($options.venueDetail.price),
+    k: common_vendor.t($options.venueDetail.type),
+    l: $options.venueDetail.supportSharing
   }, $options.venueDetail.supportSharing ? {} : {}, {
-    p: common_vendor.t($options.getVenueStatusText($options.venueDetail.status)),
-    q: common_vendor.t($options.venueDetail.description),
-    r: common_vendor.f($options.facilitiesList, (facility, k0, i0) => {
+    m: common_vendor.t($options.getVenueStatusText($options.venueDetail.status)),
+    n: common_vendor.t($options.venueDetail.description),
+    o: common_vendor.f($options.facilitiesList, (facility, k0, i0) => {
       return {
         a: common_vendor.t(facility),
         b: facility
       };
     }),
-    s: common_vendor.t($options.formatOpeningHours),
-    t: $options.venueDetail.supportSharing
+    p: common_assets._imports_0,
+    q: common_vendor.t($options.formatOpeningHours),
+    r: $options.venueDetail.supportSharing
   }, $options.venueDetail.supportSharing ? common_vendor.e({
-    v: $data.bookingType === "EXCLUSIVE" ? 1 : "",
-    w: common_vendor.o(($event) => $options.onBookingTypeChange("EXCLUSIVE")),
-    x: common_vendor.o(($event) => $options.showBookingTypeHelp("EXCLUSIVE")),
-    y: $data.bookingType === "SHARED" ? 1 : "",
-    z: common_vendor.o(($event) => $options.onBookingTypeChange("SHARED")),
-    A: common_vendor.o(($event) => $options.showBookingTypeHelp("SHARED")),
-    B: $data.bookingType === "SHARED"
+    s: $data.bookingType === "EXCLUSIVE" ? 1 : "",
+    t: common_vendor.o(($event) => $options.onBookingTypeChange("EXCLUSIVE")),
+    v: common_vendor.o(($event) => $options.showBookingTypeHelp("EXCLUSIVE")),
+    w: $data.bookingType === "SHARED" ? 1 : "",
+    x: common_vendor.o(($event) => $options.onBookingTypeChange("SHARED")),
+    y: common_vendor.o(($event) => $options.showBookingTypeHelp("SHARED")),
+    z: $data.bookingType === "SHARED"
   }, $data.bookingType === "SHARED" ? {} : {}) : {}, {
-    C: common_vendor.o((...args) => $options.forceRefreshTimeSlots && $options.forceRefreshTimeSlots(...args)),
-    D: common_vendor.f($data.availableDates, (date, index, i0) => {
+    A: common_vendor.o((...args) => $options.forceRefreshTimeSlots && $options.forceRefreshTimeSlots(...args)),
+    B: common_vendor.f($data.availableDates, (date, index, i0) => {
       return {
         a: common_vendor.t(date.day),
         b: common_vendor.t(date.date),
@@ -1136,7 +1167,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.selectDate(date.value), index)
       };
     }),
-    E: common_vendor.f($options.filteredTimeSlots, (slot, k0, i0) => {
+    C: common_vendor.f($options.filteredTimeSlots, (slot, k0, i0) => {
       return {
         a: common_vendor.t(slot.startTime),
         b: common_vendor.t(slot.endTime),
@@ -1147,31 +1178,40 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         g: common_vendor.o(($event) => $options.selectTimeSlot(slot), slot.id)
       };
     }),
-    F: $options.filteredTimeSlots.length === 0
+    D: $options.filteredTimeSlots.length === 0
   }, $options.filteredTimeSlots.length === 0 ? {} : {}, {
-    G: $data.selectedTimeSlots.length > 0
+    E: $data.selectedTimeSlots.length > 0
   }, $data.selectedTimeSlots.length > 0 ? {
-    H: common_vendor.t($data.selectedTimeSlots.length),
-    I: common_vendor.t($options.getTotalPrice())
+    F: common_vendor.t($data.selectedTimeSlots.length),
+    G: common_vendor.t($options.getTotalPrice())
   } : {}, {
-    J: common_vendor.o((...args) => $options.contactVenue && $options.contactVenue(...args)),
-    K: common_vendor.t($options.getBookButtonText()),
-    L: $data.selectedTimeSlots.length > 0 ? 1 : "",
-    M: $data.selectedTimeSlots.length === 0,
-    N: common_vendor.o((...args) => $options.bookVenue && $options.bookVenue(...args))
+    H: common_vendor.o((...args) => $options.contactVenue && $options.contactVenue(...args)),
+    I: common_vendor.t($options.getBookButtonText()),
+    J: $data.selectedTimeSlots.length > 0 ? 1 : "",
+    K: $data.selectedTimeSlots.length === 0,
+    L: common_vendor.o((...args) => $options.bookVenue && $options.bookVenue(...args))
   }) : {
-    O: common_vendor.o((...args) => $options.initData && $options.initData(...args))
+    M: common_vendor.o((...args) => $options.initData && $options.initData(...args))
   }, {
     b: $options.venueDetail,
-    P: $data.showHelpModal
+    N: $data.showHelpModal
   }, $data.showHelpModal ? {
-    Q: common_vendor.t($data.helpContent.title),
+    O: common_vendor.t($data.helpContent.title),
+    P: common_vendor.o((...args) => $options.closeHelpModal && $options.closeHelpModal(...args)),
+    Q: common_vendor.t($data.helpContent.description),
     R: common_vendor.o((...args) => $options.closeHelpModal && $options.closeHelpModal(...args)),
-    S: common_vendor.t($data.helpContent.description),
-    T: common_vendor.o((...args) => $options.closeHelpModal && $options.closeHelpModal(...args)),
-    U: common_vendor.o(() => {
+    S: common_vendor.o(() => {
     }),
-    V: common_vendor.o((...args) => $options.closeHelpModal && $options.closeHelpModal(...args))
+    T: common_vendor.o((...args) => $options.closeHelpModal && $options.closeHelpModal(...args))
+  } : {}, {
+    U: $data.showContactModal
+  }, $data.showContactModal ? {
+    V: common_vendor.t($options.venueDetail.contactPhone),
+    W: common_vendor.o((...args) => $options.copyPhone && $options.copyPhone(...args)),
+    X: common_vendor.o((...args) => $options.hideContactModal && $options.hideContactModal(...args)),
+    Y: common_vendor.o(() => {
+    }),
+    Z: common_vendor.o((...args) => $options.hideContactModal && $options.hideContactModal(...args))
   } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-91798fc9"]]);

@@ -73,10 +73,6 @@
             Lv.{{ sharing.creator.level }}
           </text>
         </view>
-        <view class="creator-rating" v-if="sharing.creator.rating">
-          <text class="rating-value">{{ sharing.creator.rating.toFixed(1) }}</text>
-          <text class="rating-icon">★</text>
-        </view>
       </view>
     </view>
     
@@ -550,22 +546,6 @@ export default {
         background-color: #fff7e6;
         padding: 2rpx 8rpx;
         border-radius: 8rpx;
-      }
-    }
-    
-    .creator-rating {
-      display: flex;
-      align-items: center;
-      
-      .rating-value {
-        font-size: 28rpx;
-        color: #333333;
-        margin-right: 4rpx;
-      }
-      
-      .rating-icon {
-        font-size: 28rpx;
-        color: #fadb14;
       }
     }
   }

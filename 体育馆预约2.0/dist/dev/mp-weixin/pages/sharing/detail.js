@@ -146,8 +146,8 @@ const _sfc_main = {
     this.applyPopupPosition = "";
     this.sharingStore = stores_sharing.useSharingStore();
     this.userStore = stores_user.useUserStore();
-    common_vendor.index.__f__("log", "at pages/sharing/detail.vue:474", "拼场详情页面：接收到的参数:", options);
-    common_vendor.index.__f__("log", "at pages/sharing/detail.vue:475", "拼场详情页面：options.id:", options.id);
+    common_vendor.index.__f__("log", "at pages/sharing/detail.vue:470", "拼场详情页面：接收到的参数:", options);
+    common_vendor.index.__f__("log", "at pages/sharing/detail.vue:471", "拼场详情页面：options.id:", options.id);
     this.$nextTick(() => {
       if (this.$refs.confirmPopup) {
         this._confirmPopupRef = this.$refs.confirmPopup;
@@ -158,18 +158,18 @@ const _sfc_main = {
     });
     try {
       if (!this.userStore.userInfoGetter || !this.userStore.userInfoGetter.username) {
-        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:490", "拼场详情页面：用户信息未加载，尝试获取");
+        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:486", "拼场详情页面：用户信息未加载，尝试获取");
         await this.userStore.getUserInfo();
       }
     } catch (error) {
-      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:494", "拼场详情页面：获取用户信息失败:", error);
+      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:490", "拼场详情页面：获取用户信息失败:", error);
     }
     if (options.id) {
       this.sharingId = options.id;
-      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:499", "拼场详情页面：设置sharingId为:", this.sharingId);
+      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:495", "拼场详情页面：设置sharingId为:", this.sharingId);
       await this.loadSharingDetail();
     } else {
-      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:502", "拼场详情页面：未接收到id参数");
+      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:498", "拼场详情页面：未接收到id参数");
       common_vendor.index.showToast({
         title: "订单ID缺失",
         icon: "error"
@@ -196,24 +196,24 @@ const _sfc_main = {
     async loadSharingDetailWithCache() {
       const now = Date.now();
       if (this.lastLoadTime && now - this.lastLoadTime < this.cacheTimeout) {
-        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:540", "拼场详情页面：使用缓存数据，跳过请求");
+        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:536", "拼场详情页面：使用缓存数据，跳过请求");
         return;
       }
       if (this.loadingFlags.detail) {
-        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:546", "拼场详情页面：正在加载中，跳过重复请求");
+        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:542", "拼场详情页面：正在加载中，跳过重复请求");
         return;
       }
       try {
         this.loadingFlags.detail = true;
-        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:552", "拼场详情页面：开始缓存优化的详情加载，ID:", this.sharingId);
+        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:548", "拼场详情页面：开始缓存优化的详情加载，ID:", this.sharingId);
         await this.sharingStore.getOrderDetail(this.sharingId);
         this.lastLoadTime = now;
-        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:559", "拼场详情页面：缓存优化加载完成:", this.sharingOrderDetail);
+        common_vendor.index.__f__("log", "at pages/sharing/detail.vue:555", "拼场详情页面：缓存优化加载完成:", this.sharingOrderDetail);
         this.$forceUpdate();
         common_vendor.index.stopPullDownRefresh();
       } catch (error) {
         common_vendor.index.stopPullDownRefresh();
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:565", "拼场详情页面：缓存优化加载失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:561", "拼场详情页面：缓存优化加载失败:", error);
         common_vendor.index.showToast({
           title: "加载失败",
           icon: "error"
@@ -240,13 +240,13 @@ const _sfc_main = {
     joinSharing() {
       try {
         if (this.applyPopupShown) {
-          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:596", "申请弹窗已显示，跳过重复显示");
+          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:592", "申请弹窗已显示，跳过重复显示");
           return;
         }
         this.initApplyForm();
         this.showApplyPopupModal();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:606", "打开申请弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:602", "打开申请弹窗失败:", error);
         common_vendor.index.showToast({
           title: "操作失败，请重试",
           icon: "none"
@@ -257,7 +257,7 @@ const _sfc_main = {
     async exitSharing() {
       try {
         if (this.confirmPopupShown) {
-          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:619", "确认弹窗已显示，跳过重复显示");
+          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:615", "确认弹窗已显示，跳过重复显示");
           return;
         }
         this.confirmData = {
@@ -267,7 +267,7 @@ const _sfc_main = {
         };
         this.showConfirmPopupModal();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:632", "打开确认弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:628", "打开确认弹窗失败:", error);
         common_vendor.index.showToast({
           title: "操作失败，请重试",
           icon: "none"
@@ -278,7 +278,7 @@ const _sfc_main = {
     async cancelSharing() {
       try {
         if (this.confirmPopupShown) {
-          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:645", "确认弹窗已显示，跳过重复显示");
+          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:641", "确认弹窗已显示，跳过重复显示");
           return;
         }
         this.confirmData = {
@@ -288,7 +288,7 @@ const _sfc_main = {
         };
         this.showConfirmPopupModal();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:658", "打开确认弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:654", "打开确认弹窗失败:", error);
         common_vendor.index.showToast({
           title: "操作失败，请重试",
           icon: "none"
@@ -299,7 +299,7 @@ const _sfc_main = {
     async removeParticipant(participant) {
       try {
         if (this.confirmPopupShown) {
-          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:671", "确认弹窗已显示，跳过重复显示");
+          common_vendor.index.__f__("log", "at pages/sharing/detail.vue:667", "确认弹窗已显示，跳过重复显示");
           return;
         }
         this.confirmData = {
@@ -310,7 +310,7 @@ const _sfc_main = {
         };
         this.showConfirmPopup();
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:685", "打开确认弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:681", "打开确认弹窗失败:", error);
         common_vendor.index.showToast({
           title: "操作失败，请重试",
           icon: "none"
@@ -419,7 +419,7 @@ const _sfc_main = {
           }
         }, 100);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:815", "关闭确认弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:811", "关闭确认弹窗失败:", error);
         this.confirmPopupShown = false;
         this.internalConfirmPopupOpened = false;
         this.$forceUpdate();
@@ -505,7 +505,7 @@ const _sfc_main = {
           }
         }, 100);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:927", "显示确认弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:923", "显示确认弹窗失败:", error);
         this.confirmPopupShown = true;
         this.internalConfirmPopupOpened = true;
         this.$forceUpdate();
@@ -596,7 +596,7 @@ const _sfc_main = {
           }
         }, 100);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1037", "关闭申请弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1033", "关闭申请弹窗失败:", error);
         this.applyPopupShown = false;
         this.internalApplyPopupOpened = false;
         this.$forceUpdate();
@@ -680,7 +680,7 @@ const _sfc_main = {
           }
         }, 100);
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1144", "显示申请弹窗失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1140", "显示申请弹窗失败:", error);
         this.applyPopupShown = true;
         this.internalApplyPopupOpened = true;
         this.$forceUpdate();
@@ -728,7 +728,7 @@ const _sfc_main = {
         await this.loadSharingDetail();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1210", "提交申请失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1206", "提交申请失败:", error);
         common_vendor.index.showToast({
           title: error.message || "提交失败",
           icon: "error"
@@ -766,7 +766,7 @@ const _sfc_main = {
         await this.loadSharingDetail();
       } catch (error) {
         common_vendor.index.hideLoading();
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1259", "操作失败:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1255", "操作失败:", error);
         common_vendor.index.showToast({
           title: error.message || "操作失败",
           icon: "error"
@@ -803,8 +803,8 @@ const _sfc_main = {
       };
       const formattedStart = formatTime(startTime);
       const formattedEnd = formatTime(endTime);
-      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1306", "⏰ 开始时间:", formattedStart);
-      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1307", "⏰ 结束时间:", formattedEnd);
+      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1302", "⏰ 开始时间:", formattedStart);
+      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1303", "⏰ 结束时间:", formattedEnd);
       return `${date} ${formattedStart}-${formattedEnd}`;
     },
     // 格式化日期
@@ -820,7 +820,7 @@ const _sfc_main = {
         const day = String(dateObj.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1324", "日期格式化错误:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1320", "日期格式化错误:", error);
         return "--";
       }
     },
@@ -843,7 +843,7 @@ const _sfc_main = {
         const minute = String(date.getMinutes()).padStart(2, "0");
         return `${year}-${month}-${day} ${hour}:${minute}`;
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1348", "时间格式化错误:", error);
+        common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1344", "时间格式化错误:", error);
         return "--";
       }
     },
@@ -874,7 +874,7 @@ const _sfc_main = {
       };
       const formattedStart = formatTime(startTime);
       const formattedEnd = formatTime(endTime);
-      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1386", "格式化时间段:", formattedStart, "-", formattedEnd);
+      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1382", "格式化时间段:", formattedStart, "-", formattedEnd);
       return `${formattedStart}-${formattedEnd}`;
     },
     // 获取总费用
@@ -991,7 +991,7 @@ const _sfc_main = {
     },
     // 倒计时过期处理
     onCountdownExpired(order) {
-      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1530", "拼场订单倒计时过期:", order.orderNo);
+      common_vendor.index.__f__("log", "at pages/sharing/detail.vue:1526", "拼场订单倒计时过期:", order.orderNo);
       this.loadSharingDetail();
     }
   },
@@ -1004,7 +1004,7 @@ const _sfc_main = {
     const currentPage = pages[pages.length - 1];
     this.sharingId = currentPage.options.id || currentPage.options.sharingId;
     if (!this.sharingId) {
-      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1551", "未获取到拼场ID");
+      common_vendor.index.__f__("error", "at pages/sharing/detail.vue:1547", "未获取到拼场ID");
       common_vendor.index.showToast({
         title: "参数错误",
         icon: "error"
@@ -1041,20 +1041,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     l: $options.getProgressWidth() + "%",
     m: common_vendor.t($options.sharingOrderDetail.venueName || "未知场馆"),
     n: common_vendor.t($options.sharingOrderDetail.venueLocation || "位置未知"),
-    o: common_vendor.t($options.sharingOrderDetail.venueRating || "暂无评分"),
-    p: common_vendor.t($options.sharingOrderDetail.venueReviewCount || 0),
-    q: common_vendor.o((...args) => $options.navigateToVenue && $options.navigateToVenue(...args)),
-    r: common_vendor.t($options.formatActivityTime()),
-    s: common_vendor.t($options.getPerTeamPrice()),
-    t: common_vendor.t($options.getTotalPrice()),
-    v: common_vendor.t($options.sharingOrderDetail.orderNo || "无"),
-    w: common_vendor.t($options.formatDateTime($options.sharingOrderDetail.createdAt)),
-    x: $options.sharingOrderDetail.description
+    o: common_vendor.o((...args) => $options.navigateToVenue && $options.navigateToVenue(...args)),
+    p: common_vendor.t($options.formatActivityTime()),
+    q: common_vendor.t($options.getPerTeamPrice()),
+    r: common_vendor.t($options.getTotalPrice()),
+    s: common_vendor.t($options.sharingOrderDetail.orderNo || "无"),
+    t: common_vendor.t($options.formatDateTime($options.sharingOrderDetail.createdAt)),
+    v: $options.sharingOrderDetail.description
   }, $options.sharingOrderDetail.description ? {
-    y: common_vendor.t($options.sharingOrderDetail.description)
+    w: common_vendor.t($options.sharingOrderDetail.description)
   } : {}, {
-    z: common_vendor.t($options.participants.length),
-    A: common_vendor.f($options.participants, (participant, k0, i0) => {
+    x: common_vendor.t($options.participants.length),
+    y: common_vendor.f($options.participants, (participant, k0, i0) => {
       return common_vendor.e({
         a: participant.avatar || "/static/images/default-avatar.svg",
         b: common_vendor.t(participant.nickname || participant.username || "未知用户"),
@@ -1066,68 +1064,68 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: participant.id || participant.username
       });
     }),
-    B: $options.showContactInfo
+    z: $options.showContactInfo
   }, $options.showContactInfo ? common_vendor.e({
-    C: (_a = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _a.phone
+    A: (_a = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _a.phone
   }, ((_b = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _b.phone) ? {
-    D: common_vendor.t($options.sharingOrderDetail.contactInfo.phone),
-    E: common_vendor.o((...args) => $options.makePhoneCall && $options.makePhoneCall(...args))
+    B: common_vendor.t($options.sharingOrderDetail.contactInfo.phone),
+    C: common_vendor.o((...args) => $options.makePhoneCall && $options.makePhoneCall(...args))
   } : {}, {
-    F: (_c = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _c.wechat
+    D: (_c = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _c.wechat
   }, ((_d = $options.sharingOrderDetail.contactInfo) == null ? void 0 : _d.wechat) ? {
-    G: common_vendor.t($options.sharingOrderDetail.contactInfo.wechat)
+    E: common_vendor.t($options.sharingOrderDetail.contactInfo.wechat)
   } : {}) : {}, {
-    H: common_vendor.t($options.sharingOrderDetail.autoApprove ? "是" : "否"),
-    I: common_vendor.t($options.sharingOrderDetail.allowExit ? "是" : "否")
+    F: common_vendor.t($options.sharingOrderDetail.autoApprove ? "是" : "否"),
+    G: common_vendor.t($options.sharingOrderDetail.allowExit ? "是" : "否")
   }) : {
-    J: common_vendor.o((...args) => $options.loadSharingDetail && $options.loadSharingDetail(...args))
+    H: common_vendor.o((...args) => $options.loadSharingDetail && $options.loadSharingDetail(...args))
   }, {
     b: $options.sharingOrderDetail,
-    K: $options.sharingOrderDetail
+    I: $options.sharingOrderDetail
   }, $options.sharingOrderDetail ? common_vendor.e({
-    L: !$options.isParticipant
+    J: !$options.isParticipant
   }, !$options.isParticipant ? common_vendor.e({
-    M: $options.canJoin
+    K: $options.canJoin
   }, $options.canJoin ? {
-    N: common_vendor.o((...args) => $options.joinSharing && $options.joinSharing(...args))
+    L: common_vendor.o((...args) => $options.joinSharing && $options.joinSharing(...args))
   } : {
-    O: common_vendor.t($options.getJoinButtonText())
+    M: common_vendor.t($options.getJoinButtonText())
   }) : !$options.isOrganizer ? common_vendor.e({
-    Q: common_vendor.o((...args) => $options.contactOrganizer && $options.contactOrganizer(...args)),
-    R: $options.canExit
+    O: common_vendor.o((...args) => $options.contactOrganizer && $options.contactOrganizer(...args)),
+    P: $options.canExit
   }, $options.canExit ? {
-    S: common_vendor.o((...args) => $options.exitSharing && $options.exitSharing(...args))
+    Q: common_vendor.o((...args) => $options.exitSharing && $options.exitSharing(...args))
   } : {}) : {
-    T: common_vendor.o((...args) => $options.manageSharing && $options.manageSharing(...args)),
-    U: common_vendor.o((...args) => $options.cancelSharing && $options.cancelSharing(...args))
+    R: common_vendor.o((...args) => $options.manageSharing && $options.manageSharing(...args)),
+    S: common_vendor.o((...args) => $options.cancelSharing && $options.cancelSharing(...args))
   }, {
-    P: !$options.isOrganizer
+    N: !$options.isOrganizer
   }) : {}, {
-    V: common_vendor.o((...args) => $options.closeApplyModal && $options.closeApplyModal(...args)),
-    W: $data.applyForm.teamName,
-    X: common_vendor.o(($event) => $data.applyForm.teamName = $event.detail.value),
-    Y: $data.applyForm.contactInfo,
-    Z: common_vendor.o(($event) => $data.applyForm.contactInfo = $event.detail.value),
-    aa: $data.applyForm.message,
-    ab: common_vendor.o(($event) => $data.applyForm.message = $event.detail.value),
-    ac: common_vendor.t($data.applyForm.message.length),
-    ad: common_vendor.o((...args) => $options.closeApplyModal && $options.closeApplyModal(...args)),
-    ae: !$options.canSubmitApplication,
-    af: common_vendor.o((...args) => $options.submitApplication && $options.submitApplication(...args)),
-    ag: common_vendor.sr("applyPopup", "1cab9fb2-1"),
-    ah: $data.internalApplyPopupOpened,
-    ai: common_vendor.n($data.applyPopupPosition),
-    aj: common_vendor.p({
+    T: common_vendor.o((...args) => $options.closeApplyModal && $options.closeApplyModal(...args)),
+    U: $data.applyForm.teamName,
+    V: common_vendor.o(($event) => $data.applyForm.teamName = $event.detail.value),
+    W: $data.applyForm.contactInfo,
+    X: common_vendor.o(($event) => $data.applyForm.contactInfo = $event.detail.value),
+    Y: $data.applyForm.message,
+    Z: common_vendor.o(($event) => $data.applyForm.message = $event.detail.value),
+    aa: common_vendor.t($data.applyForm.message.length),
+    ab: common_vendor.o((...args) => $options.closeApplyModal && $options.closeApplyModal(...args)),
+    ac: !$options.canSubmitApplication,
+    ad: common_vendor.o((...args) => $options.submitApplication && $options.submitApplication(...args)),
+    ae: common_vendor.sr("applyPopup", "1cab9fb2-1"),
+    af: $data.internalApplyPopupOpened,
+    ag: common_vendor.n($data.applyPopupPosition),
+    ah: common_vendor.p({
       type: "bottom"
     }),
-    ak: common_vendor.t($data.confirmData.title),
-    al: common_vendor.t($data.confirmData.content),
-    am: common_vendor.o((...args) => $options.closeConfirmModal && $options.closeConfirmModal(...args)),
-    an: common_vendor.o((...args) => $options.confirmAction && $options.confirmAction(...args)),
-    ao: common_vendor.sr("confirmPopup", "1cab9fb2-2"),
-    ap: $data.internalConfirmPopupOpened,
-    aq: common_vendor.n($data.confirmPopupPosition),
-    ar: common_vendor.p({
+    ai: common_vendor.t($data.confirmData.title),
+    aj: common_vendor.t($data.confirmData.content),
+    ak: common_vendor.o((...args) => $options.closeConfirmModal && $options.closeConfirmModal(...args)),
+    al: common_vendor.o((...args) => $options.confirmAction && $options.confirmAction(...args)),
+    am: common_vendor.sr("confirmPopup", "1cab9fb2-2"),
+    an: $data.internalConfirmPopupOpened,
+    ao: common_vendor.n($data.confirmPopupPosition),
+    ap: common_vendor.p({
       type: "bottom"
     })
   });

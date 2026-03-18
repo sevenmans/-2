@@ -5,7 +5,7 @@
       <view class="user-info">
         <view class="avatar-wrapper" @click="changeAvatar">
           <image 
-            :src="userInfo?.avatar || '/static/images/default-avatar.svg'" 
+            :src="avatarUrl" 
             class="avatar"
             mode="aspectFill"
           />
@@ -48,7 +48,7 @@
         
         <view class="menu-item" @click="navigateTo('/pages/booking/list')">
           <view class="item-left">
-            <text class="item-icon">📅</text>
+            <image class="item-icon-img" src="/static/tabbar/booking.png" mode="aspectFit"></image>
             <text class="item-text">我的预约</text>
           </view>
           <view class="item-right">
@@ -59,7 +59,7 @@
 
         <view class="menu-item" @click="navigateTo('/pages/sharing/list?tab=my')">
           <view class="item-left">
-            <text class="item-icon">👥</text>
+            <image class="item-icon-img" src="/static/tabbar/sharing.png" mode="aspectFit"></image>
             <text class="item-text">我的拼场</text>
           </view>
           <view class="item-right">
@@ -77,7 +77,7 @@
         
         <view class="menu-item" @click="navigateTo('/pages/sharing/requests')">
           <view class="item-left">
-            <text class="item-icon">📝</text>
+            <image class="item-icon-img" src="/static/tabbar/booking.png" mode="aspectFit"></image>
             <text class="item-text">我的申请</text>
           </view>
           <view class="item-right">
@@ -88,7 +88,7 @@
 
         <view class="menu-item" @click="navigateTo('/pages/sharing/received')">
           <view class="item-left">
-            <text class="item-icon">📬</text>
+            <image class="item-icon-img" src="/static/tabbar/sharing.png" mode="aspectFit"></image>
             <text class="item-text">收到的申请</text>
           </view>
           <view class="item-right">
@@ -106,8 +106,8 @@
 
         <view class="menu-item" @click="showLogoutConfirm">
           <view class="item-left">
-            <text class="item-icon">🚪</text>
-            <text class="item-text">退出登录</text>
+            <image class="item-icon-img" src="/static/tabbar/home.png" mode="aspectFit"></image>
+            <text class="item-text" style="color: #ff4d4f">退出登录</text>
           </view>
           <view class="item-right">
             <text class="arrow">›</text>
@@ -123,6 +123,7 @@ import { useUserStore } from '@/stores/user.js'
 import { useBookingStore } from '@/stores/booking.js'
 import { useSharingStore } from '@/stores/sharing.js'
 import requestQueue from '@/utils/request-queue.js'
+import config from '@/config/index.js'
 
 export default {
   name: 'UserProfile',
@@ -159,6 +160,15 @@ export default {
   },
   
   computed: {
+    avatarUrl() {
+      const url = this.userInfo?.avatar;
+      if (!url) return '/static/images/default-avatar.svg';
+      if (url.startsWith('http')) return url;
+      if (url.startsWith('//')) return 'https:' + url;
+      const host = config.baseURL.replace(/\/api\/?$/, '');
+      return url.startsWith('/') ? host + url : host + '/' + url;
+    },
+
     userInfo() {
       return this.userStore?.userInfoGetter || {}
     },
@@ -764,9 +774,11 @@ export default {
         display: flex;
         align-items: center;
         
-        .item-icon {
-          font-size: 32rpx;
+        .item-icon-img {
+          width: 40rpx;
+          height: 40rpx;
           margin-right: 20rpx;
+          opacity: 0.8;
         }
         
         .item-text {
